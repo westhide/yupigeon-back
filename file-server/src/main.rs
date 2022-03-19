@@ -6,9 +6,9 @@
 mod api;
 mod config;
 mod service;
-use crate::config::GLOBAL_CONFIG;
-use crate::service::router;
 use poem::{listener::TcpListener, Server};
+
+use crate::{config::GLOBAL_CONFIG, service::router};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -19,10 +19,10 @@ async fn main() -> std::io::Result<()> {
 
     let bind_ip = GLOBAL_CONFIG
         .get::<String>("BIND_IP")
-        .unwrap_or("127.0.0.1".into());
+        .unwrap_or_else(|_| "127.0.0.1".into());
     let bind_port = GLOBAL_CONFIG
         .get::<String>("BIND_PORT")
-        .unwrap_or("3301".into());
+        .unwrap_or_else(|_| "3301".into());
 
     let address = format!("{bind_ip}:{bind_port}");
     let app = router::generate();
