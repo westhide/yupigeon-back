@@ -1,0 +1,6 @@
+[workspace]
+members = [
+  "yupigeon-server",
+  "file-server",
+  "database",
+]

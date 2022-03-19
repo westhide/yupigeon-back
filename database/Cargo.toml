@@ -1,0 +1,20 @@
+[package]
+name = "database"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# rbson (required)
+serde = { version = "1", features = ["derive"] }
+rbson = "2.0"
+
+# logging lib(required)
+log = "0.4"
+fast_log="1.3"
+
+# rbatis
+rbatis = { version = "^3.1", default-features = false, features = ["runtime-tokio-rustls","mysql","postgres"] }
+
+once_cell = { version = "^1" }
