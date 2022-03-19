@@ -6,6 +6,7 @@
 mod api;
 mod config;
 mod service;
+
 use poem::{listener::TcpListener, Server};
 
 use crate::{config::GLOBAL_CONFIG, service::router};
