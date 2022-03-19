@@ -621,6 +621,7 @@ dependencies = [
  "chrono",
  "config",
  "futures",
+ "once_cell",
  "poem",
  "serde",
  "sysinfo",

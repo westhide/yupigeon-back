@@ -6,10 +6,9 @@
 mod api;
 mod config;
 mod service;
-
-use poem::{listener::TcpListener, Server};
-
+use crate::config::GLOBAL_CONFIG;
 use crate::service::router;
+use poem::{listener::TcpListener, Server};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -18,9 +17,13 @@ async fn main() -> std::io::Result<()> {
     };
     tracing_subscriber::fmt::init();
 
-    let config = config::config().unwrap();
-    let bind_ip: String = config.get("BIND_IP").unwrap();
-    let bind_port: String = config.get("BIND_PORT").unwrap();
+    let bind_ip = GLOBAL_CONFIG
+        .get::<String>("BIND_IP")
+        .unwrap_or("127.0.0.1".into());
+    let bind_port = GLOBAL_CONFIG
+        .get::<String>("BIND_PORT")
+        .unwrap_or("3301".into());
+
     let address = format!("{bind_ip}:{bind_port}");
     let app = router::generate();
     Server::new(TcpListener::bind(address)).run(app).await
