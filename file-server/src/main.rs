@@ -4,6 +4,7 @@
 // @Last Modified time: 2022-02-22 12:43:02
 
 mod api;
+mod config;
 mod service;
 
 use poem::{listener::TcpListener, Server};
@@ -16,10 +17,11 @@ async fn main() -> std::io::Result<()> {
         std::env::set_var("RUST_LOG", "poem=debug");
     };
     tracing_subscriber::fmt::init();
-    std::env::set_var("BIND_ADDRESS", "poem=debug");
-    println!("{:?}",std::env::var_os("BIND_ADDRESS"));
+
+    let config = config::config().unwrap();
+    let bind_ip: String = config.get("BIND_IP").unwrap();
+    let bind_port: String = config.get("BIND_PORT").unwrap();
+    let address = format!("{bind_ip}:{bind_port}");
     let app = router::generate();
-    Server::new(TcpListener::bind("0.0.0.0:3301"))
-        .run(app)
-        .await
+    Server::new(TcpListener::bind(address)).run(app).await
 }

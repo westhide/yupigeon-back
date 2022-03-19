@@ -1,0 +1,5 @@
+BIND_IP = "127.0.0.1"
+BIND_PORT = "3301"
+
+# enable/disable logging
+RUST_LOG = false
