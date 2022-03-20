@@ -7,6 +7,7 @@ mod api;
 mod config;
 mod service;
 
+use database::entity::user;
 use poem::{listener::TcpListener, Server};
 
 use crate::{config::GLOBAL_CONFIG, service::router};
@@ -18,8 +19,10 @@ async fn main() -> std::io::Result<()> {
     };
     tracing_subscriber::fmt::init();
 
+    user::get_user().await;
+
     let bind_ip = GLOBAL_CONFIG
-        .get::<String>("BIND_IP")
+        .get::<String>("BIND_HOST")
         .unwrap_or_else(|_| "127.0.0.1".into());
     let bind_port = GLOBAL_CONFIG
         .get::<String>("BIND_PORT")

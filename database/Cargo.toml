@@ -6,15 +6,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-# rbson (required)
-serde = { version = "1", features = ["derive"] }
-rbson = "2.0"
-
-# logging lib(required)
-log = "0.4"
-fast_log="1.3"
-
-# rbatis
-rbatis = { version = "^3.1", default-features = false, features = ["runtime-tokio-rustls","mysql","postgres"] }
-
+config = "^0.12"
 once_cell = { version = "^1" }
+
+serde = { version = "1", features = ["derive"] }
+
+sea-orm = { version = "^0.6", features = [
+    "sqlx-mysql",
+    "sqlx-postgres",
+    "runtime-tokio-native-tls",
+    "debug-print",
+    "macros",
+], default-features = false }

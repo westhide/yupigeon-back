@@ -9,11 +9,12 @@ use poem::{
     EndpointExt, IntoEndpoint, Route,
 };
 
-use crate::api::greet;
+use crate::api::{greet, user};
 
 pub fn generate() -> impl IntoEndpoint {
     Route::new()
         .at("/greet/:name", get(greet::greet))
+        .at("/user/:name", get(user::user))
         .with(Tracing)
         .with(Compression)
 }

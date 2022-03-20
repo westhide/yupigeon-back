@@ -1,6 +1,8 @@
 [workspace]
-members = [
-  "yupigeon-server",
-  "file-server",
-  "database",
-]
+members = ["yupigeon-server", "file-server", "database"]
+
+[profile.release]
+opt-level = 'z'
+lto = true
+codegen-units = 1
+panic = "abort"
