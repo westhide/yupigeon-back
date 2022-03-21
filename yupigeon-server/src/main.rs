@@ -18,7 +18,9 @@ async fn main() -> std::io::Result<()> {
     };
     tracing_subscriber::fmt::init();
 
-    database::init_database().await;
+    database::init_database()
+        .await
+        .expect("Database init failed");
 
     let bind_ip = GLOBAL_CONFIG
         .get::<String>("BIND_HOST")

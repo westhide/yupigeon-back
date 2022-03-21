@@ -43,11 +43,10 @@ pub enum Relation {}
 
 impl ActiveModelBehavior for ActiveModel {}
 
-pub async fn get(datetime_from: DateTime, datetime_end: DateTime) -> Vec<Model> {
+pub async fn get(datetime_from: DateTime, datetime_end: DateTime) -> Result<Vec<Model>, DbErr> {
     Entity::find()
         .filter(Column::DepartureDatetime.gte(datetime_from))
         .filter(Column::DepartureDatetime.lte(datetime_end))
         .all(get_db("laiu8"))
         .await
-        .unwrap()
 }

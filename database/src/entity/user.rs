@@ -19,6 +19,6 @@ pub enum Relation {}
 
 impl ActiveModelBehavior for ActiveModel {}
 
-pub async fn get() -> Option<Model> {
-    Entity::find_by_id(1).one(get_db("default")).await.unwrap()
+pub async fn get() -> Result<Option<Model>, DbErr> {
+    Entity::find_by_id(1).one(get_db("default")).await
 }
