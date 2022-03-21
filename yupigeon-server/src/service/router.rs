@@ -5,7 +5,7 @@
 
 use poem::{
     get,
-    middleware::{Compression, Tracing},
+    middleware::{Compression, Cors, Tracing},
     EndpointExt, IntoEndpoint, Route,
 };
 
@@ -18,4 +18,5 @@ pub fn generate() -> impl IntoEndpoint {
         .at("/ship_ticket_bill", get(api::ship_ticket_bill::get))
         .with(Tracing)
         .with(Compression)
+        .with(Cors::new())
 }
