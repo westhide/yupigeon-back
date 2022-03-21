@@ -2685,6 +2685,7 @@ dependencies = [
 name = "yupigeon-server"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "config",
  "database",
  "once_cell",

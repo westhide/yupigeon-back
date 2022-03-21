@@ -5,7 +5,7 @@ use poem::{
 };
 
 #[handler]
-pub async fn get(Path(_path): Path<String>) -> Json<Option<entity::user::Model>> {
+pub async fn get(Path(_username): Path<String>) -> Json<Option<entity::user::Model>> {
     let user = entity::user::get().await;
     Json(user)
 }
