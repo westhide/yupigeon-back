@@ -2,12 +2,22 @@ use database::entity;
 use poem::{
     error::BadRequest,
     handler,
-    web::{Json, Path},
+    web::{Json, Query},
     IntoResponse, Result,
 };
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize)]
+pub struct Params {
+    username: String,
+    password: String,
+}
 
 #[handler]
-pub async fn get(Path(_username): Path<String>) -> Result<impl IntoResponse> {
-    let user = entity::user::get().await.map_err(BadRequest)?;
+pub async fn get(Query(params): Query<Params>) -> Result<impl IntoResponse> {
+    let Params { username, password } = params;
+    let user = entity::user::get(username, password)
+        .await
+        .map_err(BadRequest)?;
     Ok(Json(user))
 }

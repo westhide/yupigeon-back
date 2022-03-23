@@ -7,7 +7,7 @@ use crate::get_db;
 #[sea_orm(table_name = "ticket_bill")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    #[serde(skip_deserializing)]
+    #[serde(skip_deserializing, skip_serializing)]
     id: i32,
     #[sea_orm(column_type = "BigInteger")]
     link_order_id: i64,
@@ -16,6 +16,7 @@ pub struct Model {
     serial_no: i8,
     ticket_status: String,
     line_name: String,
+    create_time: DateTime,
     departure_datetime: DateTime,
     ship_name: String,
     ticket_type_name: String,
