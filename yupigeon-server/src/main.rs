@@ -14,7 +14,7 @@ use crate::{config::GLOBAL_CONFIG, service::router};
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     if std::env::var_os("RUST_LOG").is_none() {
-        std::env::set_var("RUST_LOG", "poem=debug");
+        std::env::set_var("RUST_LOG", "debug");
     };
     tracing_subscriber::fmt::init();
 

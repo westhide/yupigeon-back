@@ -17,12 +17,37 @@ pub struct Model {
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+    #[sea_orm(has_one = "super::token::Entity")]
+    Token,
+}
+
+impl Related<super::token::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Token.def()
+    }
+}
 
 impl ActiveModelBehavior for ActiveModel {}
 
-pub async fn get(username: String, password: String) -> Result<Option<Model>, DbErr> {
+#[derive(Debug)]
+pub struct Link2User;
+
+impl Linked for Link2User {
+    type FromEntity = Entity;
+    type ToEntity = super::token::Entity;
+
+    fn link(&self) -> Vec<RelationDef> {
+        vec![Relation::Token.def()]
+    }
+}
+
+pub async fn get(
+    username: String,
+    password: String,
+) -> Result<Option<(Model, Option<super::token::Model>)>, DbErr> {
     Entity::find()
+        .find_also_linked(Link2User)
         .filter(Column::Username.eq(username))
         .filter(Column::Password.eq(password))
         .one(get_db("default"))
