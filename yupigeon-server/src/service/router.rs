@@ -16,6 +16,7 @@ pub fn generate() -> impl IntoEndpoint {
         .at("/greet/:name", get(api::greet::get))
         .at("/user", get(api::user::get))
         .at("/ship_ticket_bill", get(api::ship_ticket_bill::get))
+        .at("/login", get(api::login::get))
         .with(Tracing)
         .with(Compression)
         .with(Cors::new())
