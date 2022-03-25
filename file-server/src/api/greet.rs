@@ -7,5 +7,5 @@ use poem::{handler, web::Path};
 
 #[handler]
 pub async fn greet(Path(path): Path<String>) -> String {
-    format!("Hello: {path}!")
+    format!("Hello: {}!", path)
 }

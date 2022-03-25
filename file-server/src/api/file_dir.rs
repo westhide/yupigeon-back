@@ -103,7 +103,7 @@ impl Dir<String> {
                 dir.metadata = Metadata::new(metadata);
             }
             Err(err) => {
-                dir.metadata = Metadata::error(format!("{err}"));
+                dir.metadata = Metadata::error(format!("{}", err));
                 return Ok(dir);
             }
         };
@@ -122,7 +122,7 @@ impl Dir<String> {
 
                     dir.children = Some(children);
                 }
-                Err(err) => dir.metadata = Metadata::error(format!("{err}")),
+                Err(err) => dir.metadata = Metadata::error(format!("{}", err)),
             }
         };
 

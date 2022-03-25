@@ -25,7 +25,7 @@ async fn main() -> std::io::Result<()> {
         .get::<String>("BIND_PORT")
         .unwrap_or_else(|_| "3301".into());
 
-    let address = format!("{bind_ip}:{bind_port}");
+    let address = format!("{}:{}", bind_ip, bind_port);
     let app = router::generate();
     Server::new(TcpListener::bind(address)).run(app).await
 }

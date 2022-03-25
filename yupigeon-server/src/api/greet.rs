@@ -7,5 +7,5 @@ use poem::{handler, web::Path};
 
 #[handler]
 pub async fn get(Path(name): Path<String>) -> String {
-    format!("Hello: {name}!")
+    format!("Hello: {}!", name)
 }
