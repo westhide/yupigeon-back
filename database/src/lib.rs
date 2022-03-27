@@ -24,6 +24,7 @@ pub fn get_db(key: &str) -> &'static DatabaseConnection {
     let db_list = DB.get().expect("Database is not initialized");
     db_list.get(key).expect("Database is not exists")
 }
+
 pub async fn init_database() -> Result<(), DbErr> {
     let mut db_list = HashMap::<String, DatabaseConnection>::new();
 

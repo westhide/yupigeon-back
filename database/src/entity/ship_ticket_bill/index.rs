@@ -51,3 +51,15 @@ pub async fn get(datetime_from: DateTime, datetime_end: DateTime) -> Result<Vec<
         .all(get_db("laiu8"))
         .await
 }
+
+pub async fn refresh() -> Result<(), DbErr> {
+    super::execute_drop_table::execute().await?;
+    super::execute_create_table::execute().await?;
+    super::execute_insert_ticket_bill::execute().await?;
+    super::execute_update_order_info::execute().await?;
+    super::execute_update_ticket_bill::execute().await?;
+    super::execute_update_ticket_bill_others::execute().await?;
+    super::execute_update_laiu8_info::execute().await?;
+
+    Ok(())
+}

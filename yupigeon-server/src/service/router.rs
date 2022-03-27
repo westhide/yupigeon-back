@@ -6,7 +6,7 @@
 use poem::{
     get,
     middleware::{Compression, Cors, Tracing},
-    EndpointExt, IntoEndpoint, Route,
+    post, EndpointExt, IntoEndpoint, Route,
 };
 
 use crate::api;
@@ -16,6 +16,14 @@ pub fn generate() -> impl IntoEndpoint {
         .at("/greet/:name", get(api::greet::get))
         .at("/user", get(api::user::get))
         .at("/ship_ticket_bill", get(api::ship_ticket_bill::get))
+        .at(
+            "/ship_ticket_bill/refresh_status",
+            get(api::ship_ticket_bill::refresh_status),
+        )
+        .at(
+            "/ship_ticket_bill/refresh",
+            post(api::ship_ticket_bill::refresh),
+        )
         .at("/login", get(api::login::get))
         .with(Tracing)
         .with(Compression)

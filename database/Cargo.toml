@@ -22,3 +22,5 @@ sea-orm = { version = "^0.6", features = [
     "with-rust_decimal",
     "with-json",
 ], default-features = false }
+
+async-recursion = "^1.0"

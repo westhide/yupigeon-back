@@ -7,9 +7,13 @@ mod api;
 mod config;
 mod service;
 
+pub use global_data::GLOBAL_DATA;
 use poem::{listener::TcpListener, Server};
 
-use crate::{config::GLOBAL_CONFIG, service::router};
+use crate::{
+    config::GLOBAL_CONFIG,
+    service::{global_data, router},
+};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -17,6 +21,8 @@ async fn main() -> std::io::Result<()> {
         std::env::set_var("RUST_LOG", "debug");
     };
     tracing_subscriber::fmt::init();
+
+    global_data::init_global_data();
 
     database::init_database()
         .await
