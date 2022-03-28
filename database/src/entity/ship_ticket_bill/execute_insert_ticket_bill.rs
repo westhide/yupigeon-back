@@ -1,10 +1,8 @@
-use sea_orm::{
-    ConnectionTrait, DatabaseBackend, DatabaseTransaction, DbErr, ExecResult, Statement,
-};
+use sea_orm::{ConnectionTrait, DatabaseTransaction, DbErr, ExecResult, Statement};
 
 pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     txn .execute(Statement::from_string(
-            DatabaseBackend::MySql,
+            txn.get_database_backend(),
             r#"
                 INSERT INTO ticket_bill ( serial_no, table_name, table_id, ticket_id, ticket_id_new, ticket_id_old, link_ticket_id, create_time )
                 WITH

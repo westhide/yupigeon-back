@@ -1,6 +1,4 @@
-use sea_orm::{
-    ConnectionTrait, DatabaseBackend, DatabaseTransaction, DbErr, ExecResult, Statement,
-};
+use sea_orm::{ConnectionTrait, DatabaseTransaction, DbErr, ExecResult, Statement};
 
 pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     drop_temp_table(txn).await?;
@@ -14,7 +12,7 @@ pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
 
 async fn drop_temp_table(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     txn.execute(Statement::from_string(
-        DatabaseBackend::MySql,
+        txn.get_database_backend(),
         r#"
             DROP TABLE IF EXISTS ticket_bill2;
         "#
@@ -25,7 +23,7 @@ async fn drop_temp_table(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr>
 
 async fn create_temp_table(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     txn.execute(Statement::from_string(
-        DatabaseBackend::MySql,
+        txn.get_database_backend(),
         r#"
                 CREATE TABLE ticket_bill2 AS
                 WITH u8ot AS (
@@ -60,7 +58,7 @@ async fn create_temp_table(txn: &DatabaseTransaction) -> Result<ExecResult, DbEr
 
 async fn create_temp_table_index(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     txn.execute(Statement::from_string(
-        DatabaseBackend::MySql,
+        txn.get_database_backend(),
         r#"
                 CREATE INDEX ix_id ON ticket_bill2(id);
             "#
@@ -69,7 +67,7 @@ async fn create_temp_table_index(txn: &DatabaseTransaction) -> Result<ExecResult
     .await?;
 
     txn.execute(Statement::from_string(
-        DatabaseBackend::MySql,
+        txn.get_database_backend(),
         r#"
                 CREATE INDEX ix_old_ticket_id ON ticket_bill2(old_ticket_id);
             "#
@@ -80,7 +78,7 @@ async fn create_temp_table_index(txn: &DatabaseTransaction) -> Result<ExecResult
 
 async fn update_laiu8_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     txn.execute(Statement::from_string(
-        DatabaseBackend::MySql,
+        txn.get_database_backend(),
         r#"
                 WITH RECURSIVE
                 u8ot AS (
@@ -172,7 +170,7 @@ async fn update_laiu8_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbEr
 
 async fn update_laiu8_payment_method(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     txn.execute(Statement::from_string(
-        DatabaseBackend::MySql,
+        txn.get_database_backend(),
         r#"
                 UPDATE ticket_bill tb
                 SET tb.u8_payment_method = ( CASE u8_payment_method
@@ -208,7 +206,7 @@ async fn update_laiu8_payment_method(txn: &DatabaseTransaction) -> Result<ExecRe
 
 async fn update_mini_program_table_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     txn.execute(Statement::from_string(
-        DatabaseBackend::MySql,
+        txn.get_database_backend(),
         r#"
                 UPDATE ticket_bill tb
                 LEFT JOIN b_orderinfo_yg_1 ygt ON tb.u8_order_key=ygt.FormalOrderId
@@ -228,7 +226,7 @@ async fn update_mini_program_table_info(txn: &DatabaseTransaction) -> Result<Exe
 
 async fn update_mini_program_pay_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     txn.execute(Statement::from_string(
-        DatabaseBackend::MySql,
+        txn.get_database_backend(),
         r#"
                 -- 更新小程序 pay_id
                 UPDATE ticket_bill tb

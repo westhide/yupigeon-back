@@ -10,8 +10,8 @@ use std::collections::HashMap;
 
 use once_cell::sync::OnceCell;
 use sea_orm::{
-    ConnectionTrait, Database, DatabaseBackend, DatabaseConnection, DatabaseTransaction, DbErr,
-    ExecResult, Statement, TransactionTrait,
+    ConnectionTrait, Database, DatabaseConnection, DatabaseTransaction, DbErr, ExecResult,
+    Statement, TransactionTrait,
 };
 
 use crate::config::GLOBAL_CONFIG;
@@ -44,7 +44,7 @@ pub fn get_db(key: &str) -> &'static DatabaseConnection {
 
 async fn set_time_zone(txn: &DatabaseTransaction, time_zone: &str) -> Result<ExecResult, DbErr> {
     txn.execute(Statement::from_string(
-        DatabaseBackend::MySql,
+        txn.get_database_backend(),
         format!(
             "
             SET time_zone = '{}';

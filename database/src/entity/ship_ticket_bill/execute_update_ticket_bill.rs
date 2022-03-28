@@ -1,7 +1,5 @@
 use async_recursion::async_recursion;
-use sea_orm::{
-    ConnectionTrait, DatabaseBackend, DatabaseTransaction, DbErr, ExecResult, Statement,
-};
+use sea_orm::{ConnectionTrait, DatabaseTransaction, DbErr, ExecResult, Statement};
 
 pub async fn execute(txn: &DatabaseTransaction) -> Result<(), DbErr> {
     for _ in 0..4 {
@@ -13,7 +11,7 @@ pub async fn execute(txn: &DatabaseTransaction) -> Result<(), DbErr> {
 #[async_recursion]
 pub async fn recursion_execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     txn.execute(Statement::from_string(
-        DatabaseBackend::MySql,
+        txn.get_database_backend(),
         r#"
             WITH
             -- TODO: 暂时用create_user关联sys_user,获取改签渠道信息;可能会关联不到

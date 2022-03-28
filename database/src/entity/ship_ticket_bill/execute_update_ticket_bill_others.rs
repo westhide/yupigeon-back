@@ -1,6 +1,4 @@
-use sea_orm::{
-    ConnectionTrait, DatabaseBackend, DatabaseTransaction, DbErr, ExecResult, Statement,
-};
+use sea_orm::{ConnectionTrait, DatabaseTransaction, DbErr, ExecResult, Statement};
 
 pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     update_pay_amount(txn).await?;
@@ -11,7 +9,7 @@ pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
 
 async fn update_pay_amount(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     txn.execute(Statement::from_string(
-        DatabaseBackend::MySql,
+        txn.get_database_backend(),
         r#"
                 UPDATE ticket_bill tb
                 SET tb.pay_amount = tb.ticket_price
@@ -24,7 +22,7 @@ async fn update_pay_amount(txn: &DatabaseTransaction) -> Result<ExecResult, DbEr
 
 async fn update_departure_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     txn.execute(Statement::from_string(
-        DatabaseBackend::MySql,
+        txn.get_database_backend(),
         r#"
                 UPDATE ticket_bill tb
                 INNER JOIN bt_flight f ON tb.flight_id = f.id
@@ -41,7 +39,7 @@ async fn update_departure_info(txn: &DatabaseTransaction) -> Result<ExecResult, 
 
 async fn update_other_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     txn.execute(Statement::from_string(
-        DatabaseBackend::MySql,
+        txn.get_database_backend(),
         r#"
             UPDATE ticket_bill tb
             SET tb.ticket_status = (CASE tb.ticket_status
@@ -89,7 +87,7 @@ async fn update_other_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbEr
 
 async fn update_u8_ticket_key(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     txn.execute(Statement::from_string(
-        DatabaseBackend::MySql,
+        txn.get_database_backend(),
         r#"
                 WITH RECURSIVE
                 tbcg( serial_no, id, ticket_no, ticket_id) AS (

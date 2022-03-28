@@ -1,10 +1,8 @@
-use sea_orm::{
-    ConnectionTrait, DatabaseBackend, DatabaseTransaction, DbErr, ExecResult, Statement,
-};
+use sea_orm::{ConnectionTrait, DatabaseTransaction, DbErr, ExecResult, Statement};
 
 pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     txn.execute(Statement::from_string(
-        DatabaseBackend::MySql,
+        txn.get_database_backend(),
         r#"
             SET time_zone = '+8:00';
         "#
