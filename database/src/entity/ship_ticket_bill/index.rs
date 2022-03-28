@@ -55,14 +55,14 @@ pub async fn get(datetime_from: DateTime, datetime_end: DateTime) -> Result<Vec<
 
 pub async fn refresh() -> Result<(), DbErr> {
     let txn = get_txn("laiu8").await?;
-    super::execute_set_time_zone::execute(&txn).await?;
-    super::execute_drop_table::execute(&txn).await?;
-    super::execute_create_table::execute(&txn).await?;
-    super::execute_insert_ticket_bill::execute(&txn).await?;
-    super::execute_update_order_info::execute(&txn).await?;
-    super::execute_update_ticket_bill::execute(&txn).await?;
-    super::execute_update_ticket_bill_others::execute(&txn).await?;
-    super::execute_update_laiu8_info::execute(&txn).await?;
-    txn.commit().await?;
-    Ok(())
+    use super::ship_ticket_bill_refresh as refresh;
+    refresh::set_time_zone::execute(&txn).await?;
+    refresh::drop_ship_ticket_bill::execute(&txn).await?;
+    refresh::create_ship_ticket_bill::execute(&txn).await?;
+    refresh::insert_ship_ticket_bill::execute(&txn).await?;
+    refresh::update_order_info::execute(&txn).await?;
+    refresh::update_ship_ticket_bill::execute(&txn).await?;
+    refresh::update_ship_ticket_bill_others::execute(&txn).await?;
+    refresh::update_laiu8_info::execute(&txn).await?;
+    txn.commit().await
 }
