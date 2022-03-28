@@ -1,9 +1,8 @@
-use sea_orm::{ConnectionTrait, DatabaseTransaction, DbErr, ExecResult, Statement};
+use sea_orm::{DatabaseTransaction, DbErr, ExecResult};
 
 pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-            txn.get_database_backend(),
-            r#"
+    crate::execute_sql(txn,
+        r#"
                 CREATE TABLE ticket_bill (
                     id INT ( 11 ) NOT NULL AUTO_INCREMENT,
                     table_name VARCHAR ( 50 ) NOT NULL COMMENT '数据来源表名',
@@ -89,7 +88,5 @@ pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
                     KEY ix_u8_ticket_id_old ( u8_ticket_id_old )
                 ) ENGINE = INNODB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
             "#
-            .into(),
-        ))
-        .await
+    ).await
 }

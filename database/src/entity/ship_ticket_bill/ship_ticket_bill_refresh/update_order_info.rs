@@ -1,4 +1,4 @@
-use sea_orm::{ConnectionTrait, DatabaseTransaction, DbErr, ExecResult, Statement};
+use sea_orm::{DatabaseTransaction, DbErr, ExecResult};
 
 pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     update_link_order_id(txn).await?;
@@ -6,21 +6,20 @@ pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
 }
 
 async fn update_link_order_id(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
+    crate::execute_sql(
+        txn,
         r#"
                 UPDATE ticket_bill tb
                 LEFT JOIN bt_ticket t ON tb.ticket_id = t.id
                 SET tb.link_order_id = t.order_id;
-            "#
-        .into(),
-    ))
+            "#,
+    )
     .await
 }
 
 async fn update_order_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
+    crate::execute_sql(
+        txn,
         r#"
                 UPDATE ticket_bill tb
                 LEFT JOIN bt_ticket t ON tb.ticket_id = t.id
@@ -37,8 +36,7 @@ async fn update_order_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbEr
                     , tb.payment_time = o.payment_time
                     , tb.payment_method = o.payment_method
                 WHERE tb.serial_no = 1;
-            "#
-        .into(),
-    ))
+            "#,
+    )
     .await
 }

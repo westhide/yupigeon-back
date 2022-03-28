@@ -43,16 +43,8 @@ pub fn get_db(key: &str) -> &'static DatabaseConnection {
 }
 
 async fn set_time_zone(txn: &DatabaseTransaction, time_zone: &str) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
-        format!(
-            "
-            SET time_zone = '{}';
-        ",
-            time_zone
-        ),
-    ))
-    .await
+    let sql = format!("SET time_zone = '{}';", time_zone);
+    execute_sql(txn, &sql).await
 }
 
 pub async fn get_txn(key: &str) -> Result<DatabaseTransaction, DbErr> {
@@ -60,4 +52,12 @@ pub async fn get_txn(key: &str) -> Result<DatabaseTransaction, DbErr> {
     let txn = connection.begin().await?;
     set_time_zone(&txn, "+8:00").await?;
     Ok(txn)
+}
+
+pub async fn execute_sql(txn: &DatabaseTransaction, sql: &str) -> Result<ExecResult, DbErr> {
+    txn.execute(Statement::from_string(
+        txn.get_database_backend(),
+        sql.into(),
+    ))
+    .await
 }

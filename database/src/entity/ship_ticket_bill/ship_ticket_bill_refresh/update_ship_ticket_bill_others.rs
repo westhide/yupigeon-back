@@ -1,4 +1,4 @@
-use sea_orm::{ConnectionTrait, DatabaseTransaction, DbErr, ExecResult, Statement};
+use sea_orm::{DatabaseTransaction, DbErr, ExecResult};
 
 pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     update_pay_amount(txn).await?;
@@ -8,21 +8,20 @@ pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
 }
 
 async fn update_pay_amount(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
+    crate::execute_sql(
+        txn,
         r#"
                 UPDATE ticket_bill tb
                 SET tb.pay_amount = tb.ticket_price
                 WHERE tb.serial_no = 1 AND payment_time IS NOT NULL;
-            "#
-        .into(),
-    ))
+            "#,
+    )
     .await
 }
 
 async fn update_departure_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
+    crate::execute_sql(
+        txn,
         r#"
                 UPDATE ticket_bill tb
                 INNER JOIN bt_flight f ON tb.flight_id = f.id
@@ -31,15 +30,14 @@ async fn update_departure_info(txn: &DatabaseTransaction) -> Result<ExecResult, 
                     ,tb.line_code = f.line_code
                     ,tb.ship_name = f.ship_name
             ;
-            "#
-        .into(),
-    ))
+            "#,
+    )
     .await
 }
 
 async fn update_other_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
+    crate::execute_sql(
+        txn,
         r#"
             UPDATE ticket_bill tb
             SET tb.ticket_status = (CASE tb.ticket_status
@@ -79,16 +77,13 @@ async fn update_other_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbEr
                 ,tb.u8_ticket_id_old = tb.ticket_id_old
                 ,tb.u8_ticket_num = tb.ticket_id
             ;
-        "#
-        .into(),
-    ))
+        "#,
+    )
     .await
 }
 
 async fn update_u8_ticket_key(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
-        r#"
+    crate::execute_sql(txn,r#"
                 WITH RECURSIVE
                 tbcg( serial_no, id, ticket_no, ticket_id) AS (
                     SELECT  tb1.serial_no
@@ -126,7 +121,6 @@ async fn update_u8_ticket_key(txn: &DatabaseTransaction) -> Result<ExecResult, D
             LEFT JOIN tbcglast ON tb.id = tbcglast.id
             SET tb.u8_ticket_key = IFNULL(tbcglast.ticket_no, tb.ticket_no);
         "#
-        .into(),
-        ))
+        )
         .await
 }

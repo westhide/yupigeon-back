@@ -1,13 +1,12 @@
-use sea_orm::{ConnectionTrait, DatabaseTransaction, DbErr, ExecResult, Statement};
+use sea_orm::{DatabaseTransaction, DbErr, ExecResult};
 
 pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
+    crate::execute_sql(
+        txn,
         r#"
-                -- TODO: 重命名表为ship_ticket_bill
-                DROP TABLE IF EXISTS ticket_bill;
-            "#
-        .into(),
-    ))
+            -- TODO: 重命名表为ship_ticket_bill
+            DROP TABLE IF EXISTS ticket_bill;
+        "#,
+    )
     .await
 }

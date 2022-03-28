@@ -1,9 +1,8 @@
-use sea_orm::{ConnectionTrait, DatabaseTransaction, DbErr, ExecResult, Statement};
+use sea_orm::{DatabaseTransaction, DbErr, ExecResult};
 
 pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn .execute(Statement::from_string(
-            txn.get_database_backend(),
-            r#"
+    crate::execute_sql(txn,
+        r#"
                 INSERT INTO ticket_bill ( serial_no, table_name, table_id, ticket_id, ticket_id_new, ticket_id_old, link_ticket_id, create_time )
                 WITH
                     -- 截取指定期间，不含改签后、已取消状态的票记录
@@ -81,7 +80,5 @@ pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
                 FROM cte1
                 WINDOW w1 AS ( PARTITION BY cte1.link_ticket_id ORDER BY cte1.create_time);
             "#
-            .into(),
-        ))
-        .await
+    ).await
 }

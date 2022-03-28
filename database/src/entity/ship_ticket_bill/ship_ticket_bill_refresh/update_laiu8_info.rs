@@ -1,4 +1,4 @@
-use sea_orm::{ConnectionTrait, DatabaseTransaction, DbErr, ExecResult, Statement};
+use sea_orm::{DatabaseTransaction, DbErr, ExecResult};
 
 pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     drop_temp_table(txn).await?;
@@ -11,19 +11,18 @@ pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
 }
 
 async fn drop_temp_table(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
+    crate::execute_sql(
+        txn,
         r#"
             DROP TABLE IF EXISTS ticket_bill2;
-        "#
-        .into(),
-    ))
+        "#,
+    )
     .await
 }
 
 async fn create_temp_table(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
+    crate::execute_sql(
+        txn,
         r#"
                 CREATE TABLE ticket_bill2 AS
                 WITH u8ot AS (
@@ -50,35 +49,32 @@ async fn create_temp_table(txn: &DatabaseTransaction) -> Result<ExecResult, DbEr
                 IFNULL(otid.old_ticket_id,u8ot.old_ticket_id) old_ticket_id
                 FROM u8ot
                 LEFT JOIN otid ON otid.id=u8ot.id
-            "#
-        .into(),
-    ))
+            "#,
+    )
     .await
 }
 
 async fn create_temp_table_index(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
+    crate::execute_sql(
+        txn,
         r#"
                 CREATE INDEX ix_id ON ticket_bill2(id);
-            "#
-        .into(),
-    ))
+            "#,
+    )
     .await?;
 
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
+    crate::execute_sql(
+        txn,
         r#"
                 CREATE INDEX ix_old_ticket_id ON ticket_bill2(old_ticket_id);
-            "#
-        .into(),
-    ))
+            "#,
+    )
     .await
 }
 
 async fn update_laiu8_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
+    crate::execute_sql(
+        txn,
         r#"
                 WITH RECURSIVE
                 u8ot AS (
@@ -162,15 +158,14 @@ async fn update_laiu8_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbEr
                     , u8p.callback_trade_no)
             WHERE u8t.ticket_key IS NOT NULL
             AND tb.table_name != 'bt_hcbb_history_detail';
-            "#
-        .into(),
-    ))
+            "#,
+    )
     .await
 }
 
 async fn update_laiu8_payment_method(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
+    crate::execute_sql(
+        txn,
         r#"
                 UPDATE ticket_bill tb
                 SET tb.u8_payment_method = ( CASE u8_payment_method
@@ -198,15 +193,14 @@ async fn update_laiu8_payment_method(txn: &DatabaseTransaction) -> Result<ExecRe
                         ELSE tb.u8_payment_method
                     END)
                 ;
-            "#
-        .into(),
-    ))
+            "#,
+    )
     .await
 }
 
 async fn update_mini_program_table_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
+    crate::execute_sql(
+        txn,
         r#"
                 UPDATE ticket_bill tb
                 LEFT JOIN b_orderinfo_yg_1 ygt ON tb.u8_order_key=ygt.FormalOrderId
@@ -218,15 +212,14 @@ async fn update_mini_program_table_info(txn: &DatabaseTransaction) -> Result<Exe
                     ,tb.u8_table_name = IF(ygt.id IS NULL, 'b_orderinfo_zd_1', 'b_orderinfo_yg_1')
                     ,tb.u8_table_id = IF(ygt.id IS NULL, zdt.id, ygt.id)
                 WHERE ygt.id IS NOT NULL OR zdt.id IS NOT NULL;
-            "#
-        .into(),
-    ))
+            "#,
+    )
     .await
 }
 
 async fn update_mini_program_pay_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    txn.execute(Statement::from_string(
-        txn.get_database_backend(),
+    crate::execute_sql(
+        txn,
         r#"
                 -- 更新小程序 pay_id
                 UPDATE ticket_bill tb
@@ -242,8 +235,7 @@ async fn update_mini_program_pay_info(txn: &DatabaseTransaction) -> Result<ExecR
                     )
                 WHERE tb.pay_amount IS NOT NULL
                 AND (ygp.pay_id IS NOT NULL OR zdp.pay_id IS NOT NULL);
-            "#
-        .into(),
-    ))
+            "#,
+    )
     .await
 }
