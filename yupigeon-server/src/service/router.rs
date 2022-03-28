@@ -24,6 +24,10 @@ pub fn generate() -> impl IntoEndpoint {
             "/ship_ticket_bill/refresh",
             post(api::ship_ticket_bill::refresh),
         )
+        .at(
+            "/ship_ticket_bill/daily_sales",
+            get(api::ship_ticket_bill::daily_sales),
+        )
         .at("/login", get(api::login::get))
         .with(Tracing)
         .with(Compression)

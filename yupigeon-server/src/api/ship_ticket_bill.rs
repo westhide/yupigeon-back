@@ -17,17 +17,19 @@ pub struct Params {
     end_time: String,
 }
 
+fn parse_datetime(time_str: &str) -> Result<NaiveDateTime> {
+    NaiveDateTime::parse_from_str(time_str, "%Y-%m-%d %H:%M:%S").map_err(BadRequest)
+}
+
 #[handler]
 pub async fn get(Query(params): Query<Params>) -> Result<impl IntoResponse> {
     let Params {
-        begin_time: begin_str,
-        end_time: end_str,
+        begin_time: begin_time_str,
+        end_time: end_time_str,
     } = params;
 
-    let begin_time =
-        NaiveDateTime::parse_from_str(&begin_str, "%Y-%m-%d %H:%M:%S").map_err(BadRequest)?;
-    let end_time =
-        NaiveDateTime::parse_from_str(&end_str, "%Y-%m-%d %H:%M:%S").map_err(BadRequest)?;
+    let begin_time = parse_datetime(&begin_time_str)?;
+    let end_time = parse_datetime(&end_time_str)?;
     let ship_ticket_bill = entity::ship_ticket_bill::get(begin_time, end_time)
         .await
         .map_err(BadRequest)?;
@@ -73,4 +75,19 @@ pub async fn refresh() -> Result<impl IntoResponse> {
         }
     }
     Ok(Json(RefreshStatus { is_refresh: true }))
+}
+
+#[handler]
+pub async fn daily_sales(Query(params): Query<Params>) -> Result<impl IntoResponse> {
+    let Params {
+        begin_time: begin_time_str,
+        end_time: end_time_str,
+    } = params;
+
+    let begin_time = parse_datetime(&begin_time_str)?;
+    let end_time = parse_datetime(&end_time_str)?;
+    let daily_sales = entity::ship_ticket_bill::daily_sales(begin_time, end_time)
+        .await
+        .map_err(BadRequest)?;
+    Ok(Json(daily_sales))
 }
