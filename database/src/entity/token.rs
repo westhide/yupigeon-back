@@ -1,7 +1,7 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::get_db;
+use crate::get_txn;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Deserialize, Serialize)]
 #[sea_orm(table_name = "token")]
@@ -32,8 +32,9 @@ impl Related<super::user::Entity> for Entity {
 impl ActiveModelBehavior for ActiveModel {}
 
 pub async fn get(user_id: u32) -> Result<Option<Model>, DbErr> {
+    let txn = get_txn("default").await?;
     Entity::find()
         .filter(Column::UserId.eq(user_id))
-        .one(get_db("default"))
+        .one(&txn)
         .await
 }

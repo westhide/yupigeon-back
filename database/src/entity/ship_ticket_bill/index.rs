@@ -1,7 +1,7 @@
-use sea_orm::{entity::prelude::*, TransactionTrait};
+use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::get_db;
+use crate::get_txn;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Deserialize, Serialize)]
 #[sea_orm(table_name = "ticket_bill")]
@@ -45,15 +45,16 @@ pub enum Relation {}
 impl ActiveModelBehavior for ActiveModel {}
 
 pub async fn get(datetime_from: DateTime, datetime_end: DateTime) -> Result<Vec<Model>, DbErr> {
+    let txn = get_txn("laiu8").await?;
     Entity::find()
         .filter(Column::DepartureDatetime.gte(datetime_from))
         .filter(Column::DepartureDatetime.lte(datetime_end))
-        .all(get_db("laiu8"))
+        .all(&txn)
         .await
 }
 
 pub async fn refresh() -> Result<(), DbErr> {
-    let txn = get_db("laiu8").begin().await?;
+    let txn = get_txn("laiu8").await?;
     super::execute_set_time_zone::execute(&txn).await?;
     super::execute_drop_table::execute(&txn).await?;
     super::execute_create_table::execute(&txn).await?;
