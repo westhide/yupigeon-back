@@ -1,31 +1,29 @@
-use sea_orm::{ConnectionTrait, DatabaseBackend, DbErr, ExecResult, Statement};
+use sea_orm::{
+    ConnectionTrait, DatabaseBackend, DatabaseTransaction, DbErr, ExecResult, Statement,
+};
 
-use crate::get_db;
-
-pub async fn execute() -> Result<ExecResult, DbErr> {
-    update_link_order_id().await?;
-    update_order_info().await
+pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
+    update_link_order_id(txn).await?;
+    update_order_info(txn).await
 }
 
-async fn update_link_order_id() -> Result<ExecResult, DbErr> {
-    get_db("laiu8")
-        .execute(Statement::from_string(
-            DatabaseBackend::MySql,
-            r#"
+async fn update_link_order_id(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
+    txn.execute(Statement::from_string(
+        DatabaseBackend::MySql,
+        r#"
                 UPDATE ticket_bill tb
                 LEFT JOIN bt_ticket t ON tb.ticket_id = t.id
                 SET tb.link_order_id = t.order_id;
             "#
-            .into(),
-        ))
-        .await
+        .into(),
+    ))
+    .await
 }
 
-async fn update_order_info() -> Result<ExecResult, DbErr> {
-    get_db("laiu8")
-        .execute(Statement::from_string(
-            DatabaseBackend::MySql,
-            r#"
+async fn update_order_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
+    txn.execute(Statement::from_string(
+        DatabaseBackend::MySql,
+        r#"
                 UPDATE ticket_bill tb
                 LEFT JOIN bt_ticket t ON tb.ticket_id = t.id
                 LEFT JOIN bt_order o ON t.order_id = o.id
@@ -42,7 +40,7 @@ async fn update_order_info() -> Result<ExecResult, DbErr> {
                     , tb.payment_method = o.payment_method
                 WHERE tb.serial_no = 1;
             "#
-            .into(),
-        ))
-        .await
+        .into(),
+    ))
+    .await
 }

@@ -1,10 +1,9 @@
-use sea_orm::{ConnectionTrait, DatabaseBackend, DbErr, ExecResult, Statement};
+use sea_orm::{
+    ConnectionTrait, DatabaseBackend, DatabaseTransaction, DbErr, ExecResult, Statement,
+};
 
-use crate::get_db;
-
-pub async fn execute() -> Result<ExecResult, DbErr> {
-    get_db("laiu8")
-        .execute(Statement::from_string(
+pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
+    txn.execute(Statement::from_string(
             DatabaseBackend::MySql,
             r#"
                 CREATE TABLE ticket_bill (

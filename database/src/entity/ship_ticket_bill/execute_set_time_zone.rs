@@ -6,9 +6,8 @@ pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     txn.execute(Statement::from_string(
         DatabaseBackend::MySql,
         r#"
-                -- TODO: 重命名表为ship_ticket_bill
-                DROP TABLE IF EXISTS ticket_bill;
-            "#
+            SET time_zone = '+8:00';
+        "#
         .into(),
     ))
     .await

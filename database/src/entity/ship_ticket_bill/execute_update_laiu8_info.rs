@@ -1,33 +1,32 @@
-use sea_orm::{ConnectionTrait, DatabaseBackend, DbErr, ExecResult, Statement};
+use sea_orm::{
+    ConnectionTrait, DatabaseBackend, DatabaseTransaction, DbErr, ExecResult, Statement,
+};
 
-use crate::get_db;
-
-pub async fn execute() -> Result<ExecResult, DbErr> {
-    drop_temp_table().await?;
-    create_temp_table().await?;
-    update_laiu8_info().await?;
-    update_laiu8_payment_method().await?;
-    update_mini_program_table_info().await?;
-    update_mini_program_pay_info().await
+pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
+    drop_temp_table(txn).await?;
+    create_temp_table(txn).await?;
+    create_temp_table_index(txn).await?;
+    update_laiu8_info(txn).await?;
+    update_laiu8_payment_method(txn).await?;
+    update_mini_program_table_info(txn).await?;
+    update_mini_program_pay_info(txn).await
 }
 
-async fn drop_temp_table() -> Result<ExecResult, DbErr> {
-    get_db("laiu8")
-        .execute(Statement::from_string(
-            DatabaseBackend::MySql,
-            r#"
+async fn drop_temp_table(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
+    txn.execute(Statement::from_string(
+        DatabaseBackend::MySql,
+        r#"
             DROP TABLE IF EXISTS ticket_bill2;
         "#
-            .into(),
-        ))
-        .await
+        .into(),
+    ))
+    .await
 }
 
-async fn create_temp_table() -> Result<ExecResult, DbErr> {
-    get_db("laiu8")
-        .execute(Statement::from_string(
-            DatabaseBackend::MySql,
-            r#"
+async fn create_temp_table(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
+    txn.execute(Statement::from_string(
+        DatabaseBackend::MySql,
+        r#"
                 CREATE TABLE ticket_bill2 AS
                 WITH u8ot AS (
                 SELECT *
@@ -54,36 +53,35 @@ async fn create_temp_table() -> Result<ExecResult, DbErr> {
                 FROM u8ot
                 LEFT JOIN otid ON otid.id=u8ot.id
             "#
-            .into(),
-        ))
-        .await?;
-
-    get_db("laiu8")
-        .execute(Statement::from_string(
-            DatabaseBackend::MySql,
-            r#"
-                CREATE INDEX ix_id ON ticket_bill2(id);
-            "#
-            .into(),
-        ))
-        .await?;
-
-    get_db("laiu8")
-        .execute(Statement::from_string(
-            DatabaseBackend::MySql,
-            r#"
-                CREATE INDEX ix_old_ticket_id ON ticket_bill2(old_ticket_id);
-            "#
-            .into(),
-        ))
-        .await
+        .into(),
+    ))
+    .await
 }
 
-async fn update_laiu8_info() -> Result<ExecResult, DbErr> {
-    get_db("laiu8")
-        .execute(Statement::from_string(
-            DatabaseBackend::MySql,
-            r#"
+async fn create_temp_table_index(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
+    txn.execute(Statement::from_string(
+        DatabaseBackend::MySql,
+        r#"
+                CREATE INDEX ix_id ON ticket_bill2(id);
+            "#
+        .into(),
+    ))
+    .await?;
+
+    txn.execute(Statement::from_string(
+        DatabaseBackend::MySql,
+        r#"
+                CREATE INDEX ix_old_ticket_id ON ticket_bill2(old_ticket_id);
+            "#
+        .into(),
+    ))
+    .await
+}
+
+async fn update_laiu8_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
+    txn.execute(Statement::from_string(
+        DatabaseBackend::MySql,
+        r#"
                 WITH RECURSIVE
                 u8ot AS (
                     SELECT *
@@ -167,16 +165,15 @@ async fn update_laiu8_info() -> Result<ExecResult, DbErr> {
             WHERE u8t.ticket_key IS NOT NULL
             AND tb.table_name != 'bt_hcbb_history_detail';
             "#
-            .into(),
-        ))
-        .await
+        .into(),
+    ))
+    .await
 }
 
-async fn update_laiu8_payment_method() -> Result<ExecResult, DbErr> {
-    get_db("laiu8")
-        .execute(Statement::from_string(
-            DatabaseBackend::MySql,
-            r#"
+async fn update_laiu8_payment_method(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
+    txn.execute(Statement::from_string(
+        DatabaseBackend::MySql,
+        r#"
                 UPDATE ticket_bill tb
                 SET tb.u8_payment_method = ( CASE u8_payment_method
                         WHEN '0' THEN '未支付'
@@ -204,16 +201,15 @@ async fn update_laiu8_payment_method() -> Result<ExecResult, DbErr> {
                     END)
                 ;
             "#
-            .into(),
-        ))
-        .await
+        .into(),
+    ))
+    .await
 }
 
-async fn update_mini_program_table_info() -> Result<ExecResult, DbErr> {
-    get_db("laiu8")
-        .execute(Statement::from_string(
-            DatabaseBackend::MySql,
-            r#"
+async fn update_mini_program_table_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
+    txn.execute(Statement::from_string(
+        DatabaseBackend::MySql,
+        r#"
                 UPDATE ticket_bill tb
                 LEFT JOIN b_orderinfo_yg_1 ygt ON tb.u8_order_key=ygt.FormalOrderId
                 LEFT JOIN b_orderinfo_zd_1 zdt ON tb.u8_order_key=zdt.FormalOrderId
@@ -225,16 +221,15 @@ async fn update_mini_program_table_info() -> Result<ExecResult, DbErr> {
                     ,tb.u8_table_id = IF(ygt.id IS NULL, zdt.id, ygt.id)
                 WHERE ygt.id IS NOT NULL OR zdt.id IS NOT NULL;
             "#
-            .into(),
-        ))
-        .await
+        .into(),
+    ))
+    .await
 }
 
-async fn update_mini_program_pay_info() -> Result<ExecResult, DbErr> {
-    get_db("laiu8")
-        .execute(Statement::from_string(
-            DatabaseBackend::MySql,
-            r#"
+async fn update_mini_program_pay_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
+    txn.execute(Statement::from_string(
+        DatabaseBackend::MySql,
+        r#"
                 -- 更新小程序 pay_id
                 UPDATE ticket_bill tb
                 LEFT JOIN b_orderinfo_yg_1 ygt ON tb.u8_order_key=ygt.FormalOrderId
@@ -250,7 +245,7 @@ async fn update_mini_program_pay_info() -> Result<ExecResult, DbErr> {
                 WHERE tb.pay_amount IS NOT NULL
                 AND (ygp.pay_id IS NOT NULL OR zdp.pay_id IS NOT NULL);
             "#
-            .into(),
-        ))
-        .await
+        .into(),
+    ))
+    .await
 }

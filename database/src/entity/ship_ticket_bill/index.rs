@@ -1,4 +1,4 @@
-use sea_orm::entity::prelude::*;
+use sea_orm::{entity::prelude::*, TransactionTrait};
 use serde::{Deserialize, Serialize};
 
 use crate::get_db;
@@ -53,13 +53,15 @@ pub async fn get(datetime_from: DateTime, datetime_end: DateTime) -> Result<Vec<
 }
 
 pub async fn refresh() -> Result<(), DbErr> {
-    super::execute_drop_table::execute().await?;
-    super::execute_create_table::execute().await?;
-    super::execute_insert_ticket_bill::execute().await?;
-    super::execute_update_order_info::execute().await?;
-    super::execute_update_ticket_bill::execute().await?;
-    super::execute_update_ticket_bill_others::execute().await?;
-    super::execute_update_laiu8_info::execute().await?;
-
+    let txn = get_db("laiu8").begin().await?;
+    super::execute_set_time_zone::execute(&txn).await?;
+    super::execute_drop_table::execute(&txn).await?;
+    super::execute_create_table::execute(&txn).await?;
+    super::execute_insert_ticket_bill::execute(&txn).await?;
+    super::execute_update_order_info::execute(&txn).await?;
+    super::execute_update_ticket_bill::execute(&txn).await?;
+    super::execute_update_ticket_bill_others::execute(&txn).await?;
+    super::execute_update_laiu8_info::execute(&txn).await?;
+    txn.commit().await?;
     Ok(())
 }

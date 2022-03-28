@@ -17,6 +17,8 @@
         "RBATIS",
         "realname",
         "sysinfo",
+        "tbcg",
+        "tbcglast",
         "TINYINT",
         "westhide",
         "yupigeon"

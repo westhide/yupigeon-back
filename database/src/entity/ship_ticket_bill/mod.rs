@@ -2,6 +2,7 @@ pub use index::*;
 pub mod execute_create_table;
 pub mod execute_drop_table;
 pub mod execute_insert_ticket_bill;
+pub mod execute_set_time_zone;
 pub mod execute_update_laiu8_info;
 pub mod execute_update_order_info;
 pub mod execute_update_ticket_bill;
