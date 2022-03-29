@@ -33,7 +33,7 @@ pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
                     user_name VARCHAR ( 50 ) COMMENT '用户名称',
                     u8_user_name VARCHAR ( 20 ) COMMENT 'laiu8用户名称',
                     u8_nickname VARCHAR ( 60 ) COMMENT 'laiu8用户昵称',
-                    u8_realname VARCHAR ( 30 ) COMMENT 'laiu8用户真实名称',
+                    u8_vip_pact VARCHAR ( 50 ) COMMENT 'laiu8签约客户',
                     mobile VARCHAR ( 50 ) COMMENT '用户手机号',
                     ticket_type_name VARCHAR ( 50 ) COMMENT '票型',
                     product_type VARCHAR ( 50 ) COMMENT '产品类型',

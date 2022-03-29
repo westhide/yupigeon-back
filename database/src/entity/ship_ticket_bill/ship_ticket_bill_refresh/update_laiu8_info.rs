@@ -130,36 +130,46 @@ async fn update_laiu8_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbEr
                     WINDOW w1 AS ( PARTITION BY link_ticket_id ORDER BY serial_no)
                 )
 
-            UPDATE ticket_bill tb
-            LEFT JOIN sn ON sn.id=tb.id
-            LEFT JOIN u8t ON u8t.order_key = tb.u8_order_key
-                AND u8t.ticket_num=tb.u8_ticket_num
-                AND u8t.ticket_key=tb.u8_ticket_key
-                AND u8t.serial_no=sn.u8_serial_no
-            LEFT JOIN u8_order u8o ON u8o.id = u8t.order_id
-            LEFT JOIN u8_user u8u ON u8u.id = u8t.user_id
-            LEFT JOIN u8_tickets_orgsign u8org ON u8org.id = u8t.ota_id
-            LEFT JOIN u8_order_payment u8p ON u8p.trade_no = u8o.trade_no
-                AND FIND_IN_SET(u8o.id, u8p.orders)
+                UPDATE ticket_bill tb
+                LEFT JOIN sn ON sn.id=tb.id
+                LEFT JOIN u8t ON u8t.order_key = tb.u8_order_key
+                    AND u8t.ticket_num=tb.u8_ticket_num
+                    AND u8t.ticket_key=tb.u8_ticket_key
+                    AND u8t.serial_no=sn.u8_serial_no
+                LEFT JOIN u8_order u8o ON u8o.id = u8t.order_id
+                LEFT JOIN u8_user u8u ON u8u.id = u8t.user_id
+                LEFT JOIN u8_tickets_orgsign u8org ON u8org.id = u8t.ota_id
+                LEFT JOIN u8_order_payment u8p ON u8p.trade_no = u8o.trade_no
+                    AND FIND_IN_SET(u8o.id, u8p.orders)
+                LEFT JOIN u8_vip_pact_relation u8vpr ON u8vpr.user_id=u8t.user_id
+                LEFT JOIN u8_vip_pact u8vp ON u8vp.id=u8vpr.pact_id
 
-            SET
-                tb.u8_table_name='u8_order_ship_tickets'
-                ,tb.u8_table_id=u8t.id
-                ,tb.trade_no = u8o.trade_no
-                ,tb.order_no = u8o.order_no
-                ,tb.u8_channel_id = u8org.id
-                ,tb.u8_channel_name = u8org.name
-                ,tb.u8_user_name=IFNULL(u8u.username,u8org.name)
-                ,tb.u8_nickname=IFNULL(u8u.nickname,u8org.longname)
-                ,tb.u8_payment_method = IF(tb.pay_amount IS NULL,NULL,u8p.pay_type)
-                ,tb.pay_id = IF(
-                    tb.pay_amount IS NULL
-                    OR u8p.pay_type IN (10,23) -- 10='阶梯预存款',23='内部结算',
-                    OR u8p.callback_trade_no=''
-                    , NULL
-                    , u8p.callback_trade_no)
-            WHERE u8t.ticket_key IS NOT NULL
-            AND tb.table_name != 'bt_hcbb_history_detail';
+                SET
+                    tb.u8_table_name='u8_order_ship_tickets'
+                    ,tb.u8_table_id=u8t.id
+                    ,tb.trade_no = u8o.trade_no
+                    ,tb.order_no = u8o.order_no
+                    ,tb.u8_channel_id = u8org.id
+                    ,tb.u8_channel_name = u8org.name
+                    ,tb.u8_user_id = u8u.id
+                    ,tb.u8_user_name = IFNULL(u8u.username,u8org.name)
+                    ,tb.u8_nickname = IFNULL(u8u.nickname,u8org.longname)
+                    ,tb.u8_vip_pact = IFNULL(
+                        u8vp.company_name,
+                        IF(u8org.name='新绎APP'
+                        ,u8p.pay_source,
+                        IFNULL(u8org.longname,u8org.name)
+                        )
+                    )
+                    ,tb.u8_payment_method = IF(tb.pay_amount IS NULL,NULL,u8p.pay_type)
+                    ,tb.pay_id = IF(
+                        tb.pay_amount IS NULL
+                        OR u8p.pay_type IN (10,23) -- 10='阶梯预存款',23='内部结算',
+                        OR u8p.callback_trade_no=''
+                        , NULL
+                        , u8p.callback_trade_no)
+                WHERE u8t.ticket_key IS NOT NULL
+                AND tb.table_name != 'bt_hcbb_history_detail';
             "#,
     )
     .await
