@@ -27,6 +27,8 @@ pub struct Model {
     passenger_name: String,
     passenger_id_no: String,
     user_name: String,
+    u8_user_name: Option<String>,
+    u8_nickname: Option<String>,
     payment_method: Option<String>,
     #[sea_orm(column_type = "Decimal(Some((10, 3)))", nullable)]
     pay_amount: Option<Decimal>,

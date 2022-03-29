@@ -149,6 +149,8 @@ async fn update_laiu8_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbEr
                 ,tb.order_no = u8o.order_no
                 ,tb.u8_channel_id = u8org.id
                 ,tb.u8_channel_name = u8org.name
+                ,tb.u8_user_name=IFNULL(u8u.username,u8org.name)
+                ,tb.u8_nickname=IFNULL(u8u.nickname,u8org.longname)
                 ,tb.u8_payment_method = IF(tb.pay_amount IS NULL,NULL,u8p.pay_type)
                 ,tb.pay_id = IF(
                     tb.pay_amount IS NULL
