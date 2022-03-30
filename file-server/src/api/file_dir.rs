@@ -172,13 +172,12 @@ pub async fn file_dir(
 ) -> Result<Json<Dir<String>>, StaticFileError> {
     let FileDirParams { path, depth } = params;
 
-    let file_dir: Dir<String>;
     let depth = depth.unwrap_or(1);
-    if path.is_none() {
-        file_dir = Dir::disk_dir(depth).await?
+    let file_dir: Dir<String> = if path.is_none() {
+        Dir::disk_dir(depth).await?
     } else {
-        file_dir = Dir::new(path.unwrap(), depth).await?
-    }
+        Dir::new(path.unwrap(), depth).await?
+    };
 
     Ok(Json(file_dir))
 }

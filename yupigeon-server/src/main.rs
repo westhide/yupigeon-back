@@ -18,7 +18,7 @@ use crate::{
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     if std::env::var_os("RUST_LOG").is_none() {
-        std::env::set_var("RUST_LOG", "debug");
+        std::env::set_var("RUST_LOG", "poem=debug,sea_orm=debug");
     };
     tracing_subscriber::fmt::init();
 
