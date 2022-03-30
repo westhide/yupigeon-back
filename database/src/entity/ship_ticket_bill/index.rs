@@ -22,17 +22,23 @@ pub struct Model {
     ticket_type_name: String,
     #[sea_orm(column_type = "Decimal(Some((10, 3)))")]
     ticket_price: Decimal,
+    #[sea_orm(column_type = "Decimal(Some((10, 3)))", nullable)]
+    pay_amount: Option<Decimal>,
+    #[sea_orm(column_type = "Decimal(Some((10, 3)))", nullable)]
+    refund_amount: Option<Decimal>,
+    #[sea_orm(column_type = "Decimal(Some((10, 3)))", nullable)]
+    fee: Option<Decimal>,
     cabin_name: String,
     seat_memo: String,
     passenger_name: String,
     passenger_id_no: String,
+    user_type: String,
     user_name: String,
+    u8_user_type: Option<String>,
     u8_user_name: Option<String>,
     u8_nickname: Option<String>,
     u8_vip_pact: Option<String>,
     payment_method: Option<String>,
-    #[sea_orm(column_type = "Decimal(Some((10, 3)))", nullable)]
-    pay_amount: Option<Decimal>,
     payment_time: Option<DateTime>,
     pay_id: Option<String>,
     #[sea_orm(column_type = "BigInteger")]
