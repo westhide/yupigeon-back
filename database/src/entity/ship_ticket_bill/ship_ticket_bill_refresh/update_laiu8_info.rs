@@ -6,6 +6,7 @@ pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     create_temp_table_index(txn).await?;
     update_laiu8_info(txn).await?;
     update_laiu8_payment_method(txn).await?;
+    update_laiu8_user_type(txn).await?;
     update_mini_program_table_info(txn).await?;
     update_mini_program_pay_info(txn).await
 }
@@ -152,6 +153,7 @@ async fn update_laiu8_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbEr
                     ,tb.u8_channel_id = u8org.id
                     ,tb.u8_channel_name = u8org.name
                     ,tb.u8_user_id = u8u.id
+                    ,tb.u8_user_type = IFNULL(u8u.type_id,IF(u8org.id IS NOT NULL,'OTA',NULL))
                     ,tb.u8_user_name = IFNULL(u8u.username,u8org.name)
                     ,tb.u8_nickname = IFNULL(u8u.nickname,u8org.longname)
                     ,tb.u8_vip_pact = IFNULL(
@@ -203,6 +205,25 @@ async fn update_laiu8_payment_method(txn: &DatabaseTransaction) -> Result<ExecRe
                         WHEN '22' THEN '现金'
                         WHEN '23' THEN '阶梯预存款'
                         ELSE tb.u8_payment_method
+                    END)
+                ;
+            "#,
+    )
+    .await
+}
+
+async fn update_laiu8_user_type(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
+    crate::execute_sql(
+        txn,
+        r#"
+                UPDATE ticket_bill tb
+                SET tb.u8_user_type = ( CASE u8_user_type
+                        WHEN '1' THEN '散客'
+                        WHEN '3' THEN 'VIP'
+                        WHEN '7' THEN '岛民'
+                        WHEN '8' THEN '军属'
+                        WHEN '9' THEN '驻岛'
+                        ELSE tb.u8_user_type
                     END)
                 ;
             "#,

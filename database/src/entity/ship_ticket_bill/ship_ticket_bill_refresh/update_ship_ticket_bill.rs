@@ -229,7 +229,7 @@ pub async fn recursion_execute(txn: &DatabaseTransaction) -> Result<ExecResult, 
                             IF(cgo.price_difference>0,
                                 -- ! 窗口改签订单重新支付只取差额
                                 IF(cg_c.category_id=2,
-                                cg.ticket_price_diff,
+                                cg.ticket_price_diff + cg.ticket_change_fee,
                                 cg.ticket_price_new),
                                 NULL)
                     END)

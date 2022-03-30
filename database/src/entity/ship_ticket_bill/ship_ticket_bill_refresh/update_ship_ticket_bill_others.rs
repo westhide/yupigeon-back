@@ -40,6 +40,7 @@ async fn update_other_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbEr
         txn,
         r#"
             UPDATE ticket_bill tb
+            LEFT JOIN bt_channel_category cc ON cc.id=tb.user_type
             SET tb.ticket_status = (CASE tb.ticket_status
                     WHEN "0" THEN '待出票'
                     WHEN "1" THEN '出票成功'
@@ -67,6 +68,7 @@ async fn update_other_info(txn: &DatabaseTransaction) -> Result<ExecResult, DbEr
                     WHEN "9" THEN '预存款'
                     ELSE tb.payment_method
                 END)
+                ,tb.user_type = cc.name
                 ,tb.line_name = (CASE tb.line_code
                     WHEN "BW" THEN '北海-涠洲'
                     WHEN "BH" THEN '北海-海口'

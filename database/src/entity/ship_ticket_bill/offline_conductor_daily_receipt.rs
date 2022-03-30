@@ -22,7 +22,7 @@ pub async fn offline_conductor_daily_receipt(
                 SUM( pay_amount ) amount
             FROM ticket_bill
             WHERE
-                channel_name NOT IN ('来游吧','驻岛订票','内部订票')
+                user_type='线下'
                 AND pay_amount IS NOT NULL
                 AND create_time >=? AND create_time <= ?
             GROUP BY date,user_name

@@ -63,6 +63,8 @@ pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
                     order_no VARCHAR ( 50 ) COMMENT '平台订单号 <laiu8.order_no>',
                     trade_no VARCHAR ( 40 ) COMMENT '商户订单号 <laiu8.trade_no>',
                     pay_id VARCHAR ( 50 ) COMMENT '支付号 <laiu8.callback_trade_no>',
+                    refund_amount DECIMAL ( 10, 3 ) COMMENT '退票总额',
+                    fee DECIMAL ( 10, 3 ) COMMENT '手续费',
                     is_lock TINYINT ( 1 ) DEFAULT '0' COMMENT '锁定状态<0=否,1=是>',
                     create_time datetime NOT NULL COMMENT '创建时间',
                     update_time datetime COMMENT '修改时间',
