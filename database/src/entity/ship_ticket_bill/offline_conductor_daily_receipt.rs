@@ -9,6 +9,10 @@ pub struct OfflineConductorDailyReceipt {
     sum_pay_amount: Option<Decimal>,
     sum_fee: Option<Decimal>,
     sum_refund_amount: Option<Decimal>,
+    just_refund_total: Option<Decimal>,
+    just_change_total: Option<Decimal>,
+    just_compensation_total: Option<Decimal>,
+    just_hcbb_total: Option<Decimal>,
 }
 
 pub async fn offline_conductor_daily_receipt(
@@ -24,6 +28,11 @@ pub async fn offline_conductor_daily_receipt(
                     DATE( refund_finish_time ) date,
                     user_name,
                     SUM(IF(refund_amount>0,refund_amount+fee,0)) sum_refund_amount,
+                    SUM(IF(refund_type='已退款',IF(refund_amount>0,refund_amount+fee,0),0)) just_refund_total,
+                    SUM(IF(refund_type='改签废票',IF(refund_amount>0,refund_amount+fee,0),0)) just_change_total,
+                    SUM(IF(refund_type='已补差',IF(refund_amount>0,refund_amount+fee,0),0)) just_compensation_total,
+                    SUM(IF(refund_type='已换船',IF(refund_amount>0,refund_amount+fee,0),0)) just_hcbb_total,
+                    SUM(IF(refund_amount>0,fee,0)) sum_repeat_fee,
                     SUM(fee) sum_fee
                 FROM ship_ticket_refund_bill
                 WHERE
@@ -49,7 +58,12 @@ pub async fn offline_conductor_daily_receipt(
                 offp.user_name,
                 offp.sum_pay_amount,
                 offr.sum_fee,
-                offr.sum_refund_amount
+                offr.sum_refund_amount,
+                offr.just_refund_total,
+                offr.just_change_total,
+                offr.just_compensation_total,
+                offr.just_hcbb_total,
+                offr.sum_repeat_fee
             FROM offp LEFT JOIN offr ON offp.date=offr.date AND offp.user_name=offr.user_name
             UNION
             SELECT
@@ -57,21 +71,30 @@ pub async fn offline_conductor_daily_receipt(
                 offr.user_name,
                 offp.sum_pay_amount,
                 offr.sum_fee,
-                offr.sum_refund_amount
+                offr.sum_refund_amount,
+                offr.just_refund_total,
+                offr.just_change_total,
+                offr.just_compensation_total,
+                offr.just_hcbb_total,
+                offr.sum_repeat_fee
             FROM offp RIGHT JOIN offr ON offp.date=offr.date AND offp.user_name=offr.user_name
             )
             SELECT
                 off.date,
                 off.user_name,
-                IFNULL(off.sum_pay_amount,0) + IFNULL(off.sum_fee,0) receipt,
+                IFNULL(off.sum_pay_amount,0) + IFNULL(off.sum_repeat_fee,0) receipt,
                 off.sum_pay_amount,
-                off.sum_fee,
-                off.sum_refund_amount
+                IF(off.sum_fee>0,off.sum_fee,NULL) sum_fee,
+                IF(off.sum_refund_amount>0,off.sum_refund_amount,NULL) sum_refund_amount,
+                IF(off.just_refund_total>0,off.just_refund_total,NULL) just_refund_total,
+                IF(off.just_change_total>0,off.just_change_total,NULL) just_change_total,
+                IF(off.just_compensation_total>0,off.just_compensation_total,NULL) just_compensation_total,
+                IF(off.just_hcbb_total>0,off.just_hcbb_total,NULL) just_hcbb_total
             FROM
                 off
             WHERE off.sum_pay_amount>0 OR off.sum_fee>0 OR off.sum_refund_amount>0
             ORDER BY off.date DESC,off.user_name
-        ;
+            ;
         "#,
         vec![
             datetime_from.into(),
