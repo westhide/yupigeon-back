@@ -93,6 +93,21 @@ pub async fn daily_sales(Query(params): Query<Params>) -> Result<impl IntoRespon
 }
 
 #[handler]
+pub async fn client_sales(Query(params): Query<Params>) -> Result<impl IntoResponse> {
+    let Params {
+        begin_time: begin_time_str,
+        end_time: end_time_str,
+    } = params;
+
+    let begin_time = parse_datetime(&begin_time_str)?;
+    let end_time = parse_datetime(&end_time_str)?;
+    let client_sales = entity::ship_ticket_bill::client_sales(begin_time, end_time)
+        .await
+        .map_err(BadRequest)?;
+    Ok(Json(client_sales))
+}
+
+#[handler]
 pub async fn offline_conductor_daily_receipt(
     Query(params): Query<Params>,
 ) -> Result<impl IntoResponse> {

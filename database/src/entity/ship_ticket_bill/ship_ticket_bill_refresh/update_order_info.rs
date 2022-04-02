@@ -1,17 +1,26 @@
 use sea_orm::{DatabaseTransaction, DbErr, ExecResult};
 
 pub async fn execute(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
-    update_link_order_id(txn).await?;
+    update_link_id(txn).await?;
     update_order_info(txn).await
 }
 
-async fn update_link_order_id(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
+async fn update_link_id(txn: &DatabaseTransaction) -> Result<ExecResult, DbErr> {
     crate::execute_sql(
         txn,
         r#"
-                UPDATE ticket_bill tb
-                LEFT JOIN bt_ticket t ON tb.ticket_id = t.id
-                SET tb.link_order_id = t.order_id;
+            WITH lid AS (
+                SELECT
+                    id
+                    ,link_ticket_id
+                FROM ticket_bill
+                WHERE serial_no =1
+            )
+            UPDATE ticket_bill tb
+            LEFT JOIN lid ON tb.link_ticket_id=lid.link_ticket_id
+            LEFT JOIN bt_ticket t ON tb.ticket_id=t.id
+            SET tb.link_order_id = t.order_id
+                ,tb.link_id = lid.id;
             "#,
     )
     .await
