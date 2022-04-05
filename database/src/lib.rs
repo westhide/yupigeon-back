@@ -37,7 +37,7 @@ pub async fn init_database() -> Result<(), DbErr> {
     Ok(())
 }
 
-pub fn get_db(key: &str) -> &'static DatabaseConnection {
+pub fn get_db(key: &str) -> &DatabaseConnection {
     let db_list = DB.get().expect("Database is not initialized");
     db_list.get(key).expect("Database is not exists")
 }

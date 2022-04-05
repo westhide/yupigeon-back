@@ -6,4 +6,5 @@
 pub mod greet;
 pub mod login;
 pub mod ship_ticket_bill;
+pub mod tenpay_bill;
 pub mod user;
