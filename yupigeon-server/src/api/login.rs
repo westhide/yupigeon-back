@@ -1,10 +1,5 @@
 use database::entity;
-use poem::{
-    error::BadRequest,
-    handler,
-    web::{Json, Query},
-    IntoResponse, Result,
-};
+use poem::{error::BadRequest, handler, web::Json, IntoResponse, Result};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -14,7 +9,7 @@ pub struct Params {
 }
 
 #[handler]
-pub async fn get(Query(params): Query<Params>) -> Result<impl IntoResponse> {
+pub async fn post(Json(params): Json<Params>) -> Result<impl IntoResponse> {
     let Params { username, password } = params;
     let user = entity::user::get(username, password)
         .await
