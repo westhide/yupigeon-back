@@ -40,7 +40,7 @@ pub fn generate() -> impl IntoEndpoint {
         )
         .at(
             "/ship_ticket_bill/client_sales",
-            get(api::ship_ticket_bill::client_sales),
+            post(api::ship_ticket_bill::client_sales),
         )
         .at(
             "/ship_ticket_bill/offline_conductor_daily_receipt",

@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use crate::GLOBAL_DATA;
 
 #[derive(Debug, Deserialize)]
-pub struct Params {
+pub struct DateTimeParams {
     begin_time: String,
     end_time: String,
 }
@@ -22,8 +22,8 @@ fn parse_datetime(time_str: &str) -> Result<NaiveDateTime> {
 }
 
 #[handler]
-pub async fn get(Query(params): Query<Params>) -> Result<impl IntoResponse> {
-    let Params {
+pub async fn get(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
+    let DateTimeParams {
         begin_time: begin_time_str,
         end_time: end_time_str,
     } = params;
@@ -84,8 +84,8 @@ pub async fn refresh() -> Result<impl IntoResponse> {
 }
 
 #[handler]
-pub async fn daily_sales(Query(params): Query<Params>) -> Result<impl IntoResponse> {
-    let Params {
+pub async fn daily_sales(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
+    let DateTimeParams {
         begin_time: begin_time_str,
         end_time: end_time_str,
     } = params;
@@ -99,8 +99,8 @@ pub async fn daily_sales(Query(params): Query<Params>) -> Result<impl IntoRespon
 }
 
 #[handler]
-pub async fn daily_receipt(Query(params): Query<Params>) -> Result<impl IntoResponse> {
-    let Params {
+pub async fn daily_receipt(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
+    let DateTimeParams {
         begin_time: begin_time_str,
         end_time: end_time_str,
     } = params;
@@ -113,26 +113,36 @@ pub async fn daily_receipt(Query(params): Query<Params>) -> Result<impl IntoResp
     Ok(Json(daily_receipt))
 }
 
+#[derive(Debug, Deserialize)]
+pub struct ClientSalesParams {
+    begin_time: String,
+    end_time: String,
+    where_condition: Option<String>,
+}
+
 #[handler]
-pub async fn client_sales(Query(params): Query<Params>) -> Result<impl IntoResponse> {
-    let Params {
+pub async fn client_sales(Json(params): Json<ClientSalesParams>) -> Result<impl IntoResponse> {
+    let ClientSalesParams {
         begin_time: begin_time_str,
         end_time: end_time_str,
+        where_condition,
     } = params;
 
     let begin_time = parse_datetime(&begin_time_str)?;
     let end_time = parse_datetime(&end_time_str)?;
-    let client_sales = entity::ship_ticket_bill::client_sales(begin_time, end_time)
-        .await
-        .map_err(BadRequest)?;
+    let where_condition = where_condition.unwrap_or_default();
+    let client_sales =
+        entity::ship_ticket_bill::client_sales(begin_time, end_time, &where_condition)
+            .await
+            .map_err(BadRequest)?;
     Ok(Json(client_sales))
 }
 
 #[handler]
 pub async fn offline_conductor_daily_receipt(
-    Query(params): Query<Params>,
+    Query(params): Query<DateTimeParams>,
 ) -> Result<impl IntoResponse> {
-    let Params {
+    let DateTimeParams {
         begin_time: begin_time_str,
         end_time: end_time_str,
     } = params;
