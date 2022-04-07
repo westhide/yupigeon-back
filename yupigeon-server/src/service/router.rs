@@ -19,6 +19,10 @@ pub fn generate() -> impl IntoEndpoint {
         .at("/user", get(api::user::get))
         .at("/ship_ticket_bill", get(api::ship_ticket_bill::get))
         .at(
+            "/ship_ticket_bill/clients",
+            get(api::ship_ticket_bill::clients),
+        )
+        .at(
             "/ship_ticket_bill/refresh_status",
             get(api::ship_ticket_bill::refresh_status),
         )

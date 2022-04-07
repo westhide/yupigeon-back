@@ -36,6 +36,14 @@ pub async fn get(Query(params): Query<Params>) -> Result<impl IntoResponse> {
     Ok(Json(ship_ticket_bill))
 }
 
+#[handler]
+pub async fn clients() -> Result<impl IntoResponse> {
+    let clients = entity::ship_ticket_bill::clients()
+        .await
+        .map_err(BadRequest)?;
+    Ok(Json(clients))
+}
+
 #[derive(Debug, Deserialize, Serialize, Default)]
 struct RefreshStatus {
     is_refresh: bool,
