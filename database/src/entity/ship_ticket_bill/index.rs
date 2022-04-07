@@ -62,7 +62,7 @@ pub async fn get(datetime_from: DateTime, datetime_end: DateTime) -> Result<Vec<
 
 pub async fn refresh() -> Result<(), DbErr> {
     let database = crate::Database::new("laiu8").await?;
-    use super::refresh_sql::{bt_ticket_info, laiu8_info};
+    use super::refresh_sql::{bt_ticket_info, laiu8_info, refund_info};
     database
         .execute_multi_sql(vec![
             bt_ticket_info::DROP_TABLE,
@@ -87,6 +87,11 @@ pub async fn refresh() -> Result<(), DbErr> {
             laiu8_info::UPDATE_RELATED_INFO,
             laiu8_info::UPDATE_MINI_PROGRAM_INFO,
             laiu8_info::UPDATE_MINI_PROGRAM_PAY_ID,
+            refund_info::DELETE_TABLE,
+            refund_info::INSERT_REFUND_RECORD,
+            refund_info::INSERT_OTHER_RECORD,
+            refund_info::UPDATE_RELATED_INFO,
+            refund_info::UPDATE_TICKET_REFUND_INFO,
         ])
         .await?;
     database.txn.commit().await
