@@ -1,8 +1,6 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::get_txn;
-
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Deserialize, Serialize)]
 #[sea_orm(table_name = "user")]
 pub struct Model {
@@ -46,7 +44,7 @@ pub async fn get(
     username: String,
     password: String,
 ) -> Result<Option<(Model, Option<super::token::Model>)>, DbErr> {
-    let txn = get_txn("default").await?;
+    let txn = crate::Database::new("default").await?.txn;
     Entity::find()
         .find_also_linked(Link2User)
         .filter(Column::Username.eq(username))

@@ -13,7 +13,7 @@ pub async fn daily_receipt(
     datetime_from: DateTime,
     datetime_end: DateTime,
 ) -> Result<Vec<DailyReceipt>, DbErr> {
-    let txn = crate::get_txn("laiu8").await?;
+    let txn = crate::Database::new("laiu8").await?.txn;
     DailyReceipt::find_by_statement(Statement::from_sql_and_values(
         txn.get_database_backend(),
         r#"

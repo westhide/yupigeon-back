@@ -21,7 +21,7 @@ pub async fn offline_conductor_daily_receipt(
     datetime_from: DateTime,
     datetime_end: DateTime,
 ) -> Result<Vec<OfflineConductorDailyReceipt>, DbErr> {
-    let txn = crate::get_txn("laiu8").await?;
+    let txn = crate::Database::new("laiu8").await?.txn;
     OfflineConductorDailyReceipt::find_by_statement(Statement::from_sql_and_values(
         txn.get_database_backend(),
         r#"

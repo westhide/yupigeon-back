@@ -24,7 +24,7 @@ async fn main() -> std::io::Result<()> {
 
     global_data::init_global_data();
 
-    database::init_database()
+    database::Database::init()
         .await
         .expect("Database init failed");
 

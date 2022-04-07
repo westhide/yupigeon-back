@@ -1,8 +1,6 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::get_txn;
-
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Deserialize, Serialize)]
 #[sea_orm(table_name = "token")]
 pub struct Model {
@@ -32,7 +30,7 @@ impl Related<super::user::Entity> for Entity {
 impl ActiveModelBehavior for ActiveModel {}
 
 pub async fn get(user_id: u32) -> Result<Option<Model>, DbErr> {
-    let txn = get_txn("default").await?;
+    let txn = crate::Database::new("default").await?.txn;
     Entity::find()
         .filter(Column::UserId.eq(user_id))
         .one(&txn)
