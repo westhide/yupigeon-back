@@ -30,8 +30,8 @@ pub struct Model {
     seat_memo: String,
     passenger_name: String,
     passenger_id_no: String,
-    user_type: String,
-    user_name: String,
+    user_type: Option<String>,
+    user_name: Option<String>,
     u8_user_type: Option<String>,
     u8_user_name: Option<String>,
     u8_nickname: Option<String>,
@@ -51,7 +51,7 @@ pub enum Relation {}
 
 impl ActiveModelBehavior for ActiveModel {}
 
-pub async fn get(datetime_from: DateTime, datetime_end: DateTime) -> Result<Vec<Model>, DbErr> {
+pub async fn bill(datetime_from: DateTime, datetime_end: DateTime) -> Result<Vec<Model>, DbErr> {
     let txn = crate::Database::new("laiu8").await?.txn;
     Entity::find()
         .filter(Column::DepartureDatetime.gte(datetime_from))

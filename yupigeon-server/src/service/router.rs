@@ -17,10 +17,14 @@ pub fn generate() -> impl IntoEndpoint {
         .at("/greet/:name", get(api::greet::get))
         .at("/login", post(api::login::post))
         .at("/user", get(api::user::get))
-        .at("/ship_ticket_bill", get(api::ship_ticket_bill::get))
+        .at("/ship_ticket_bill", get(api::ship_ticket_bill::bill))
         .at(
             "/ship_ticket_bill/clients",
             get(api::ship_ticket_bill::clients),
+        )
+        .at(
+            "/ship_ticket_bill/conductors",
+            get(api::ship_ticket_bill::conductors),
         )
         .at(
             "/ship_ticket_bill/refresh_status",
@@ -43,8 +47,8 @@ pub fn generate() -> impl IntoEndpoint {
             post(api::ship_ticket_bill::client_sales),
         )
         .at(
-            "/ship_ticket_bill/offline_conductor_daily_receipt",
-            get(api::ship_ticket_bill::offline_conductor_daily_receipt),
+            "/ship_ticket_bill/conductor_daily_receipt",
+            post(api::ship_ticket_bill::conductor_daily_receipt),
         )
         .at(
             "/tenpay_bill/daily_receipt",

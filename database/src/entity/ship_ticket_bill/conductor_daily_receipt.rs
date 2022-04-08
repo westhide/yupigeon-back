@@ -2,7 +2,7 @@ use sea_orm::{entity::prelude::*, ConnectionTrait, FromQueryResult, Statement};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, FromQueryResult, Deserialize, Serialize)]
-pub struct OfflineConductorDailyReceipt {
+pub struct ConductorDailyReceipt {
     date: Date,
     user_name: String,
     receipt: Option<Decimal>,
@@ -17,14 +17,23 @@ pub struct OfflineConductorDailyReceipt {
     just_hcbb_amount: Option<Decimal>,
 }
 
-pub async fn offline_conductor_daily_receipt(
+pub async fn conductor_daily_receipt(
     datetime_from: DateTime,
     datetime_end: DateTime,
-) -> Result<Vec<OfflineConductorDailyReceipt>, DbErr> {
-    let txn = crate::Database::new("laiu8").await?.txn;
-    OfflineConductorDailyReceipt::find_by_statement(Statement::from_sql_and_values(
+    where_condition: &str,
+) -> Result<Vec<ConductorDailyReceipt>, DbErr> {
+    let database = crate::Database::new("laiu8").await?;
+
+    let set_from = format!("SET @from_time='{}';", datetime_from);
+    database.execute_sql(&set_from).await?;
+
+    let set_end = format!("SET @end_time='{}';", datetime_end);
+    database.execute_sql(&set_end).await?;
+
+    let txn = database.txn;
+    ConductorDailyReceipt::find_by_statement(Statement::from_string(
         txn.get_database_backend(),
-        r#"
+        format!("
             WITH offr AS (
                 SELECT
                     DATE( refund_finish_time ) date,
@@ -41,7 +50,7 @@ pub async fn offline_conductor_daily_receipt(
                 FROM ship_ticket_refund_bill
                 WHERE
                         user_type='线下'
-                        AND refund_finish_time >=? AND refund_finish_time <= ?
+                        AND refund_finish_time >=@from_time AND refund_finish_time <= @end_time
                 GROUP BY date,user_name
             )
             ,offp AS (
@@ -53,7 +62,7 @@ pub async fn offline_conductor_daily_receipt(
                 WHERE
                         user_type='线下'
                         AND pay_amount IS NOT NULL
-                        AND create_time >=? AND create_time <= ?
+                        AND create_time >=@from_time AND create_time <= @end_time
                 GROUP BY date,user_name
             )
             ,off AS (
@@ -102,16 +111,11 @@ pub async fn offline_conductor_daily_receipt(
                 IF(off.just_hcbb_amount>0,off.just_hcbb_amount,NULL) just_hcbb_amount
             FROM
                 off
-            WHERE off.sum_pay_amount>0 OR off.sum_fee>0 OR off.sum_refund_amount>0
+            WHERE (off.sum_pay_amount>0 OR off.sum_fee>0 OR off.sum_refund_amount>0)
+            {}
             ORDER BY off.date DESC,off.user_name
             ;
-        "#,
-        vec![
-            datetime_from.into(),
-            datetime_end.into(),
-            datetime_from.into(),
-            datetime_end.into(),
-        ],
+        ",where_condition),
     ))
     .all(&txn)
     .await

@@ -22,7 +22,7 @@ fn parse_datetime(time_str: &str) -> Result<NaiveDateTime> {
 }
 
 #[handler]
-pub async fn get(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
+pub async fn bill(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let DateTimeParams {
         begin_time: begin_time_str,
         end_time: end_time_str,
@@ -30,7 +30,7 @@ pub async fn get(Query(params): Query<DateTimeParams>) -> Result<impl IntoRespon
 
     let begin_time = parse_datetime(&begin_time_str)?;
     let end_time = parse_datetime(&end_time_str)?;
-    let ship_ticket_bill = entity::ship_ticket_bill::get(begin_time, end_time)
+    let ship_ticket_bill = entity::ship_ticket_bill::bill(begin_time, end_time)
         .await
         .map_err(BadRequest)?;
     Ok(Json(ship_ticket_bill))
@@ -42,6 +42,14 @@ pub async fn clients() -> Result<impl IntoResponse> {
         .await
         .map_err(BadRequest)?;
     Ok(Json(clients))
+}
+
+#[handler]
+pub async fn conductors() -> Result<impl IntoResponse> {
+    let conductors = entity::ship_ticket_bill::conductors()
+        .await
+        .map_err(BadRequest)?;
+    Ok(Json(conductors))
 }
 
 #[derive(Debug, Deserialize, Serialize, Default)]
@@ -138,20 +146,29 @@ pub async fn client_sales(Json(params): Json<ClientSalesParams>) -> Result<impl 
     Ok(Json(client_sales))
 }
 
+#[derive(Debug, Deserialize)]
+pub struct ConductorDailyReceiptParams {
+    begin_time: String,
+    end_time: String,
+    where_condition: Option<String>,
+}
+
 #[handler]
-pub async fn offline_conductor_daily_receipt(
-    Query(params): Query<DateTimeParams>,
+pub async fn conductor_daily_receipt(
+    Json(params): Json<ConductorDailyReceiptParams>,
 ) -> Result<impl IntoResponse> {
-    let DateTimeParams {
+    let ConductorDailyReceiptParams {
         begin_time: begin_time_str,
         end_time: end_time_str,
+        where_condition,
     } = params;
 
     let begin_time = parse_datetime(&begin_time_str)?;
     let end_time = parse_datetime(&end_time_str)?;
-    let offline_conductor_daily_receipt =
-        entity::ship_ticket_bill::offline_conductor_daily_receipt(begin_time, end_time)
+    let where_condition = where_condition.unwrap_or_default();
+    let conductor_daily_receipt =
+        entity::ship_ticket_bill::conductor_daily_receipt(begin_time, end_time, &where_condition)
             .await
             .map_err(BadRequest)?;
-    Ok(Json(offline_conductor_daily_receipt))
+    Ok(Json(conductor_daily_receipt))
 }
