@@ -1,4 +1,4 @@
-use database::entity;
+use database::query;
 use poem::{
     error::BadRequest,
     handler,
@@ -16,7 +16,7 @@ pub struct Params {
 #[handler]
 pub async fn get(Query(params): Query<Params>) -> Result<impl IntoResponse> {
     let Params { username, password } = params;
-    let user = entity::user::user(username, password)
+    let user = query::user::user(username, password)
         .await
         .map_err(BadRequest)?;
     Ok(Json(user))

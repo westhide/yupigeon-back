@@ -26,7 +26,7 @@ pub async fn daily_receipt(Query(params): Query<Params>) -> Result<impl IntoResp
 
     let begin_time = parse_datetime(&begin_time_str)?;
     let end_time = parse_datetime(&end_time_str)?;
-    let daily_receipt = database::tenpay_bill::daily_receipt(begin_time, end_time)
+    let daily_receipt = database::query::tenpay_bill::daily_receipt(begin_time, end_time)
         .await
         .map_err(BadRequest)?;
     Ok(Json(daily_receipt))

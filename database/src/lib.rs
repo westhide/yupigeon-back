@@ -6,8 +6,7 @@
 mod config;
 mod database;
 pub mod entity;
-pub mod ship_ticket_bill;
-pub mod tenpay_bill;
+pub mod query;
 
 pub use database::Database;
 pub use sea_orm;

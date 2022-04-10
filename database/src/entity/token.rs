@@ -28,11 +28,3 @@ impl Related<super::user::Entity> for Entity {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
-
-pub async fn token(user_id: u32) -> Result<Option<Model>, DbErr> {
-    let txn = crate::Database::new("default").await?.txn;
-    Entity::find()
-        .filter(Column::UserId.eq(user_id))
-        .one(&txn)
-        .await
-}

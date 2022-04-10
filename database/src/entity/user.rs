@@ -39,16 +39,3 @@ impl Linked for Link2User {
         vec![Relation::Token.def()]
     }
 }
-
-pub async fn user(
-    username: String,
-    password: String,
-) -> Result<Option<(Model, Option<super::token::Model>)>, DbErr> {
-    let txn = crate::Database::new("default").await?.txn;
-    Entity::find()
-        .find_also_linked(Link2User)
-        .filter(Column::Username.eq(username))
-        .filter(Column::Password.eq(password))
-        .one(&txn)
-        .await
-}

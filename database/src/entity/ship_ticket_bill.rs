@@ -50,15 +50,3 @@ pub struct Model {
 pub enum Relation {}
 
 impl ActiveModelBehavior for ActiveModel {}
-
-pub async fn ship_ticket_bill(
-    datetime_from: DateTime,
-    datetime_end: DateTime,
-) -> Result<Vec<Model>, DbErr> {
-    let txn = crate::Database::new("laiu8").await?.txn;
-    Entity::find()
-        .filter(Column::DepartureDatetime.gte(datetime_from))
-        .filter(Column::DepartureDatetime.lte(datetime_end))
-        .all(&txn)
-        .await
-}
