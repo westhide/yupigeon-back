@@ -40,7 +40,7 @@ impl Linked for Link2User {
     }
 }
 
-pub async fn get(
+pub async fn user(
     username: String,
     password: String,
 ) -> Result<Option<(Model, Option<super::token::Model>)>, DbErr> {
