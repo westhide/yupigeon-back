@@ -17,7 +17,7 @@ pub fn generate() -> impl IntoEndpoint {
         .at("/greet/:name", get(api::greet::get))
         .at("/login", post(api::login::post))
         .at("/user", get(api::user::get))
-        .at("/ship_ticket_bill", get(api::ship_ticket_bill::bill))
+        .at("/ship_ticket_bill/bill", get(api::ship_ticket_bill::bill))
         .at(
             "/ship_ticket_bill/clients",
             get(api::ship_ticket_bill::clients),
@@ -54,6 +54,7 @@ pub fn generate() -> impl IntoEndpoint {
             "/tenpay_bill/daily_receipt",
             get(api::tenpay_bill::daily_receipt),
         )
+        .at("/finance_account", get(api::finance_account::get))
         .with(Auth)
         .with(Tracing)
         .with(Compression)

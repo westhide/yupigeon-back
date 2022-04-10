@@ -6,3 +6,4 @@
 pub mod ship_ticket_bill;
 pub mod token;
 pub mod user;
+pub mod finance_account;
