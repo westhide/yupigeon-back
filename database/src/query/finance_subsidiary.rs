@@ -3,7 +3,7 @@ use serde::Serialize;
 
 use crate::entity::{
     finance_subsidiary_account as SubAccount, finance_subsidiary_client as SubClient,
-    finance_subsidiary_conductor as SubConductor,
+    finance_subsidiary_conductor as SubConductor, finance_subsidiary_group as SubGroup,
     finance_subsidiary_receipt_type as SubReceiptType,
 };
 
@@ -50,4 +50,20 @@ pub async fn update_items() -> Result<Vec<SubAccount::Model>, DbErr> {
 
     let result = vec![sub_client, sub_receipt_type, sub_conductor];
     Ok(result)
+}
+
+pub async fn subsidiary_group(id: i32) -> Result<(SubGroup::Model, Vec<SubAccount::Model>), DbErr> {
+    let txn = crate::Database::new("default").await?.txn;
+
+    let sub_group = SubGroup::Entity::find_by_id(id).one(&txn).await?;
+
+    if let Some(sub_group) = sub_group {
+        let sub_account = sub_group
+            .find_linked(SubGroup::Link2FinanceSubsidiaryGroup)
+            .all(&txn)
+            .await?;
+        Ok((sub_group, sub_account))
+    } else {
+        Err(DbErr::RecordNotFound("RecordNotFound".into()))
+    }
 }

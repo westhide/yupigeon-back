@@ -40,3 +40,19 @@ pub async fn subsidiary_account(
         .map_err(BadRequest)?;
     Ok(Json(subsidiary_account))
 }
+
+#[derive(Debug, Deserialize)]
+pub struct SubsidiaryGroupParams {
+    id: i32,
+}
+
+#[handler]
+pub async fn subsidiary_group(
+    Query(params): Query<SubsidiaryGroupParams>,
+) -> Result<impl IntoResponse> {
+    let SubsidiaryGroupParams { id } = params;
+    let subsidiary_group = query::finance_subsidiary::subsidiary_group(id)
+        .await
+        .map_err(BadRequest)?;
+    Ok(Json(subsidiary_group))
+}

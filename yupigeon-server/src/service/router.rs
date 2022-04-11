@@ -63,6 +63,10 @@ pub fn generate() -> impl IntoEndpoint {
             "/finance_subsidiary_account",
             get(api::finance_subsidiary::subsidiary_account),
         )
+        .at(
+            "/finance_subsidiary_group",
+            get(api::finance_subsidiary::subsidiary_group),
+        )
         .with(Auth)
         .with(Tracing)
         .with(Compression)
