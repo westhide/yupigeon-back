@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use once_cell::sync::OnceCell;
 use sea_orm::{
-    ConnectionTrait, DatabaseConnection, DatabaseTransaction, DbErr, ExecResult, Statement,
-    TransactionTrait,
+    sea_query::Value, ConnectionTrait, DatabaseConnection, DatabaseTransaction, DbErr, ExecResult,
+    FromQueryResult, Statement, TransactionTrait,
 };
 
 use crate::config::GLOBAL_CONFIG;
@@ -58,25 +58,39 @@ impl Database {
 
     pub async fn execute_sql(&self, sql: &str) -> Result<ExecResult, DbErr> {
         let txn = &self.txn;
-        txn.execute(Statement::from_string(
-            txn.get_database_backend(),
-            sql.into(),
-        ))
-        .await
+        let db_backend = txn.get_database_backend();
+        txn.execute(Statement::from_string(db_backend, sql.into()))
+            .await
     }
 
     pub async fn execute_multi_sql(&self, multi_sql: Vec<&str>) -> Result<Vec<ExecResult>, DbErr> {
         let txn = &self.txn;
+        let db_backend = txn.get_database_backend();
         let mut results = vec![];
         for sql in multi_sql {
             let result = txn
-                .execute(Statement::from_string(
-                    txn.get_database_backend(),
-                    sql.into(),
-                ))
+                .execute(Statement::from_string(db_backend, sql.into()))
                 .await?;
             results.push(result)
         }
         Ok(results)
+    }
+
+    pub async fn find_by_sql<T: FromQueryResult>(&self, sql: &str) -> Result<Vec<T>, DbErr> {
+        let db_backend = self.txn.get_database_backend();
+        T::find_by_statement(Statement::from_string(db_backend, sql.into()))
+            .all(&self.txn)
+            .await
+    }
+
+    pub async fn find_by_sql_and_values<T, V>(&self, sql: &str, values: V) -> Result<Vec<T>, DbErr>
+    where
+        T: FromQueryResult,
+        V: IntoIterator<Item = Value>,
+    {
+        let db_backend = self.txn.get_database_backend();
+        T::find_by_statement(Statement::from_sql_and_values(db_backend, sql, values))
+            .all(&self.txn)
+            .await
     }
 }

@@ -1,4 +1,4 @@
-use sea_orm::{entity::prelude::*, ConnectionTrait, FromQueryResult, Statement};
+use sea_orm::{entity::prelude::*, FromQueryResult};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, FromQueryResult, Deserialize, Serialize)]
@@ -7,16 +7,15 @@ pub struct Conductor {
 }
 
 pub async fn conductors() -> Result<Vec<Conductor>, DbErr> {
-    let txn = crate::Database::new("laiu8").await?.txn;
-    Conductor::find_by_statement(Statement::from_string(
-        txn.get_database_backend(),
-        r#"
+    let database = crate::Database::new("laiu8").await?;
+
+    database
+        .find_by_sql(
+            r#"
             SELECT  DISTINCT user_name AS value
             FROM ticket_bill
             WHERE user_type='线下'
-           "#
-        .into(),
-    ))
-    .all(&txn)
-    .await
+           "#,
+        )
+        .await
 }

@@ -1,4 +1,4 @@
-use sea_orm::{entity::prelude::*, ConnectionTrait, FromQueryResult, Statement};
+use sea_orm::{entity::prelude::*, FromQueryResult};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, FromQueryResult, Deserialize, Serialize)]
@@ -30,10 +30,7 @@ pub async fn conductor_daily_receipt(
     let set_end = format!("SET @end_time='{}';", datetime_end);
     database.execute_sql(&set_end).await?;
 
-    let txn = database.txn;
-    ConductorDailyReceipt::find_by_statement(Statement::from_string(
-        txn.get_database_backend(),
-        format!("
+    let sql = format!("
             WITH offr AS (
                 SELECT
                     DATE( refund_finish_time ) date,
@@ -115,8 +112,7 @@ pub async fn conductor_daily_receipt(
             {}
             ORDER BY off.date DESC,off.user_name
             ;
-        ",where_condition),
-    ))
-    .all(&txn)
-    .await
+        ",where_condition);
+
+    database.find_by_sql(&sql).await
 }

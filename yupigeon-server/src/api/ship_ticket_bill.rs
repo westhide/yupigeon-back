@@ -82,7 +82,7 @@ pub async fn refresh() -> Result<impl IntoResponse> {
             if !global_data.is_ship_ticket_bill_refresh {
                 tokio::spawn(async move {
                     global_data.is_ship_ticket_bill_refresh = true;
-                    query::ship_ticket_bill::refresh().await.unwrap();
+                    query::ship_ticket_bill::refresh().await.ok();
                     global_data.is_ship_ticket_bill_refresh = false;
                 });
             }
