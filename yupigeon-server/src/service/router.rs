@@ -55,6 +55,14 @@ pub fn generate() -> impl IntoEndpoint {
             get(api::tenpay_bill::daily_receipt),
         )
         .at("/finance_account", get(api::finance_account::get))
+        .at(
+            "/finance_subsidiary/update_items",
+            get(api::finance_subsidiary::update_items),
+        )
+        .at(
+            "/finance_subsidiary_account",
+            get(api::finance_subsidiary::subsidiary_account),
+        )
         .with(Auth)
         .with(Tracing)
         .with(Compression)

@@ -491,6 +491,7 @@ dependencies = [
  "once_cell",
  "sea-orm",
  "serde",
+ "serde_json",
 ]
 
 [[package]]
