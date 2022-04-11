@@ -93,6 +93,7 @@ pub async fn daily_receipt(
         ORDER BY date DESC
         ;
     "#;
+
     database
         .find_by_sql_and_values(
             sql,

@@ -11,9 +11,9 @@ pub async fn clients() -> Result<Vec<Client>, DbErr> {
     database
         .find_by_sql(
             r#"
-            SELECT  DISTINCT u8_vip_pact as value
-            FROM ticket_bill
-            WHERE IFNULL(u8_vip_pact,'')!=''
+                SELECT  DISTINCT u8_vip_pact as value
+                FROM ticket_bill
+                WHERE IFNULL(u8_vip_pact,'')!=''
            "#,
         )
         .await
