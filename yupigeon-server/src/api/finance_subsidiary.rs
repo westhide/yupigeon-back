@@ -47,12 +47,12 @@ pub struct SubsidiaryGroupParams {
 }
 
 #[handler]
-pub async fn subsidiary_group(
+pub async fn subsidiary_group_info(
     Query(params): Query<SubsidiaryGroupParams>,
 ) -> Result<impl IntoResponse> {
     let SubsidiaryGroupParams { id } = params;
-    let subsidiary_group = query::finance_subsidiary::subsidiary_group(id)
+    let subsidiary_group_info = query::finance_subsidiary::subsidiary_group_info(id)
         .await
         .map_err(BadRequest)?;
-    Ok(Json(subsidiary_group))
+    Ok(Json(subsidiary_group_info))
 }

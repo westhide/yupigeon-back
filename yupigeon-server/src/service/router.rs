@@ -54,7 +54,10 @@ pub fn generate() -> impl IntoEndpoint {
             "/tenpay_bill/daily_receipt",
             get(api::tenpay_bill::daily_receipt),
         )
-        .at("/finance_account", get(api::finance_account::get))
+        .at(
+            "/finance_account/finance_account_info",
+            get(api::finance_account::finance_account_info),
+        )
         .at(
             "/finance_subsidiary/update_items",
             get(api::finance_subsidiary::update_items),
@@ -64,12 +67,12 @@ pub fn generate() -> impl IntoEndpoint {
             get(api::finance_subsidiary::subsidiary_account),
         )
         .at(
-            "/finance_subsidiary/subsidiary_group",
-            get(api::finance_subsidiary::subsidiary_group),
+            "/finance_subsidiary/subsidiary_group_info",
+            get(api::finance_subsidiary::subsidiary_group_info),
         )
         .at(
-            "/finance_voucher/voucher_template",
-            get(api::finance_voucher::voucher_template),
+            "/finance_voucher/voucher_template_info",
+            get(api::finance_voucher::voucher_template_info),
         )
         .with(Auth)
         .with(Tracing)

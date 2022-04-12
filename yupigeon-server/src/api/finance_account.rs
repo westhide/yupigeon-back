@@ -13,11 +13,11 @@ pub struct Params {
 }
 
 #[handler]
-pub async fn get(Query(params): Query<Params>) -> Result<impl IntoResponse> {
+pub async fn finance_account_info(Query(params): Query<Params>) -> Result<impl IntoResponse> {
     let Params { code } = params;
 
-    let finance_account = query::finance_account::finance_account(&code)
+    let finance_account_info = query::finance_account::finance_account_info(&code)
         .await
         .map_err(BadRequest)?;
-    Ok(Json(finance_account))
+    Ok(Json(finance_account_info))
 }

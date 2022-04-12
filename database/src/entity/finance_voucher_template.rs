@@ -17,7 +17,7 @@ pub struct Model {
     voucher_id: Option<String>,
     entry_no: Option<String>,
     r#abstract: Option<String>,
-    finance_account_code: String,
+    pub finance_account_code: String,
     currency_type: Option<String>,
     currency_rate: Option<f32>,
     direction: Option<String>,

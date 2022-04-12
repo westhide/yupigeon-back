@@ -7,12 +7,12 @@ use crate::entity::{
 };
 
 #[derive(Serialize)]
-pub struct FinanceAccountLink {
+pub struct FinanceAccountInfo {
     finance_account: Model,
     subsidiary_account: Vec<SubAccount::Model>,
 }
 
-pub async fn finance_account(code: &str) -> Result<FinanceAccountLink, DbErr> {
+pub async fn finance_account_info(code: &str) -> Result<FinanceAccountInfo, DbErr> {
     let txn = crate::Database::new("default").await?.txn;
 
     let finance_account = Entity::find()
@@ -26,7 +26,7 @@ pub async fn finance_account(code: &str) -> Result<FinanceAccountLink, DbErr> {
                 .find_linked(Link2FinanceAccount)
                 .all(&txn)
                 .await?;
-            Ok(FinanceAccountLink {
+            Ok(FinanceAccountInfo {
                 finance_account,
                 subsidiary_account,
             })

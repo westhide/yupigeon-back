@@ -56,12 +56,12 @@ pub async fn update_items() -> Result<Vec<SubAccount::Model>, DbErr> {
 }
 
 #[derive(Serialize)]
-pub struct SubsidiaryGroupLink {
+pub struct SubsidiaryGroupInfo {
     subsidiary_group: SubGroup::Model,
     subsidiary_account: Vec<SubAccount::Model>,
 }
 
-pub async fn subsidiary_group(id: i32) -> Result<SubsidiaryGroupLink, DbErr> {
+pub async fn subsidiary_group_info(id: i32) -> Result<SubsidiaryGroupInfo, DbErr> {
     let txn = crate::Database::new("default").await?.txn;
 
     let subsidiary_group = SubGroup::Entity::find_by_id(id).one(&txn).await?;
@@ -72,7 +72,7 @@ pub async fn subsidiary_group(id: i32) -> Result<SubsidiaryGroupLink, DbErr> {
                 .find_linked(SubGroup::Link2FinanceSubsidiaryGroup)
                 .all(&txn)
                 .await?;
-            Ok(SubsidiaryGroupLink {
+            Ok(SubsidiaryGroupInfo {
                 subsidiary_group,
                 subsidiary_account,
             })
