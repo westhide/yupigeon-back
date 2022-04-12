@@ -27,7 +27,10 @@ where
     let items_json = serde_json::json!(items);
 
     let mut sub_account: SubAccount::ActiveModel =
-        find_subsidiary_account_by_code(code).await?.unwrap().into();
+        match find_subsidiary_account_by_code(code).await? {
+            Some(model) => model.into(),
+            None => return Err(DbErr::RecordNotFound("RecordNotFound".into())),
+        };
 
     sub_account.items = Set(items_json.into());
 
@@ -52,18 +55,28 @@ pub async fn update_items() -> Result<Vec<SubAccount::Model>, DbErr> {
     Ok(result)
 }
 
-pub async fn subsidiary_group(id: i32) -> Result<(SubGroup::Model, Vec<SubAccount::Model>), DbErr> {
+#[derive(Serialize)]
+pub struct SubsidiaryGroupLink {
+    subsidiary_group: SubGroup::Model,
+    subsidiary_account: Vec<SubAccount::Model>,
+}
+
+pub async fn subsidiary_group(id: i32) -> Result<SubsidiaryGroupLink, DbErr> {
     let txn = crate::Database::new("default").await?.txn;
 
-    let sub_group = SubGroup::Entity::find_by_id(id).one(&txn).await?;
+    let subsidiary_group = SubGroup::Entity::find_by_id(id).one(&txn).await?;
 
-    if let Some(sub_group) = sub_group {
-        let sub_account = sub_group
-            .find_linked(SubGroup::Link2FinanceSubsidiaryGroup)
-            .all(&txn)
-            .await?;
-        Ok((sub_group, sub_account))
-    } else {
-        Err(DbErr::RecordNotFound("RecordNotFound".into()))
+    match subsidiary_group {
+        Some(subsidiary_group) => {
+            let subsidiary_account = subsidiary_group
+                .find_linked(SubGroup::Link2FinanceSubsidiaryGroup)
+                .all(&txn)
+                .await?;
+            Ok(SubsidiaryGroupLink {
+                subsidiary_group,
+                subsidiary_account,
+            })
+        }
+        None => Err(DbErr::RecordNotFound("RecordNotFound".into())),
     }
 }

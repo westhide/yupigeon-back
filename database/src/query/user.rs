@@ -1,19 +1,31 @@
 use sea_orm::entity::prelude::*;
+use serde::Serialize;
 
 use crate::entity::{
     token,
-    user::{Column, Entity, Link2User, Model},
+    user::{Column, Entity, Model},
 };
 
-pub async fn user(
-    username: String,
-    password: String,
-) -> Result<Option<(Model, Option<token::Model>)>, DbErr> {
+#[derive(Serialize)]
+pub struct UserRelated {
+    user: Model,
+    token: Option<token::Model>,
+}
+
+pub async fn user(username: String, password: String) -> Result<UserRelated, DbErr> {
     let txn = crate::Database::new("default").await?.txn;
-    Entity::find()
-        .find_also_linked(Link2User)
+    let related = Entity::find()
+        .find_also_related(token::Entity)
         .filter(Column::Username.eq(username))
         .filter(Column::Password.eq(password))
         .one(&txn)
-        .await
+        .await?;
+
+    match related {
+        Some(related) => {
+            let (user, token) = related;
+            Ok(UserRelated { user, token })
+        }
+        None => Err(DbErr::RecordNotFound("RecordNotFound".into())),
+    }
 }
