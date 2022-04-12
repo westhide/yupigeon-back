@@ -5,6 +5,7 @@
 
 pub mod finance_account;
 pub mod finance_subsidiary;
+pub mod finance_voucher;
 pub mod greet;
 pub mod login;
 pub mod ship_ticket_bill;

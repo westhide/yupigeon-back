@@ -60,12 +60,16 @@ pub fn generate() -> impl IntoEndpoint {
             get(api::finance_subsidiary::update_items),
         )
         .at(
-            "/finance_subsidiary_account",
+            "/finance_subsidiary/subsidiary_account",
             get(api::finance_subsidiary::subsidiary_account),
         )
         .at(
-            "/finance_subsidiary_group",
+            "/finance_subsidiary/subsidiary_group",
             get(api::finance_subsidiary::subsidiary_group),
+        )
+        .at(
+            "/finance_voucher/voucher_template",
+            get(api::finance_voucher::voucher_template),
         )
         .with(Auth)
         .with(Tracing)

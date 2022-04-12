@@ -10,6 +10,7 @@ pub mod finance_subsidiary_client;
 pub mod finance_subsidiary_conductor;
 pub mod finance_subsidiary_group;
 pub mod finance_subsidiary_receipt_type;
+pub mod finance_voucher_template;
 pub mod ship_ticket_bill;
 pub mod token;
 pub mod user;
