@@ -6,6 +6,11 @@ use crate::entity::{
     finance_subsidiary_account as SubAccount,
 };
 
+pub async fn finance_accounts() -> Result<Vec<Model>, DbErr> {
+    let txn = crate::Database::new("default").await?.txn;
+    Entity::find().all(&txn).await
+}
+
 #[derive(Serialize)]
 pub struct FinanceAccountInfo {
     finance_account: Model,
