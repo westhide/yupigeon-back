@@ -14,18 +14,18 @@ pub struct Params {
 
 #[handler]
 pub async fn finance_accounts() -> Result<impl IntoResponse> {
-    let finance_account = query::finance_account::finance_accounts()
+    query::finance_account::finance_accounts()
         .await
-        .map_err(BadRequest)?;
-    Ok(Json(finance_account))
+        .map_err(BadRequest)
+        .map(Json)
 }
 
 #[handler]
 pub async fn finance_account_info(Query(params): Query<Params>) -> Result<impl IntoResponse> {
     let Params { code } = params;
 
-    let finance_account_info = query::finance_account::finance_account_info(&code)
+    query::finance_account::finance_account_info(&code)
         .await
-        .map_err(BadRequest)?;
-    Ok(Json(finance_account_info))
+        .map_err(BadRequest)
+        .map(Json)
 }

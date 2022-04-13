@@ -18,10 +18,10 @@ pub async fn voucher_template(
 ) -> Result<impl IntoResponse> {
     let VoucherTemplateParams { code } = params;
 
-    let voucher_template = query::finance_voucher::voucher_template(&code)
+    query::finance_voucher::voucher_template(&code)
         .await
-        .map_err(BadRequest)?;
-    Ok(Json(voucher_template))
+        .map_err(BadRequest)
+        .map(Json)
 }
 
 #[handler]
@@ -30,8 +30,8 @@ pub async fn voucher_template_info(
 ) -> Result<impl IntoResponse> {
     let VoucherTemplateParams { code } = params;
 
-    let voucher_template_info = query::finance_voucher::voucher_template_info(&code)
+    query::finance_voucher::voucher_template_info(&code)
         .await
-        .map_err(BadRequest)?;
-    Ok(Json(voucher_template_info))
+        .map_err(BadRequest)
+        .map(Json)
 }

@@ -9,19 +9,18 @@ use serde::Deserialize;
 
 #[handler]
 pub async fn subsidiary_clients() -> Result<impl IntoResponse> {
-    let subsidiary_clients = query::finance_subsidiary::subsidiary_clients()
+    query::finance_subsidiary::subsidiary_clients()
         .await
-        .map_err(BadRequest)?;
-    Ok(Json(subsidiary_clients))
+        .map_err(BadRequest)
+        .map(Json)
 }
 
 #[handler]
 pub async fn update_items() -> Result<impl IntoResponse> {
-    let result = query::finance_subsidiary::update_items()
+    query::finance_subsidiary::update_items()
         .await
-        .map_err(BadRequest)?;
-
-    Ok(Json(result))
+        .map_err(BadRequest)
+        .map(Json)
 }
 
 #[derive(Debug, Deserialize)]
@@ -35,10 +34,10 @@ pub async fn subsidiary_account(
 ) -> Result<impl IntoResponse> {
     let SubsidiaryAccountParams { code } = params;
 
-    let subsidiary_account = query::finance_subsidiary::find_subsidiary_account_by_code(&code)
+    query::finance_subsidiary::find_subsidiary_account_by_code(&code)
         .await
-        .map_err(BadRequest)?;
-    Ok(Json(subsidiary_account))
+        .map_err(BadRequest)
+        .map(Json)
 }
 
 #[derive(Debug, Deserialize)]
@@ -51,8 +50,9 @@ pub async fn subsidiary_group_info(
     Query(params): Query<SubsidiaryGroupParams>,
 ) -> Result<impl IntoResponse> {
     let SubsidiaryGroupParams { id } = params;
-    let subsidiary_group_info = query::finance_subsidiary::subsidiary_group_info(id)
+
+    query::finance_subsidiary::subsidiary_group_info(id)
         .await
-        .map_err(BadRequest)?;
-    Ok(Json(subsidiary_group_info))
+        .map_err(BadRequest)
+        .map(Json)
 }

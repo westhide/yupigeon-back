@@ -1,4 +1,3 @@
-use chrono::NaiveDateTime;
 use database::query;
 use poem::{
     error::BadRequest,
@@ -9,47 +8,35 @@ use poem::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::GLOBAL_DATA;
-
-#[derive(Debug, Deserialize)]
-pub struct DateTimeParams {
-    begin_time: String,
-    end_time: String,
-}
-
-fn parse_datetime(time_str: &str) -> Result<NaiveDateTime> {
-    NaiveDateTime::parse_from_str(time_str, "%Y-%m-%d %H:%M:%S").map_err(BadRequest)
-}
+use crate::{
+    service::utils::{parse_datetime, DateTimeParams, ParseDateTimeParams},
+    GLOBAL_DATA,
+};
 
 #[handler]
 pub async fn bill(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
-    let DateTimeParams {
-        begin_time: begin_time_str,
-        end_time: end_time_str,
-    } = params;
+    let (begin_time, end_time) = params.get_datetime_params()?;
 
-    let begin_time = parse_datetime(&begin_time_str)?;
-    let end_time = parse_datetime(&end_time_str)?;
-    let ship_ticket_bill = query::ship_ticket_bill::bill(begin_time, end_time)
+    query::ship_ticket_bill::bill(begin_time, end_time)
         .await
-        .map_err(BadRequest)?;
-    Ok(Json(ship_ticket_bill))
+        .map_err(BadRequest)
+        .map(Json)
 }
 
 #[handler]
 pub async fn clients() -> Result<impl IntoResponse> {
-    let clients = query::ship_ticket_bill::clients()
+    query::ship_ticket_bill::clients()
         .await
-        .map_err(BadRequest)?;
-    Ok(Json(clients))
+        .map_err(BadRequest)
+        .map(Json)
 }
 
 #[handler]
 pub async fn conductors() -> Result<impl IntoResponse> {
-    let conductors = query::ship_ticket_bill::conductors()
+    query::ship_ticket_bill::conductors()
         .await
-        .map_err(BadRequest)?;
-    Ok(Json(conductors))
+        .map_err(BadRequest)
+        .map(Json)
 }
 
 #[derive(Debug, Deserialize, Serialize, Default)]
@@ -93,32 +80,22 @@ pub async fn refresh() -> Result<impl IntoResponse> {
 
 #[handler]
 pub async fn daily_sales(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
-    let DateTimeParams {
-        begin_time: begin_time_str,
-        end_time: end_time_str,
-    } = params;
+    let (begin_time, end_time) = params.get_datetime_params()?;
 
-    let begin_time = parse_datetime(&begin_time_str)?;
-    let end_time = parse_datetime(&end_time_str)?;
-    let daily_sales = query::ship_ticket_bill::daily_sales(begin_time, end_time)
+    query::ship_ticket_bill::daily_sales(begin_time, end_time)
         .await
-        .map_err(BadRequest)?;
-    Ok(Json(daily_sales))
+        .map_err(BadRequest)
+        .map(Json)
 }
 
 #[handler]
 pub async fn daily_receipt(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
-    let DateTimeParams {
-        begin_time: begin_time_str,
-        end_time: end_time_str,
-    } = params;
+    let (begin_time, end_time) = params.get_datetime_params()?;
 
-    let begin_time = parse_datetime(&begin_time_str)?;
-    let end_time = parse_datetime(&end_time_str)?;
-    let daily_receipt = query::ship_ticket_bill::daily_receipt(begin_time, end_time)
+    query::ship_ticket_bill::daily_receipt(begin_time, end_time)
         .await
-        .map_err(BadRequest)?;
-    Ok(Json(daily_receipt))
+        .map_err(BadRequest)
+        .map(Json)
 }
 
 #[derive(Debug, Deserialize)]
@@ -139,11 +116,11 @@ pub async fn client_sales(Json(params): Json<ClientSalesParams>) -> Result<impl 
     let begin_time = parse_datetime(&begin_time_str)?;
     let end_time = parse_datetime(&end_time_str)?;
     let where_condition = where_condition.unwrap_or_default();
-    let client_sales =
-        query::ship_ticket_bill::client_sales(begin_time, end_time, &where_condition)
-            .await
-            .map_err(BadRequest)?;
-    Ok(Json(client_sales))
+
+    query::ship_ticket_bill::client_sales(begin_time, end_time, &where_condition)
+        .await
+        .map_err(BadRequest)
+        .map(Json)
 }
 
 #[derive(Debug, Deserialize)]
@@ -166,9 +143,9 @@ pub async fn conductor_daily_receipt(
     let begin_time = parse_datetime(&begin_time_str)?;
     let end_time = parse_datetime(&end_time_str)?;
     let where_condition = where_condition.unwrap_or_default();
-    let conductor_daily_receipt =
-        query::ship_ticket_bill::conductor_daily_receipt(begin_time, end_time, &where_condition)
-            .await
-            .map_err(BadRequest)?;
-    Ok(Json(conductor_daily_receipt))
+
+    query::ship_ticket_bill::conductor_daily_receipt(begin_time, end_time, &where_condition)
+        .await
+        .map_err(BadRequest)
+        .map(Json)
 }

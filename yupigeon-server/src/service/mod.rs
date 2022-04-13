@@ -6,3 +6,4 @@
 pub mod auth;
 pub mod global_data;
 pub mod router;
+pub mod utils;

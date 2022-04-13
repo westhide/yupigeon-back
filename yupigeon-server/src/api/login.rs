@@ -11,8 +11,8 @@ pub struct Params {
 #[handler]
 pub async fn post(Json(params): Json<Params>) -> Result<impl IntoResponse> {
     let Params { username, password } = params;
-    let user = query::user::user(username, password)
+    query::user::user(username, password)
         .await
-        .map_err(BadRequest)?;
-    Ok(Json(user))
+        .map_err(BadRequest)
+        .map(Json)
 }
