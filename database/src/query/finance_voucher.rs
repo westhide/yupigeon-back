@@ -12,7 +12,8 @@ pub async fn voucher_template(code: &str) -> Result<Vec<Model>, DbErr> {
 #[derive(Serialize)]
 pub struct VoucherTemplateInfo {
     template: Model,
-    finance_account_info: FinanceAccountInfo,
+    debit_info: FinanceAccountInfo,
+    credit_info: FinanceAccountInfo,
 }
 
 pub async fn voucher_template_info(code: &str) -> Result<Vec<VoucherTemplateInfo>, DbErr> {
@@ -20,11 +21,13 @@ pub async fn voucher_template_info(code: &str) -> Result<Vec<VoucherTemplateInfo
 
     let mut voucher_template_info_group = vec![];
     for template in voucher_templates {
-        let finance_account_code = &template.finance_account_code;
-        let finance_account_info = finance_account_info(finance_account_code).await?;
+        let debit_info = finance_account_info(&template.debit_finance_account_code).await?;
+        let credit_info = finance_account_info(&template.credit_finance_account_code).await?;
+
         let voucher_template_info = VoucherTemplateInfo {
             template,
-            finance_account_info,
+            debit_info,
+            credit_info,
         };
         voucher_template_info_group.push(voucher_template_info);
     }
