@@ -12,6 +12,7 @@ pub struct Model {
     id: i32,
     code: String,
     name: String,
+    field: Option<String>,
     items: Option<Json>,
 }
 

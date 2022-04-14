@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 #[sea_orm(table_name = "ticket_bill")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    #[serde(skip_deserializing, skip_serializing)]
+    #[serde(skip)]
     id: i32,
     #[sea_orm(column_type = "BigInteger")]
     link_order_id: i64,

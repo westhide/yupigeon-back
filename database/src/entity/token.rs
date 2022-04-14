@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 #[sea_orm(table_name = "token")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    #[serde(skip_deserializing, skip_serializing)]
+    #[serde(skip)]
     id: i32,
     user_id: i32,
     token: String,

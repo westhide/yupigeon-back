@@ -58,6 +58,7 @@ pub async fn update_items() -> Result<Vec<SubAccount::Model>, DbErr> {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SubsidiaryGroupInfo {
+    #[serde(flatten)]
     subsidiary_group: SubGroup::Model,
     subsidiary_account: Vec<SubAccount::Model>,
 }

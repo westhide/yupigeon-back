@@ -9,7 +9,7 @@ use poem::{
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    service::utils::{parse_datetime, DateTimeParams, ParseDateTimeParams},
+    service::utils::{DateTimeParams, ParseDateTimeParams},
     GLOBAL_DATA,
 };
 
@@ -102,21 +102,19 @@ pub async fn daily_receipt(Query(params): Query<DateTimeParams>) -> Result<impl 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ClientSalesParams {
-    begin_time: String,
-    end_time: String,
+    #[serde(flatten)]
+    datetime_params: DateTimeParams,
     where_condition: Option<String>,
 }
 
 #[handler]
 pub async fn client_sales(Json(params): Json<ClientSalesParams>) -> Result<impl IntoResponse> {
     let ClientSalesParams {
-        begin_time: begin_time_str,
-        end_time: end_time_str,
+        datetime_params,
         where_condition,
     } = params;
 
-    let begin_time = parse_datetime(&begin_time_str)?;
-    let end_time = parse_datetime(&end_time_str)?;
+    let (begin_time, end_time) = datetime_params.get_datetime_params()?;
     let where_condition = where_condition.unwrap_or_default();
 
     query::ship_ticket_bill::client_sales(begin_time, end_time, &where_condition)
@@ -128,8 +126,8 @@ pub async fn client_sales(Json(params): Json<ClientSalesParams>) -> Result<impl 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ConductorDailyReceiptParams {
-    begin_time: String,
-    end_time: String,
+    #[serde(flatten)]
+    datetime_params: DateTimeParams,
     where_condition: Option<String>,
 }
 
@@ -138,13 +136,11 @@ pub async fn conductor_daily_receipt(
     Json(params): Json<ConductorDailyReceiptParams>,
 ) -> Result<impl IntoResponse> {
     let ConductorDailyReceiptParams {
-        begin_time: begin_time_str,
-        end_time: end_time_str,
+        datetime_params,
         where_condition,
     } = params;
 
-    let begin_time = parse_datetime(&begin_time_str)?;
-    let end_time = parse_datetime(&end_time_str)?;
+    let (begin_time, end_time) = datetime_params.get_datetime_params()?;
     let where_condition = where_condition.unwrap_or_default();
 
     query::ship_ticket_bill::conductor_daily_receipt(begin_time, end_time, &where_condition)
