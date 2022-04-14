@@ -7,6 +7,7 @@ use crate::entity::{
 };
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct UserRelated {
     user: Model,
     token: Option<token::Model>,

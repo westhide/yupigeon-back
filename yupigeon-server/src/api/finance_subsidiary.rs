@@ -24,6 +24,7 @@ pub async fn update_items() -> Result<impl IntoResponse> {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SubsidiaryAccountParams {
     code: String,
 }
@@ -41,6 +42,7 @@ pub async fn subsidiary_account(
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SubsidiaryGroupParams {
     id: i32,
 }

@@ -3,7 +3,10 @@ use serde::{Deserialize, Serialize};
 
 use super::finance_link_subsidiary_group as link;
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Deserialize, Serialize)]
+#[derive(
+    Clone, Debug, PartialEq, Serialize, Deserialize, DeriveEntityModel, DeriveActiveModelBehavior,
+)]
+#[serde(rename_all = "camelCase")]
 #[sea_orm(table_name = "finance_account")]
 pub struct Model {
     #[sea_orm(primary_key)]
@@ -30,8 +33,6 @@ impl Related<super::finance_subsidiary_group::Entity> for Entity {
         Relation::FinanceSubsidiaryGroup.def()
     }
 }
-
-impl ActiveModelBehavior for ActiveModel {}
 
 #[derive(Debug)]
 pub struct Link2FinanceAccount;

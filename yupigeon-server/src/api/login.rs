@@ -3,6 +3,7 @@ use poem::{error::BadRequest, handler, web::Json, IntoResponse, Result};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Params {
     username: String,
     password: String,

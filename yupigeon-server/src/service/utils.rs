@@ -7,6 +7,7 @@ pub fn parse_datetime(time_str: &str) -> Result<NaiveDateTime> {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DateTimeParams {
     begin_time: String,
     end_time: String,

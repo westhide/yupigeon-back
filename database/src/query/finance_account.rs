@@ -12,6 +12,7 @@ pub async fn finance_accounts() -> Result<Vec<Model>, DbErr> {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FinanceAccountInfo {
     finance_account: Model,
     subsidiary_account: Vec<SubAccount::Model>,

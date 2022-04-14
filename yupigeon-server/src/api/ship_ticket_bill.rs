@@ -40,6 +40,7 @@ pub async fn conductors() -> Result<impl IntoResponse> {
 }
 
 #[derive(Debug, Deserialize, Serialize, Default)]
+#[serde(rename_all = "camelCase")]
 struct RefreshStatus {
     is_refresh: bool,
 }
@@ -99,6 +100,7 @@ pub async fn daily_receipt(Query(params): Query<DateTimeParams>) -> Result<impl 
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ClientSalesParams {
     begin_time: String,
     end_time: String,
@@ -124,6 +126,7 @@ pub async fn client_sales(Json(params): Json<ClientSalesParams>) -> Result<impl 
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ConductorDailyReceiptParams {
     begin_time: String,
     end_time: String,

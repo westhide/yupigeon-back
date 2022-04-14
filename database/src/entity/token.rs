@@ -1,7 +1,10 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Deserialize, Serialize)]
+#[derive(
+    Clone, Debug, PartialEq, Serialize, Deserialize, DeriveEntityModel, DeriveActiveModelBehavior,
+)]
+#[serde(rename_all = "camelCase")]
 #[sea_orm(table_name = "token")]
 pub struct Model {
     #[sea_orm(primary_key)]
@@ -26,5 +29,3 @@ impl Related<super::user::Entity> for Entity {
         Relation::User.def()
     }
 }
-
-impl ActiveModelBehavior for ActiveModel {}

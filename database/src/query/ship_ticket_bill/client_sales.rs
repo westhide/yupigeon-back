@@ -2,6 +2,7 @@ use sea_orm::{entity::prelude::*, FromQueryResult};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, FromQueryResult, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ClientSales {
     user_type: String,
     channel_name: String,

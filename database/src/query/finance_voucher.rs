@@ -10,6 +10,7 @@ pub async fn voucher_template(code: &str) -> Result<Vec<Model>, DbErr> {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct VoucherTemplateInfo {
     template: Model,
     debit_info: FinanceAccountInfo,
