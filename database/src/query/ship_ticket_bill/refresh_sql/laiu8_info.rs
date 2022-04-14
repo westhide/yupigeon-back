@@ -123,7 +123,7 @@ pub const UPDATE_LAIU8_INFO: &str = r#"
             u8vp.company_name,
             IF(u8org.name='新绎APP'
             ,u8p.pay_source,
-            IFNULL(u8org.longname,u8org.name)
+            IF(IFNULL(u8org.longname, '')!='', u8org.longname, u8org.name)
             )
         )
         ,tb.u8_payment_method = IF(tb.pay_amount IS NULL,NULL,u8p.pay_type)

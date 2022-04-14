@@ -4,7 +4,8 @@ use serde::Serialize;
 use crate::entity::{
     finance_subsidiary_account as SubAccount, finance_subsidiary_client as SubClient,
     finance_subsidiary_conductor as SubConductor, finance_subsidiary_group as SubGroup,
-    finance_subsidiary_receipt_type as SubReceiptType,
+    finance_subsidiary_receipt_type as SubReceiptType, finance_subsidiary_ship as SubShip,
+    finance_subsidiary_ship_line as SubShipLine,
 };
 
 pub async fn find_subsidiary_account_by_code(
@@ -46,13 +47,13 @@ pub async fn subsidiary_clients() -> Result<Vec<SubClient::Model>, DbErr> {
 }
 
 pub async fn update_items() -> Result<Vec<SubAccount::Model>, DbErr> {
-    let sub_client = update_subsidiary_account_items::<SubClient::Entity>("00001").await?;
-    let sub_receipt_type =
-        update_subsidiary_account_items::<SubReceiptType::Entity>("00044").await?;
-    let sub_conductor = update_subsidiary_account_items::<SubConductor::Entity>("00058").await?;
-
-    let result = vec![sub_client, sub_receipt_type, sub_conductor];
-    Ok(result)
+    Ok(vec![
+        update_subsidiary_account_items::<SubClient::Entity>("00001").await?,
+        update_subsidiary_account_items::<SubShipLine::Entity>("00028").await?,
+        update_subsidiary_account_items::<SubShip::Entity>("00029").await?,
+        update_subsidiary_account_items::<SubReceiptType::Entity>("00044").await?,
+        update_subsidiary_account_items::<SubConductor::Entity>("00058").await?,
+    ])
 }
 
 #[derive(Serialize)]

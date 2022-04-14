@@ -7,6 +7,7 @@ pub mod daily_receipt;
 pub mod daily_sales;
 pub mod refresh;
 pub mod refresh_sql;
+pub mod voucher_revenue;
 
 pub use bill::bill;
 pub use client_sales::client_sales;
@@ -16,3 +17,4 @@ pub use conductors::conductors;
 pub use daily_receipt::daily_receipt;
 pub use daily_sales::daily_sales;
 pub use refresh::refresh;
+pub use voucher_revenue::voucher_revenue;

@@ -148,3 +148,13 @@ pub async fn conductor_daily_receipt(
         .map_err(BadRequest)
         .map(Json)
 }
+
+#[handler]
+pub async fn voucher_revenue(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
+    let (begin_time, end_time) = params.get_datetime_params()?;
+
+    query::ship_ticket_bill::voucher_revenue(begin_time, end_time)
+        .await
+        .map_err(BadRequest)
+        .map(Json)
+}

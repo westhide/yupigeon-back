@@ -98,7 +98,7 @@ pub const CREATE_TABLE: &str = r#"
 pub const INSERT_KEY_RECORD: &str = r#"
     INSERT INTO ticket_bill ( serial_no, table_name, table_id, ticket_id, ticket_id_new, ticket_id_old, link_ticket_id, create_time )
     WITH
-        -- 截取指定期间，不含改签后、已取消状态的票记录
+        -- 截取指定期间,不含改签后、已取消状态的票记录
         tid AS (
         SELECT id FROM bt_ticket t
         WHERE NOT t.ticket_status <=> -1 -- 剔除已取消记录
@@ -254,7 +254,7 @@ pub const UPDATE_TICKET_INFO: &str = r#"
     LEFT JOIN bt_hcbb_history_detail hc2 ON tb2.table_id = hc2.id AND tb2.table_name = "bt_hcbb_history_detail"
     LEFT JOIN bt_hcbb_history hch2 ON hc2.history_id = hch2.id
 
-    LEFT JOIN bt_ticket_change_history cg ON tb.ticket_no = cg.ticket_no_new AND cg.link_order_id=tb.link_order_id	-- !ticket_no有重复,用order_id加强join唯一性，防止join重复陷阱
+    LEFT JOIN bt_ticket_change_history cg ON tb.ticket_no = cg.ticket_no_new AND cg.link_order_id=tb.link_order_id	-- !ticket_no有重复,用order_id加强join唯一性,防止join重复陷阱
     LEFT JOIN ul cg_ul ON cg.create_user = cg_ul.user
     LEFT JOIN sys_user cg_u ON cg_ul.code = cg_u.code
     LEFT JOIN bt_channel cg_c ON t.channel_id = cg_c.id

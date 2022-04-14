@@ -180,7 +180,7 @@ pub const INSERT_OTHER_RECORD: &str = r#"
 
         LEFT JOIN bt_ticket_change_history cg2 ON tb2.ticket_no = cg2.ticket_no_new
             AND cg2.link_order_id=tb2.link_order_id
-                    -- !ticket_no有重复,用order_id加强join唯一性，防止join重复陷阱
+                    -- !ticket_no有重复,用order_id加强join唯一性,防止join重复陷阱
         LEFT JOIN bt_ticket_change_order cgo2 ON cg2.change_order_id = cgo2.id
     )
     SELECT * FROM cte
