@@ -9,7 +9,7 @@ pub struct VoucherRevenue {
     conductor: String,
     ship_line: String,
     ship: String,
-    sum_ticket_price: Decimal,
+    currency_amount: Decimal,
 }
 
 pub async fn voucher_revenue(
@@ -58,7 +58,7 @@ pub async fn voucher_revenue(
             ) conductor
             ,ts.ship_line
             ,ts.ship
-            ,SUM(IFNULL(tb.pay_amount,0)-IFNULL(tr.sum_refund,0)-IFNULL(tr.sum_fee,0)) sum_ticket_price
+            ,SUM(IFNULL(tb.pay_amount,0)-IFNULL(tr.sum_refund,0)-IFNULL(tr.sum_fee,0)) currency_amount
         -- , SUM(tb.pay_amount) sum_pay_amount
         -- , SUM(tr.sum_refund) sum_refund_amount
         -- , SUM(tr.sum_fee) sum_fee
@@ -72,7 +72,7 @@ pub async fn voucher_revenue(
                 ,conductor
                 ,ship_line
                 ,ship
-        HAVING sum_ticket_price!=0
+        HAVING currency_amount!=0
         ;
     ").await
 }
