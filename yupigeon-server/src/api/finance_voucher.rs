@@ -36,3 +36,15 @@ pub async fn voucher_template_info(
         .map_err(BadRequest)
         .map(Json)
 }
+
+#[handler]
+pub async fn voucher_template_group(
+    Query(params): Query<VoucherTemplateParams>,
+) -> Result<impl IntoResponse> {
+    let VoucherTemplateParams { code } = params;
+
+    query::finance_voucher::voucher_template_group(&code)
+        .await
+        .map_err(BadRequest)
+        .map(Json)
+}

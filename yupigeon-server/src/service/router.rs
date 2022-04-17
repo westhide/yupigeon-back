@@ -86,6 +86,10 @@ pub fn generate() -> impl IntoEndpoint {
             "/finance_voucher/voucher_template_info",
             get(api::finance_voucher::voucher_template_info),
         )
+        .at(
+            "/finance_voucher/voucher_template_group",
+            get(api::finance_voucher::voucher_template_group),
+        )
         .with(Auth)
         .with(Tracing)
         .with(Compression)

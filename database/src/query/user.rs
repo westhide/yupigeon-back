@@ -20,13 +20,9 @@ pub async fn user(username: String, password: String) -> Result<UserRelated, DbE
         .filter(Column::Username.eq(username))
         .filter(Column::Password.eq(password))
         .one(&txn)
-        .await?;
+        .await?
+        .ok_or_else(|| DbErr::RecordNotFound("RecordNotFound".into()))?;
 
-    match related {
-        Some(related) => {
-            let (user, token) = related;
-            Ok(UserRelated { user, token })
-        }
-        None => Err(DbErr::RecordNotFound("RecordNotFound".into())),
-    }
+    let (user, token) = related;
+    Ok(UserRelated { user, token })
 }

@@ -2,10 +2,11 @@ use sea_orm::{entity::prelude::*, EntityTrait, Set};
 use serde::Serialize;
 
 use crate::entity::{
-    finance_subsidiary_account as SubAccount, finance_subsidiary_client as SubClient,
-    finance_subsidiary_conductor as SubConductor, finance_subsidiary_group as SubGroup,
-    finance_subsidiary_receipt_type as SubReceiptType, finance_subsidiary_ship as SubShip,
-    finance_subsidiary_ship_line as SubShipLine,
+    finance_subsidiary_account as SubAccount, finance_subsidiary_business as SubBusiness,
+    finance_subsidiary_client as SubClient, finance_subsidiary_conductor as SubConductor,
+    finance_subsidiary_group as SubGroup, finance_subsidiary_receipt_type as SubReceiptType,
+    finance_subsidiary_ship as SubShip, finance_subsidiary_ship_line as SubShipLine,
+    finance_subsidiary_tax as SubTax,
 };
 
 pub async fn find_subsidiary_account_by_code(
@@ -51,8 +52,10 @@ pub async fn update_items() -> Result<Vec<SubAccount::Model>, DbErr> {
         update_subsidiary_account_items::<SubClient::Entity>("00001").await?,
         update_subsidiary_account_items::<SubShipLine::Entity>("00028").await?,
         update_subsidiary_account_items::<SubShip::Entity>("00029").await?,
+        update_subsidiary_account_items::<SubBusiness::Entity>("00031").await?,
         update_subsidiary_account_items::<SubReceiptType::Entity>("00044").await?,
         update_subsidiary_account_items::<SubConductor::Entity>("00058").await?,
+        update_subsidiary_account_items::<SubTax::Entity>("00074").await?,
     ])
 }
 
@@ -67,19 +70,18 @@ pub struct SubsidiaryGroupInfo {
 pub async fn subsidiary_group_info(id: i32) -> Result<SubsidiaryGroupInfo, DbErr> {
     let txn = crate::Database::new("default").await?.txn;
 
-    let subsidiary_group = SubGroup::Entity::find_by_id(id).one(&txn).await?;
+    let subsidiary_group = SubGroup::Entity::find_by_id(id)
+        .one(&txn)
+        .await?
+        .ok_or_else(|| DbErr::RecordNotFound("RecordNotFound".into()))?;
 
-    match subsidiary_group {
-        Some(subsidiary_group) => {
-            let subsidiary_account = subsidiary_group
-                .find_linked(SubGroup::Link2FinanceSubsidiaryGroup)
-                .all(&txn)
-                .await?;
-            Ok(SubsidiaryGroupInfo {
-                subsidiary_group,
-                subsidiary_account,
-            })
-        }
-        None => Err(DbErr::RecordNotFound("RecordNotFound".into())),
-    }
+    let subsidiary_account = subsidiary_group
+        .find_linked(SubGroup::Link2FinanceSubsidiaryGroup)
+        .all(&txn)
+        .await?;
+
+    Ok(SubsidiaryGroupInfo {
+        subsidiary_group,
+        subsidiary_account,
+    })
 }

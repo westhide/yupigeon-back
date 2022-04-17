@@ -30,9 +30,9 @@ impl Related<super::token::Entity> for Entity {
 }
 
 #[derive(Debug)]
-pub struct Link2User;
+pub struct Link2Token;
 
-impl Linked for Link2User {
+impl Linked for Link2Token {
     type FromEntity = Entity;
     type ToEntity = super::token::Entity;
 

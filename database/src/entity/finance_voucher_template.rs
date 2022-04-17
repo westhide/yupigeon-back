@@ -10,7 +10,7 @@ pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
     id: i32,
-    code: String,
+    pub code: String,
     name: String,
     company_code: Option<String>,
     bookkeeping_date: Option<Date>,

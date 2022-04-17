@@ -35,9 +35,9 @@ impl Related<super::finance_subsidiary_group::Entity> for Entity {
 }
 
 #[derive(Debug)]
-pub struct Link2FinanceAccount;
+pub struct Link2FinanceSubsidiaryAccount;
 
-impl Linked for Link2FinanceAccount {
+impl Linked for Link2FinanceSubsidiaryAccount {
     type FromEntity = Entity;
     type ToEntity = super::finance_subsidiary_account::Entity;
 

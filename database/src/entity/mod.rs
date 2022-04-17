@@ -5,14 +5,18 @@
 
 pub mod finance_account;
 pub mod finance_link_subsidiary_group;
+pub mod finance_link_voucher_template_group;
 pub mod finance_subsidiary_account;
+pub mod finance_subsidiary_business;
 pub mod finance_subsidiary_client;
 pub mod finance_subsidiary_conductor;
 pub mod finance_subsidiary_group;
 pub mod finance_subsidiary_receipt_type;
-pub mod finance_subsidiary_ship_line;
 pub mod finance_subsidiary_ship;
+pub mod finance_subsidiary_ship_line;
+pub mod finance_subsidiary_tax;
 pub mod finance_voucher_template;
+pub mod finance_voucher_template_group;
 pub mod ship_ticket_bill;
 pub mod token;
 pub mod user;
