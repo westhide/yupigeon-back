@@ -9,7 +9,7 @@ pub struct VoucherRevenue {
     conductor: String,
     ship_line: String,
     ship: String,
-    currency_amount: Decimal,
+    amount: Decimal,
 }
 
 pub async fn voucher_revenue(
@@ -24,7 +24,9 @@ pub async fn voucher_revenue(
     let set_end = format!("SET @end_time='{}';", datetime_end);
     database.execute_sql(&set_end).await?;
 
-    database.find_by_sql("
+    database
+        .find_by_sql(
+            "
         WITH ts AS
         (
             SELECT  link_id
@@ -58,7 +60,7 @@ pub async fn voucher_revenue(
             ) conductor
             ,ts.ship_line
             ,ts.ship
-            ,SUM(IFNULL(tb.pay_amount,0)-IFNULL(tr.sum_refund,0)-IFNULL(tr.sum_fee,0)) currency_amount
+            ,SUM(IFNULL(tb.pay_amount,0)-IFNULL(tr.sum_refund,0)-IFNULL(tr.sum_fee,0)) amount
         -- , SUM(tb.pay_amount) sum_pay_amount
         -- , SUM(tr.sum_refund) sum_refund_amount
         -- , SUM(tr.sum_fee) sum_fee
@@ -72,7 +74,9 @@ pub async fn voucher_revenue(
                 ,conductor
                 ,ship_line
                 ,ship
-        HAVING currency_amount!=0
+        HAVING amount!=0
         ;
-    ").await
+    ",
+        )
+        .await
 }
