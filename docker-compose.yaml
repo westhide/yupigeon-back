@@ -1,0 +1,14 @@
+version: '3.6'
+services:
+  yupigeon-backend:
+    build: .
+    volumes:
+      - yupigeon-rust:/usr/src/myapp
+    ports:
+      - "9901:9901"
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+
+volumes:
+  yupigeon-rust:
