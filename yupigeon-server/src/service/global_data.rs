@@ -1,6 +1,8 @@
 use once_cell::sync::OnceCell;
-use poem::{error::BadRequest, http::StatusCode, Error, Result};
+use poem::Result;
 use tokio::sync::{Mutex, MutexGuard};
+
+use crate::service::error::error_msg;
 
 #[derive(Debug, Clone)]
 pub struct GlobalData {
@@ -24,9 +26,7 @@ pub fn init_global_data() {
 pub fn get_global_data() -> Result<MutexGuard<'static, GlobalData>> {
     GLOBAL_DATA
         .get()
-        .ok_or_else(|| {
-            Error::from_string("Can Not Get GLOBAL_DATA", StatusCode::INTERNAL_SERVER_ERROR)
-        })?
+        .ok_or_else(|| error_msg("Can Not Get GLOBAL_DATA"))?
         .try_lock()
-        .map_err(BadRequest)
+        .map_err(|_| error_msg("数据更新中").into())
 }

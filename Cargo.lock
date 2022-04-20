@@ -2855,6 +2855,8 @@ dependencies = [
  "once_cell",
  "poem",
  "serde",
+ "serde_json",
+ "thiserror",
  "tokio",
  "tracing-subscriber",
 ]

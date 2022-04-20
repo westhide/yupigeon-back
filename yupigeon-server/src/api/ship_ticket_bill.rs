@@ -41,13 +41,13 @@ pub async fn conductors() -> Result<impl IntoResponse> {
 
 #[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(rename_all = "camelCase")]
-struct RefreshStatus {
+pub struct RefreshStatus {
     is_refresh: bool,
     last_refresh_datetime: String,
 }
 
 #[handler]
-pub async fn refresh_status() -> Result<impl IntoResponse> {
+pub fn refresh_status() -> Result<Json<RefreshStatus>> {
     let global_data = get_global_data()?;
 
     let default_datetime = String::from("");
