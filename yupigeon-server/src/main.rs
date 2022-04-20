@@ -7,13 +7,10 @@ mod api;
 mod config;
 mod service;
 
-pub use global_data::GLOBAL_DATA;
 use poem::{listener::TcpListener, Server};
 
-use crate::{
-    config::GLOBAL_CONFIG,
-    service::{global_data, router},
-};
+pub use crate::service::global_data;
+use crate::{config::GLOBAL_CONFIG, service::router};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {

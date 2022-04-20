@@ -1,16 +1,16 @@
+use chrono::offset::Local;
 use database::query;
 use poem::{
     error::BadRequest,
     handler,
-    http::StatusCode,
     web::{Json, Query},
-    Error, IntoResponse, Result,
+    IntoResponse, Result,
 };
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    global_data::get_global_data,
     service::utils::{DateTimeParams, ParseDateTimeParams},
-    GLOBAL_DATA,
 };
 
 #[handler]
@@ -43,40 +43,44 @@ pub async fn conductors() -> Result<impl IntoResponse> {
 #[serde(rename_all = "camelCase")]
 struct RefreshStatus {
     is_refresh: bool,
+    last_refresh_datetime: String,
 }
 
 #[handler]
 pub async fn refresh_status() -> Result<impl IntoResponse> {
-    match GLOBAL_DATA.get() {
-        Some(global_data_mutex) => {
-            if let Ok(global_data) = global_data_mutex.try_lock() {
-                return Ok(Json(RefreshStatus {
-                    is_refresh: global_data.is_ship_ticket_bill_refresh,
-                }));
-            };
-            Ok(Json(RefreshStatus { is_refresh: true }))
-        }
-        None => Err(Error::from_string(
-            "Can Not Get GLOBAL_DATA",
-            StatusCode::INTERNAL_SERVER_ERROR,
-        )),
-    }
+    let global_data = get_global_data()?;
+
+    let default_datetime = String::from("");
+    let last_refresh_datetime = global_data
+        .last_refresh_datetime
+        .as_ref()
+        .unwrap_or(&default_datetime);
+
+    Ok(Json(RefreshStatus {
+        is_refresh: global_data.is_ship_ticket_bill_refresh,
+        last_refresh_datetime: last_refresh_datetime.clone(),
+    }))
 }
 
 #[handler]
 pub async fn refresh() -> Result<impl IntoResponse> {
-    if let Some(global_data_mutex) = GLOBAL_DATA.get() {
-        if let Ok(mut global_data) = global_data_mutex.try_lock() {
-            if !global_data.is_ship_ticket_bill_refresh {
-                tokio::spawn(async move {
-                    global_data.is_ship_ticket_bill_refresh = true;
-                    query::ship_ticket_bill::refresh().await.ok();
-                    global_data.is_ship_ticket_bill_refresh = false;
-                });
-            }
-        }
+    let mut global_data = get_global_data()?;
+
+    if !global_data.is_ship_ticket_bill_refresh {
+        tokio::spawn(async move {
+            global_data.is_ship_ticket_bill_refresh = true;
+
+            query::ship_ticket_bill::refresh().await.ok();
+
+            global_data.is_ship_ticket_bill_refresh = false;
+            global_data.last_refresh_datetime = Some(Local::now().to_string());
+        });
     }
-    Ok(Json(RefreshStatus { is_refresh: true }))
+
+    Ok(Json(RefreshStatus {
+        is_refresh: true,
+        ..Default::default()
+    }))
 }
 
 #[handler]
