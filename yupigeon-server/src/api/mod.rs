@@ -9,5 +9,5 @@ pub mod finance_voucher;
 pub mod greet;
 pub mod login;
 pub mod ship_ticket_bill;
-pub mod tenpay_bill;
+pub mod tenpay;
 pub mod user;
