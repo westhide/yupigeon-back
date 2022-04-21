@@ -8,6 +8,7 @@ pub struct ConductorDailyReceipt {
     user_name: String,
     receipt: Option<Decimal>,
     sum_pay_amount: Option<Decimal>,
+    petty_cash_fee: Option<Decimal>,
     sum_fee: Option<Decimal>,
     just_refund_fee: Option<Decimal>,
     just_change_fee: Option<Decimal>,
@@ -41,7 +42,7 @@ pub async fn conductor_daily_receipt(
                     SUM(IF(refund_type='改签废票',IF(refund_amount>0,refund_amount+fee,0),0)) just_change_amount,
                     SUM(IF(refund_type='已补差',IF(refund_amount>0,refund_amount+fee,0),0)) just_compensation_amount,
                     SUM(IF(refund_type='已换船',IF(refund_amount>0,refund_amount+fee,0),0)) just_hcbb_amount,
-                    SUM(IF(refund_amount>0,fee,0)) sum_repeat_fee,
+                    SUM(IF(refund_amount>0,fee,0)) petty_cash_fee,
                     SUM(fee) sum_fee,
                     SUM(IF(refund_type='已退款',fee,0)) just_refund_fee,
                     SUM(IF(refund_type='改签废票',fee,0)) just_change_fee
@@ -76,7 +77,7 @@ pub async fn conductor_daily_receipt(
                 offr.just_change_amount,
                 offr.just_compensation_amount,
                 offr.just_hcbb_amount,
-                offr.sum_repeat_fee
+                offr.petty_cash_fee
             FROM offp LEFT JOIN offr ON offp.date=offr.date AND offp.user_name=offr.user_name
             UNION
             SELECT
@@ -91,14 +92,15 @@ pub async fn conductor_daily_receipt(
                 offr.just_change_amount,
                 offr.just_compensation_amount,
                 offr.just_hcbb_amount,
-                offr.sum_repeat_fee
+                offr.petty_cash_fee
             FROM offp RIGHT JOIN offr ON offp.date=offr.date AND offp.user_name=offr.user_name
             )
             SELECT
                 off.date,
                 off.user_name,
-                IFNULL(off.sum_pay_amount,0) + IFNULL(off.sum_repeat_fee,0) receipt,
+                IFNULL(off.sum_pay_amount,0) + IFNULL(off.petty_cash_fee,0) receipt,
                 off.sum_pay_amount,
+                IF(off.petty_cash_fee>0,off.petty_cash_fee,NULL) petty_cash_fee,
                 IF(off.sum_fee>0,off.sum_fee,NULL) sum_fee,
                 IF(off.just_refund_fee>0,off.just_refund_fee,NULL) just_refund_fee,
                 IF(off.just_change_fee>0,off.just_change_fee,NULL) just_change_fee,
