@@ -18,22 +18,13 @@ pub fn generate() -> impl IntoEndpoint {
         .at("/login", post(api::login::post))
         .at("/user", get(api::user::get))
         .at("/ship_ticket/bill", get(api::ship_ticket::bill))
-        .at(
-            "/ship_ticket/clients",
-            get(api::ship_ticket::clients),
-        )
-        .at(
-            "/ship_ticket/conductors",
-            get(api::ship_ticket::conductors),
-        )
+        .at("/ship_ticket/clients", get(api::ship_ticket::clients))
+        .at("/ship_ticket/conductors", get(api::ship_ticket::conductors))
         .at(
             "/ship_ticket/refresh_status",
             get(api::ship_ticket::refresh_status),
         )
-        .at(
-            "/ship_ticket/refresh",
-            post(api::ship_ticket::refresh),
-        )
+        .at("/ship_ticket/refresh", post(api::ship_ticket::refresh))
         .at(
             "/ship_ticket/daily_sales",
             get(api::ship_ticket::daily_sales),
@@ -54,41 +45,35 @@ pub fn generate() -> impl IntoEndpoint {
             "/ship_ticket/voucher_revenue",
             get(api::ship_ticket::voucher_revenue),
         )
+        .at("/tenpay/daily_receipt", get(api::tenpay::daily_receipt))
         .at(
-            "/tenpay/daily_receipt",
-            get(api::tenpay::daily_receipt),
+            "/finance/finance_accounts",
+            get(api::finance::finance_accounts),
         )
         .at(
-            "/finance_account/finance_accounts",
-            get(api::finance_account::finance_accounts),
+            "/finance/finance_account_info",
+            get(api::finance::finance_account_info),
+        )
+        .at("/finance/update_items", get(api::finance::update_items))
+        .at(
+            "/finance/subsidiary_account",
+            get(api::finance::subsidiary_account),
         )
         .at(
-            "/finance_account/finance_account_info",
-            get(api::finance_account::finance_account_info),
+            "/finance/subsidiary_group_info",
+            get(api::finance::subsidiary_group_info),
         )
         .at(
-            "/finance_subsidiary/update_items",
-            get(api::finance_subsidiary::update_items),
+            "/finance/voucher_template",
+            get(api::finance::voucher_template),
         )
         .at(
-            "/finance_subsidiary/subsidiary_account",
-            get(api::finance_subsidiary::subsidiary_account),
+            "/finance/voucher_template_info",
+            get(api::finance::voucher_template_info),
         )
         .at(
-            "/finance_subsidiary/subsidiary_group_info",
-            get(api::finance_subsidiary::subsidiary_group_info),
-        )
-        .at(
-            "/finance_voucher/voucher_template",
-            get(api::finance_voucher::voucher_template),
-        )
-        .at(
-            "/finance_voucher/voucher_template_info",
-            get(api::finance_voucher::voucher_template_info),
-        )
-        .at(
-            "/finance_voucher/voucher_template_group",
-            get(api::finance_voucher::voucher_template_group),
+            "/finance/voucher_template_group",
+            get(api::finance::voucher_template_group),
         )
         .with(Auth)
         .with(Tracing)

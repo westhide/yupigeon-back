@@ -1,7 +1,7 @@
 use sea_orm::entity::prelude::*;
 use serde::Serialize;
 
-use super::finance_account::{finance_account_info, FinanceAccountInfo};
+use super::account::{finance_account_info, FinanceAccountInfo};
 use crate::entity::{
     finance_voucher_template as VoucherTemplate,
     finance_voucher_template_group as VoucherTemplateGroup,

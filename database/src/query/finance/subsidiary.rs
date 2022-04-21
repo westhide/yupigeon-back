@@ -19,7 +19,7 @@ pub async fn find_subsidiary_account_by_code(
         .await
 }
 
-async fn update_subsidiary_account_items<E>(code: &str) -> Result<SubAccount::Model, DbErr>
+async fn update_items<E>(code: &str) -> Result<SubAccount::Model, DbErr>
 where
     E: EntityTrait,
     E::Model: Serialize,
@@ -47,15 +47,15 @@ pub async fn subsidiary_clients() -> Result<Vec<SubClient::Model>, DbErr> {
     SubClient::Entity::find().all(&txn).await
 }
 
-pub async fn update_items() -> Result<Vec<SubAccount::Model>, DbErr> {
+pub async fn update_subsidiary_account_items() -> Result<Vec<SubAccount::Model>, DbErr> {
     Ok(vec![
-        update_subsidiary_account_items::<SubClient::Entity>("00001").await?,
-        update_subsidiary_account_items::<SubShipLine::Entity>("00028").await?,
-        update_subsidiary_account_items::<SubShip::Entity>("00029").await?,
-        update_subsidiary_account_items::<SubBusiness::Entity>("00031").await?,
-        update_subsidiary_account_items::<SubReceiptType::Entity>("00044").await?,
-        update_subsidiary_account_items::<SubConductor::Entity>("00058").await?,
-        update_subsidiary_account_items::<SubTax::Entity>("00074").await?,
+        update_items::<SubClient::Entity>("00001").await?,
+        update_items::<SubShipLine::Entity>("00028").await?,
+        update_items::<SubShip::Entity>("00029").await?,
+        update_items::<SubBusiness::Entity>("00031").await?,
+        update_items::<SubReceiptType::Entity>("00044").await?,
+        update_items::<SubConductor::Entity>("00058").await?,
+        update_items::<SubTax::Entity>("00074").await?,
     ])
 }
 
