@@ -17,42 +17,42 @@ pub fn generate() -> impl IntoEndpoint {
         .at("/greet/:name", get(api::greet::get))
         .at("/login", post(api::login::post))
         .at("/user", get(api::user::get))
-        .at("/ship_ticket_bill/bill", get(api::ship_ticket_bill::bill))
+        .at("/ship_ticket/bill", get(api::ship_ticket::bill))
         .at(
-            "/ship_ticket_bill/clients",
-            get(api::ship_ticket_bill::clients),
+            "/ship_ticket/clients",
+            get(api::ship_ticket::clients),
         )
         .at(
-            "/ship_ticket_bill/conductors",
-            get(api::ship_ticket_bill::conductors),
+            "/ship_ticket/conductors",
+            get(api::ship_ticket::conductors),
         )
         .at(
-            "/ship_ticket_bill/refresh_status",
-            get(api::ship_ticket_bill::refresh_status),
+            "/ship_ticket/refresh_status",
+            get(api::ship_ticket::refresh_status),
         )
         .at(
-            "/ship_ticket_bill/refresh",
-            post(api::ship_ticket_bill::refresh),
+            "/ship_ticket/refresh",
+            post(api::ship_ticket::refresh),
         )
         .at(
-            "/ship_ticket_bill/daily_sales",
-            get(api::ship_ticket_bill::daily_sales),
+            "/ship_ticket/daily_sales",
+            get(api::ship_ticket::daily_sales),
         )
         .at(
-            "/ship_ticket_bill/daily_receipt",
-            get(api::ship_ticket_bill::daily_receipt),
+            "/ship_ticket/daily_receipt",
+            get(api::ship_ticket::daily_receipt),
         )
         .at(
-            "/ship_ticket_bill/client_sales",
-            post(api::ship_ticket_bill::client_sales),
+            "/ship_ticket/client_sales",
+            post(api::ship_ticket::client_sales),
         )
         .at(
-            "/ship_ticket_bill/conductor_daily_receipt",
-            post(api::ship_ticket_bill::conductor_daily_receipt),
+            "/ship_ticket/conductor_daily_receipt",
+            post(api::ship_ticket::conductor_daily_receipt),
         )
         .at(
-            "/ship_ticket_bill/voucher_revenue",
-            get(api::ship_ticket_bill::voucher_revenue),
+            "/ship_ticket/voucher_revenue",
+            get(api::ship_ticket::voucher_revenue),
         )
         .at(
             "/tenpay/daily_receipt",

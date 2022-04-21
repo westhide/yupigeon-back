@@ -17,7 +17,7 @@ use crate::{
 pub async fn bill(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    query::ship_ticket_bill::bill(begin_time, end_time)
+    query::ship_ticket::bill(begin_time, end_time)
         .await
         .map_err(BadRequest)
         .map(Json)
@@ -25,7 +25,7 @@ pub async fn bill(Query(params): Query<DateTimeParams>) -> Result<impl IntoRespo
 
 #[handler]
 pub async fn clients() -> Result<impl IntoResponse> {
-    query::ship_ticket_bill::clients()
+    query::ship_ticket::clients()
         .await
         .map_err(BadRequest)
         .map(Json)
@@ -33,7 +33,7 @@ pub async fn clients() -> Result<impl IntoResponse> {
 
 #[handler]
 pub async fn conductors() -> Result<impl IntoResponse> {
-    query::ship_ticket_bill::conductors()
+    query::ship_ticket::conductors()
         .await
         .map_err(BadRequest)
         .map(Json)
@@ -70,7 +70,7 @@ pub async fn refresh() -> Result<impl IntoResponse> {
         tokio::spawn(async move {
             global_data.is_ship_ticket_bill_refresh = true;
 
-            query::ship_ticket_bill::refresh().await.ok();
+            query::ship_ticket::refresh().await.ok();
 
             global_data.is_ship_ticket_bill_refresh = false;
             global_data.last_refresh_datetime = Some(Local::now().to_string());
@@ -87,7 +87,7 @@ pub async fn refresh() -> Result<impl IntoResponse> {
 pub async fn daily_sales(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    query::ship_ticket_bill::daily_sales(begin_time, end_time)
+    query::ship_ticket::daily_sales(begin_time, end_time)
         .await
         .map_err(BadRequest)
         .map(Json)
@@ -97,7 +97,7 @@ pub async fn daily_sales(Query(params): Query<DateTimeParams>) -> Result<impl In
 pub async fn daily_receipt(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    query::ship_ticket_bill::daily_receipt(begin_time, end_time)
+    query::ship_ticket::daily_receipt(begin_time, end_time)
         .await
         .map_err(BadRequest)
         .map(Json)
@@ -121,7 +121,7 @@ pub async fn client_sales(Json(params): Json<ClientSalesParams>) -> Result<impl 
     let (begin_time, end_time) = datetime_params.get_datetime_params()?;
     let where_condition = where_condition.unwrap_or_default();
 
-    query::ship_ticket_bill::client_sales(begin_time, end_time, &where_condition)
+    query::ship_ticket::client_sales(begin_time, end_time, &where_condition)
         .await
         .map_err(BadRequest)
         .map(Json)
@@ -147,7 +147,7 @@ pub async fn conductor_daily_receipt(
     let (begin_time, end_time) = datetime_params.get_datetime_params()?;
     let where_condition = where_condition.unwrap_or_default();
 
-    query::ship_ticket_bill::conductor_daily_receipt(begin_time, end_time, &where_condition)
+    query::ship_ticket::conductor_daily_receipt(begin_time, end_time, &where_condition)
         .await
         .map_err(BadRequest)
         .map(Json)
@@ -157,7 +157,7 @@ pub async fn conductor_daily_receipt(
 pub async fn voucher_revenue(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    query::ship_ticket_bill::voucher_revenue(begin_time, end_time)
+    query::ship_ticket::voucher_revenue(begin_time, end_time)
         .await
         .map_err(BadRequest)
         .map(Json)

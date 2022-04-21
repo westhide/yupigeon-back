@@ -8,6 +8,6 @@ pub mod finance_subsidiary;
 pub mod finance_voucher;
 pub mod greet;
 pub mod login;
-pub mod ship_ticket_bill;
+pub mod ship_ticket;
 pub mod tenpay;
 pub mod user;
