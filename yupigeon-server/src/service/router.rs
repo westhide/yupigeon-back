@@ -62,7 +62,10 @@ pub fn generate() -> impl IntoEndpoint {
             "/finance/finance_account_info",
             get(api::finance::finance_account_info),
         )
-        .at("/finance/update_subsidiary_account_items", get(api::finance::update_subsidiary_account_items))
+        .at(
+            "/finance/update_subsidiary_account_items",
+            get(api::finance::update_subsidiary_account_items),
+        )
         .at(
             "/finance/subsidiary_account",
             get(api::finance::subsidiary_account),
