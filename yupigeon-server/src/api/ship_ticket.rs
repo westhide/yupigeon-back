@@ -147,7 +147,11 @@ pub async fn client_sales(Json(params): Json<ClientSalesParams>) -> Result<impl 
     } = params;
 
     let (begin_time, end_time) = datetime_params.get_datetime_params()?;
-    let where_condition = where_condition.unwrap_or_default();
+
+    let where_condition = match where_condition {
+        Some(where_condition) => format!(" WHERE {}", where_condition),
+        None => "".into(),
+    };
 
     query::ship_ticket::client_sales(begin_time, end_time, &where_condition)
         .await
@@ -173,7 +177,11 @@ pub async fn conductor_daily_receipt(
     } = params;
 
     let (begin_time, end_time) = datetime_params.get_datetime_params()?;
-    let where_condition = where_condition.unwrap_or_default();
+
+    let where_condition = match where_condition {
+        Some(where_condition) => format!(" AND {}", where_condition),
+        None => "".into(),
+    };
 
     query::ship_ticket::conductor_daily_receipt(begin_time, end_time, &where_condition)
         .await
