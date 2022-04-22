@@ -40,7 +40,7 @@ pub async fn subsidiary_clients() -> Result<impl IntoResponse> {
 }
 
 #[handler]
-pub async fn update_items() -> Result<impl IntoResponse> {
+pub async fn update_subsidiary_account_items() -> Result<impl IntoResponse> {
     query::finance::update_subsidiary_account_items()
         .await
         .map_err(BadRequest)

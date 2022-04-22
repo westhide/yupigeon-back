@@ -12,7 +12,7 @@ pub struct VoucherRevenue {
     sales: Decimal,
 }
 
-pub async fn voucher_revenue(
+pub async fn ticket_revenue(
     datetime_from: DateTime,
     datetime_end: DateTime,
 ) -> Result<Vec<VoucherRevenue>, DbErr> {

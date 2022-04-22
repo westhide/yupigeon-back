@@ -190,10 +190,20 @@ pub async fn conductor_daily_receipt(
 }
 
 #[handler]
-pub async fn voucher_revenue(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
+pub async fn ticket_revenue(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    query::ship_ticket::voucher_revenue(begin_time, end_time)
+    query::ship_ticket::ticket_revenue(begin_time, end_time)
+        .await
+        .map_err(BadRequest)
+        .map(Json)
+}
+
+#[handler]
+pub async fn fee_revenue(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
+    let (begin_time, end_time) = params.get_datetime_params()?;
+
+    query::ship_ticket::fee_revenue(begin_time, end_time)
         .await
         .map_err(BadRequest)
         .map(Json)
