@@ -18,5 +18,6 @@ pub mod finance_subsidiary_tax;
 pub mod finance_voucher_template;
 pub mod finance_voucher_template_group;
 pub mod ship_ticket_bill;
+pub mod ship_ticket_refund_bill;
 pub mod token;
 pub mod user;

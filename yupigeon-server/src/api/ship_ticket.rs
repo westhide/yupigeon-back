@@ -23,6 +23,34 @@ pub async fn bill(Query(params): Query<DateTimeParams>) -> Result<impl IntoRespo
         .map(Json)
 }
 
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RefundBillParams {
+    #[serde(flatten)]
+    datetime_params: DateTimeParams,
+    where_condition: Option<String>,
+}
+
+#[handler]
+pub async fn refund_bill(Json(params): Json<RefundBillParams>) -> Result<impl IntoResponse> {
+    let RefundBillParams {
+        datetime_params,
+        where_condition,
+    } = params;
+
+    let (begin_time, end_time) = datetime_params.get_datetime_params()?;
+
+    let where_condition = match where_condition {
+        Some(where_condition) => format!(" AND {}", where_condition),
+        None => "".into(),
+    };
+
+    query::ship_ticket::refund_bill(begin_time, end_time, &where_condition)
+        .await
+        .map_err(BadRequest)
+        .map(Json)
+}
+
 #[handler]
 pub async fn clients() -> Result<impl IntoResponse> {
     query::ship_ticket::clients()

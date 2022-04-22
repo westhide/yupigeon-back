@@ -18,6 +18,10 @@ pub fn generate() -> impl IntoEndpoint {
         .at("/login", post(api::login::post))
         .at("/user", get(api::user::get))
         .at("/ship_ticket/bill", get(api::ship_ticket::bill))
+        .at(
+            "/ship_ticket/refund_bill",
+            post(api::ship_ticket::refund_bill),
+        )
         .at("/ship_ticket/clients", get(api::ship_ticket::clients))
         .at("/ship_ticket/conductors", get(api::ship_ticket::conductors))
         .at(
