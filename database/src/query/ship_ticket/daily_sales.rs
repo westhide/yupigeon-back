@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 pub struct DailySales {
     date: Date,
     times: i64,
-    sales: Option<Decimal>,
+    sales: Decimal,
 }
 
 pub async fn daily_sales(
@@ -16,23 +16,40 @@ pub async fn daily_sales(
     let database = crate::Database::new("laiu8").await?;
 
     let sql = r#"
-        WITH td AS (
-            SELECT
-            ticket_status,
-            departure_datetime,
-            ticket_price
+        WITH tbd AS
+        (
+            SELECT  DISTINCT DATE(departure_datetime) date
             FROM ticket_bill
-            WHERE departure_datetime >=? AND departure_datetime <= ?
-            )
-
-        SELECT date(departure_datetime) date,count(1) times,sum(ticket_price) sales FROM td
-        WHERE ticket_status IN ('一检','二检','出票成功')
-        GROUP BY date
+            WHERE departure_datetime BETWEEN ? AND ?
+        ) , tbs AS
+        (
+            SELECT  DATE(departure_datetime) date
+                ,COUNT(1) times
+                ,SUM(ticket_price) sales
+            FROM ticket_bill
+            WHERE ticket_status IN ('一检', '二检', '出票成功')
+            AND departure_datetime BETWEEN ? AND ?
+            GROUP BY  date
+        )
+        SELECT  tbd.date
+            ,IFNULL(tbs.times,0) times
+            ,IFNULL(tbs.sales,0) sales
+        FROM tbd
+        LEFT JOIN tbs
+        ON tbd.date=tbs.date
         ORDER BY date
         ;
     "#;
 
     database
-        .find_by_sql_and_values(sql, vec![datetime_from.into(), datetime_end.into()])
+        .find_by_sql_and_values(
+            sql,
+            vec![
+                datetime_from.into(),
+                datetime_end.into(),
+                datetime_from.into(),
+                datetime_end.into(),
+            ],
+        )
         .await
 }
