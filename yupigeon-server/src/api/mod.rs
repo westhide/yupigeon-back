@@ -6,6 +6,7 @@
 pub mod finance;
 pub mod greet;
 pub mod login;
+pub mod mapper;
 pub mod ship_ticket;
 pub mod tenpay;
 pub mod user;
