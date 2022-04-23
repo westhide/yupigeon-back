@@ -17,6 +17,7 @@ pub mod finance_subsidiary_ship_line;
 pub mod finance_subsidiary_tax;
 pub mod finance_voucher_template;
 pub mod finance_voucher_template_group;
+pub mod investment_real_estates;
 pub mod mapper_domain_value;
 pub mod ship_ticket_bill;
 pub mod ship_ticket_refund_bill;
