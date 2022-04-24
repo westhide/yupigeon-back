@@ -23,6 +23,8 @@ pub struct Model {
     lease_end_date: Option<Date>,
     term: Option<u32>,
     total_rent: Option<Decimal>,
+    each_term_rent: Decimal,
+    attachment: Option<String>,
     remark: Option<String>,
 }
 

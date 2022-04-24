@@ -13,7 +13,7 @@ pub struct RentRevenue {
     debit_receipt_type: String,
     #[serde(rename(serialize = "C__receiptType"))]
     credit_receipt_type: String,
-    #[serde(rename(serialize = "C_taxRate"))]
+    #[serde(rename(serialize = "C__taxRate"))]
     credit_tax_rate: String,
     #[serde(rename(serialize = "C__businessType"))]
     credit_business_type: String,
