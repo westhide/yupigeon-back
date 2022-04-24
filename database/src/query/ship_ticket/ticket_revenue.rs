@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, FromQueryResult, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct VoucherRevenue {
+pub struct TicketRevenue {
     client: String,
     receipt_type: String,
     conductor: String,
@@ -15,7 +15,7 @@ pub struct VoucherRevenue {
 pub async fn ticket_revenue(
     datetime_from: DateTime,
     datetime_end: DateTime,
-) -> Result<Vec<VoucherRevenue>, DbErr> {
+) -> Result<Vec<TicketRevenue>, DbErr> {
     let database = crate::Database::new("laiu8").await?;
 
     let set_from = format!("SET @from_time='{}';", datetime_from);

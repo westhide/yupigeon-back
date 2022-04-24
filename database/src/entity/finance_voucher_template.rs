@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
-    id: i32,
+    id: u32,
     pub code: String,
     name: String,
     company_code: Option<String>,
@@ -28,13 +28,13 @@ pub struct Model {
     currency_rate: f32,
     direction: Option<String>,
     currency_amount: Option<f32>,
-    quantity: i64,
+    quantity: u32,
     unit_price: f32,
     amount: Option<f32>,
     creator: Option<String>,
     confirmor: Option<String>,
     auditor: Option<String>,
-    attachment_num: i64,
+    attachment_num: u32,
     confirm_mark: bool,
     system_module: Option<String>,
     delete_mark: bool,

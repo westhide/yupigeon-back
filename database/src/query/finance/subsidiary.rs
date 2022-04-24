@@ -67,7 +67,7 @@ pub struct SubsidiaryGroupInfo {
     subsidiary_account: Vec<SubAccount::Model>,
 }
 
-pub async fn subsidiary_group_info(id: i32) -> Result<SubsidiaryGroupInfo, DbErr> {
+pub async fn subsidiary_group_info(id: u32) -> Result<SubsidiaryGroupInfo, DbErr> {
     let txn = crate::Database::new("default").await?.txn;
 
     let subsidiary_group = SubGroup::Entity::find_by_id(id)

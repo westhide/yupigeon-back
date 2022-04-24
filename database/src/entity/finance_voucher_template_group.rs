@@ -11,7 +11,7 @@ use super::finance_link_voucher_template_group as link;
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
-    id: i32,
+    id: u32,
     code: String,
     name: String,
 }

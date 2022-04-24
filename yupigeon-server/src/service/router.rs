@@ -88,6 +88,10 @@ pub fn generate() -> impl IntoEndpoint {
         )
         .at("/mapper/domain_value", get(api::mapper::domain_value))
         .at("/commercial_street/bill", get(api::commercial_street::bill))
+        .at(
+            "/commercial_street/rent_revenue",
+            get(api::commercial_street::rent_revenue),
+        )
         .with(Auth)
         .with(Tracing)
         .with(Compression)

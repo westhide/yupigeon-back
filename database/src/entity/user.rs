@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
-    id: i32,
+    id: u32,
     #[sea_orm(unique)]
     username: String,
     #[sea_orm(unique)]

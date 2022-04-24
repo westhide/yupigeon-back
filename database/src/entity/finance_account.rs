@@ -11,11 +11,11 @@ use super::finance_link_subsidiary_group as link;
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
-    id: i32,
+    id: u32,
     code: String,
     name: String,
     direction: i8,
-    subsidiary_group_id: Option<i32>,
+    subsidiary_group_id: Option<u32>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

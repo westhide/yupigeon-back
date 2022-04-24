@@ -68,7 +68,7 @@ pub async fn subsidiary_account(
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SubsidiaryGroupParams {
-    id: i32,
+    id: u32,
 }
 
 #[handler]

@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
-    id: i32,
+    id: u32,
     name: String,
     location: Option<String>,
     code: String,
@@ -21,7 +21,7 @@ pub struct Model {
     business_type: Option<String>,
     lease_commencement_date: Option<Date>,
     lease_end_date: Option<Date>,
-    term: Option<i32>,
+    term: Option<u32>,
     total_rent: Option<Decimal>,
     remark: Option<String>,
 }

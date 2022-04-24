@@ -8,3 +8,11 @@ pub async fn bill() -> Result<impl IntoResponse> {
         .map_err(BadRequest)
         .map(Json)
 }
+
+#[handler]
+pub async fn rent_revenue() -> Result<impl IntoResponse> {
+    query::commercial_street::rent_revenue()
+        .await
+        .map_err(BadRequest)
+        .map(Json)
+}

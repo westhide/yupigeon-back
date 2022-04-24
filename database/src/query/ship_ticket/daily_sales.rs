@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct DailySales {
     date: Date,
-    times: i64,
+    times: i32,
     sales: Decimal,
 }
 
