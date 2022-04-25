@@ -5,17 +5,23 @@ use serde::{Deserialize, Serialize};
     Clone, Debug, PartialEq, Serialize, Deserialize, DeriveEntityModel, DeriveActiveModelBehavior,
 )]
 #[serde(rename_all = "camelCase")]
-#[sea_orm(table_name = "investment_real_estates")]
+#[sea_orm(table_name = "investment_real_estates_lease_history")]
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
     id: u32,
-    name: String,
-    location: Option<String>,
-    code: String,
-    floor: Option<String>,
-    leasable_area: Decimal,
-    status: Option<String>,
+    investment_real_estates_id: u32,
+    serial_no: u32,
+    client: String,
+    status: String,
+    brand: Option<String>,
+    business_type: Option<String>,
+    lease_commencement_date: Date,
+    lease_end_date: Date,
+    canceling_date: Option<Date>,
+    term: u32,
+    total_rent: Option<Decimal>,
+    each_term_rent: Option<Decimal>,
     attachment: Option<String>,
     remark: Option<String>,
 }

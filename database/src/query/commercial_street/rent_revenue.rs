@@ -27,6 +27,39 @@ pub async fn rent_revenue() -> Result<Vec<RentRevenue>, DbErr> {
     let database = crate::Database::new("default").await?;
 
     let sql = r#"
+            WITH irelh_latest AS
+            (
+                SELECT  investment_real_estates_id ire_id
+                    ,MAX( serial_no ) max_serial_no
+                FROM investment_real_estates_lease_history
+                GROUP BY  ire_id
+            ) , ireb AS
+            (
+                SELECT  ire.id
+                    ,ire.name
+                    ,ire.location
+                    ,ire.code
+                    ,ire.floor
+                    ,ire.leasable_area
+                    ,ire.status
+                    ,ire.attachment
+                    ,ire.remark
+                    ,irelh.client
+                    ,irelh.brand
+                    ,irelh.business_type
+                    ,irelh.status signing_status
+                    ,irelh.lease_commencement_date
+                    ,irelh.lease_end_date
+                    ,irelh.canceling_date
+                    ,irelh.term
+                    ,irelh.total_rent
+                    ,irelh.each_term_rent
+                FROM investment_real_estates ire
+                LEFT JOIN irelh_latest
+                ON irelh_latest.ire_id = ire.id
+                LEFT JOIN investment_real_estates_lease_history irelh
+                ON irelh.investment_real_estates_id = ire.id AND irelh.serial_no = irelh_latest.max_serial_no
+            )
             SELECT  CONCAT(name,'(',code,')','-',brand,'-',client) subsidiary_abstract
                 ,client debit_client
                 ,client credit_client
@@ -36,10 +69,11 @@ pub async fn rent_revenue() -> Result<Vec<RentRevenue>, DbErr> {
                 ,"其他" credit_business_type
                 ,SUM( each_term_rent ) monthly_rent
                 ,0.09 tax_rate
-            FROM investment_real_estates
-            WHERE status='已签约'
-            GROUP BY subsidiary_abstract , client
-            ;
+            FROM ireb
+            WHERE status='已租赁'
+            AND signing_status='已签约'
+            GROUP BY  subsidiary_abstract
+                    ,client ;
         "#;
 
     database.find_by_sql(sql).await
