@@ -7,7 +7,7 @@ COPY log.txt ./
 COPY Cargo.toml ./
 COPY Cargo.lock ./
 COPY database ./database
-COPY yupigeon-server ./yupigeon-server
+COPY server ./server
 
 RUN cargo build --release
 

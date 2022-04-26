@@ -10,7 +10,7 @@ pub static GLOBAL_CONFIG: Lazy<Config> = Lazy::new(|| config().unwrap());
 
 pub fn config() -> Result<Config, ConfigError> {
     Config::builder()
-        .add_source(config::File::with_name("yupigeon-server/Config"))
+        .add_source(config::File::with_name("server/Config"))
         // .add_source(config::Environment::with_prefix("APP"))
         .build()
 }
