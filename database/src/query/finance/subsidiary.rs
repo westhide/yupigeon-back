@@ -76,7 +76,7 @@ pub async fn subsidiary_group_info(id: u32) -> Result<SubsidiaryGroupInfo, DbErr
         .ok_or_else(|| DbErr::RecordNotFound("RecordNotFound".into()))?;
 
     let subsidiary_account = subsidiary_group
-        .find_linked(SubGroup::Link2FinanceSubsidiaryGroup)
+        .find_linked(SubGroup::Link2FinanceSubsidiaryAccount)
         .all(&txn)
         .await?;
 

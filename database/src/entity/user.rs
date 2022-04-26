@@ -40,3 +40,20 @@ impl Linked for Link2Token {
         vec![Relation::Token.def()]
     }
 }
+
+#[derive(Debug)]
+pub struct Link2Role;
+
+use super::link_user2role;
+
+impl Linked for Link2Role {
+    type FromEntity = Entity;
+    type ToEntity = super::role::Entity;
+
+    fn link(&self) -> Vec<RelationDef> {
+        vec![
+            link_user2role::Relation::User.def().rev(),
+            link_user2role::Relation::Role.def(),
+        ]
+    }
+}

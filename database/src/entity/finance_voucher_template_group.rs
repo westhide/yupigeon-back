@@ -1,8 +1,6 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use super::finance_link_voucher_template_group as link;
-
 #[derive(
     Clone, Debug, PartialEq, Serialize, Deserialize, DeriveEntityModel, DeriveActiveModelBehavior,
 )]
@@ -21,6 +19,8 @@ pub enum Relation {}
 
 #[derive(Debug)]
 pub struct Link2FinanceVoucherTemplate;
+
+use super::finance_link_voucher_template_group as link;
 
 impl Linked for Link2FinanceVoucherTemplate {
     type FromEntity = Entity;

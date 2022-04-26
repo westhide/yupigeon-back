@@ -1,8 +1,6 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use super::finance_link_subsidiary_group as link;
-
 #[derive(
     Clone, Debug, PartialEq, Serialize, Deserialize, DeriveEntityModel, DeriveActiveModelBehavior,
 )]
@@ -32,9 +30,11 @@ impl Related<super::finance_subsidiary_account::Entity> for Entity {
 }
 
 #[derive(Debug)]
-pub struct Link2FinanceSubsidiaryGroup;
+pub struct Link2FinanceSubsidiaryAccount;
 
-impl Linked for Link2FinanceSubsidiaryGroup {
+use super::finance_link_subsidiary_group as link;
+
+impl Linked for Link2FinanceSubsidiaryAccount {
     type FromEntity = Entity;
     type ToEntity = super::finance_subsidiary_account::Entity;
 
