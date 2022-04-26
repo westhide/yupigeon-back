@@ -1,14 +1,14 @@
 version: '3.6'
 services:
-  yupigeon-backend:
+  tibetour-backend:
     build: .
     volumes:
-      - yupigeon-rust:/usr/src/myapp
+      - tibetour-rust:/usr/src/myapp
     ports:
-      - "9901:9901"
+      - "9902:9902"
     restart: always
     environment:
       TZ: Asia/Shanghai
 
 volumes:
-  yupigeon-rust:
+  tibetour-rust:

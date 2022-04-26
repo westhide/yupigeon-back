@@ -13,4 +13,4 @@ RUN cargo build --release
 
 CMD cargo run --release
 
-EXPOSE 9901
+EXPOSE 9902

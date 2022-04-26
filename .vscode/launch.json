@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'yupigeon-server'",
+            "name": "Debug executable 'server'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=yupigeon-server",
-                    "--package=yupigeon-server"
+                    "--bin=server",
+                    "--package=server"
                 ],
                 "filter": {
-                    "name": "yupigeon-server",
+                    "name": "server",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'yupigeon-server'",
+            "name": "Debug unit tests in executable 'server'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=yupigeon-server",
-                    "--package=yupigeon-server"
+                    "--bin=server",
+                    "--package=server"
                 ],
                 "filter": {
-                    "name": "yupigeon-server",
+                    "name": "server",
                     "kind": "bin"
                 }
             },
