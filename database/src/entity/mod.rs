@@ -3,6 +3,8 @@
 // @Last Modified by:   westhide.yzw
 // @Last Modified time: 2022-03-20 17:45:02
 
+pub mod canyon_offline_ticket_bill;
+pub mod canyon_online_ticket_bill;
 pub mod finance_account;
 pub mod finance_link_subsidiary_group;
 pub mod finance_link_voucher_template_group;

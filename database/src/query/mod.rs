@@ -1,3 +1,4 @@
+pub mod canyon;
 pub mod commercial_street;
 pub mod finance;
 pub mod mapper;

@@ -28,5 +28,9 @@ pub async fn user(username: String, password: String) -> Result<UserInfo, DbErr>
 
     let roles = user.find_linked(Link2Role).all(&txn).await?;
 
-    Ok(UserInfo { user, token_info, roles })
+    Ok(UserInfo {
+        user,
+        token_info,
+        roles,
+    })
 }

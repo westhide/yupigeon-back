@@ -92,6 +92,10 @@ pub fn generate() -> impl IntoEndpoint {
             "/commercial_street/rent_revenue",
             get(api::commercial_street::rent_revenue),
         )
+        .at(
+            "/canyon/upload_ticket_data",
+            post(api::canyon::upload_ticket_data),
+        )
         .with(Auth)
         .with(Tracing)
         .with(Compression)
