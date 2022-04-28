@@ -10,6 +10,7 @@ pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
     id: u32,
+    trade_type: String,
     operator: String,
     trade_no: String,
     group_no: Option<String>,
