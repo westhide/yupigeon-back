@@ -61,6 +61,7 @@ pub async fn bill() -> Result<Vec<Bill>, DbErr> {
             LEFT JOIN investment_real_estates_lease_history irelh
             ON irelh.investment_real_estates_id = ire.id AND irelh.serial_no = irelh_latest.max_serial_no
             ORDER BY ire.code
+            ;
         "#;
 
     database.find_by_sql(sql).await

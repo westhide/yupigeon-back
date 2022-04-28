@@ -12,7 +12,6 @@ pub struct Model {
     id: u32,
     #[sea_orm(unique)]
     username: String,
-    #[sea_orm(unique)]
     #[serde(skip_deserializing, skip_serializing)]
     password: String,
 }

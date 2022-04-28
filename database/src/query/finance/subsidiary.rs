@@ -64,7 +64,7 @@ pub async fn update_subsidiary_account_items() -> Result<Vec<SubAccount::Model>,
 pub struct SubsidiaryGroupInfo {
     #[serde(flatten)]
     subsidiary_group: SubGroup::Model,
-    subsidiary_account: Vec<SubAccount::Model>,
+    subsidiary_accounts: Vec<SubAccount::Model>,
 }
 
 pub async fn subsidiary_group_info(id: u32) -> Result<SubsidiaryGroupInfo, DbErr> {
@@ -75,13 +75,13 @@ pub async fn subsidiary_group_info(id: u32) -> Result<SubsidiaryGroupInfo, DbErr
         .await?
         .ok_or_else(|| DbErr::RecordNotFound("RecordNotFound".into()))?;
 
-    let subsidiary_account = subsidiary_group
+    let subsidiary_accounts = subsidiary_group
         .find_linked(SubGroup::Link2FinanceSubsidiaryAccount)
         .all(&txn)
         .await?;
 
     Ok(SubsidiaryGroupInfo {
         subsidiary_group,
-        subsidiary_account,
+        subsidiary_accounts,
     })
 }

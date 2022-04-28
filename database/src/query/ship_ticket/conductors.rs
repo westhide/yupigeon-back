@@ -16,6 +16,7 @@ pub async fn conductors() -> Result<Vec<Conductor>, DbErr> {
                 SELECT  DISTINCT user_name AS value
                 FROM ticket_bill
                 WHERE user_type='线下'
+                ;
            "#,
         )
         .await

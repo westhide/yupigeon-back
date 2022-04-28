@@ -5,7 +5,7 @@ use database::{
 use poem::{error::BadRequest, handler, web::Json, IntoResponse, Result};
 use serde::Deserialize;
 
-use crate::service::utils::Response;
+use crate::service::utils::{DateTimeParams, ParseDateTimeParams, Response};
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -40,4 +40,30 @@ pub async fn upload_ticket_data(Json(params): Json<TicketData>) -> Result<impl I
     }
 
     Response::<String>::new(None, "导入成功")
+}
+
+#[handler]
+pub async fn update_ticket_type_items() -> Result<impl IntoResponse> {
+    query::canyon::update_ticket_type_items()
+        .await
+        .map_err(BadRequest)
+        .map(Json)
+}
+
+#[handler]
+pub async fn ticket_types() -> Result<impl IntoResponse> {
+    query::canyon::ticket_types()
+        .await
+        .map_err(BadRequest)
+        .map(Json)
+}
+
+#[handler]
+pub async fn daily_sales(Json(params): Json<DateTimeParams>) -> Result<impl IntoResponse> {
+    let (begin_time, end_time) = params.get_datetime_params()?;
+
+    query::canyon::daily_sales(begin_time, end_time)
+        .await
+        .map_err(BadRequest)
+        .map(Json)
 }

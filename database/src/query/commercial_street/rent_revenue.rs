@@ -73,7 +73,8 @@ pub async fn rent_revenue() -> Result<Vec<RentRevenue>, DbErr> {
             WHERE status='已租赁'
             AND signing_status='已签约'
             GROUP BY  subsidiary_abstract
-                    ,client ;
+                    ,client
+            ;
         "#;
 
     database.find_by_sql(sql).await

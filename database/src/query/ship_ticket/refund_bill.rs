@@ -29,6 +29,7 @@ pub async fn refund_bill(
             FROM ship_ticket_refund_bill
             WHERE refund_finish_time BETWEEN '{}' AND '{}'
             {}
+            ;
         ",
         datetime_from, datetime_end, where_condition
     );

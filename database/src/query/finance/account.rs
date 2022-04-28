@@ -16,7 +16,7 @@ pub async fn finance_accounts() -> Result<Vec<Model>, DbErr> {
 pub struct FinanceAccountInfo {
     #[serde(flatten)]
     finance_account: Model,
-    subsidiary_account: Vec<SubAccount::Model>,
+    subsidiary_accounts: Vec<SubAccount::Model>,
 }
 
 pub async fn finance_account_info(code: &str) -> Result<FinanceAccountInfo, DbErr> {
@@ -28,13 +28,13 @@ pub async fn finance_account_info(code: &str) -> Result<FinanceAccountInfo, DbEr
         .await?
         .ok_or_else(|| DbErr::RecordNotFound("RecordNotFound".into()))?;
 
-    let subsidiary_account = finance_account
+    let subsidiary_accounts = finance_account
         .find_linked(Link2FinanceSubsidiaryAccount)
         .all(&txn)
         .await?;
 
     Ok(FinanceAccountInfo {
         finance_account,
-        subsidiary_account,
+        subsidiary_accounts,
     })
 }

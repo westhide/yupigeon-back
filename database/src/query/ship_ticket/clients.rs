@@ -15,6 +15,7 @@ pub async fn clients() -> Result<Vec<Client>, DbErr> {
                 SELECT  DISTINCT u8_vip_pact as value
                 FROM ticket_bill
                 WHERE IFNULL(u8_vip_pact,'')!=''
+                ;
            "#,
         )
         .await
