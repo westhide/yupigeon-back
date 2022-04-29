@@ -33,10 +33,11 @@ pub struct DailySales {
 pub async fn daily_sales(
     datetime_from: DateTime,
     datetime_end: DateTime,
+    where_condition: &str,
 ) -> Result<Vec<DailySales>, DbErr> {
     let database = crate::Database::new("default").await?;
 
-    let sql = "
+    let sql = format!("
             WITH offt AS
             (
                 SELECT  DISTINCT *
@@ -60,16 +61,18 @@ pub async fn daily_sales(
                 FROM offt
                 UNION ALL(
                 SELECT  'sale' trade_type
-                    ,check_in_datetime trade_time
+                    ,ont.check_in_datetime trade_time
                     ,'线上' channel
-                    ,'线上' operator
-                    ,'线上' payment_method
-                    ,client
-                    ,'' ticket_type_raw
-                    ,ticket_price
-                    ,ticket_num
-                    ,ticket_amount
-                FROM ont )
+                    ,ont.client operator
+                    ,( CASE tc.type WHEN 'online' THEN '挂账' WHEN 'travelAgency' THEN '返利' END ) payment_method
+                    ,ont.client
+                    ,ont.ticket_type ticket_type_raw
+                    ,ont.ticket_price
+                    ,ont.ticket_num
+                    ,ont.ticket_amount
+                FROM ont
+                LEFT JOIN canyon_ticket_client tc
+                ON tc.name=ont.client )
             )
             SELECT  DATE( trade_time ) date
                 ,channel
@@ -84,6 +87,7 @@ pub async fn daily_sales(
             LEFT JOIN mapper_domain_value mdv
             ON mdv.domain='CanyonTicket' AND mdv.type='ticket_type' AND tb.ticket_type_raw=mdv.from_value
             WHERE trade_time BETWEEN ? AND ?
+            {}
             GROUP BY  date
                     ,channel
                     ,operator
@@ -92,9 +96,9 @@ pub async fn daily_sales(
                     ,ticket_type
                     ,ticket_price
             ;
-        ";
+        ",where_condition);
 
     database
-        .find_by_sql_and_values(sql, vec![datetime_from.into(), datetime_end.into()])
+        .find_by_sql_and_values(&sql, vec![datetime_from.into(), datetime_end.into()])
         .await
 }

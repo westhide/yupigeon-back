@@ -26,8 +26,16 @@ pub async fn update_ticket_type_items() -> Result<Vec<TicketType::Model>, DbErr>
     Ok(results)
 }
 
-pub async fn ticket_types() -> Result<Vec<TicketType::Model>, DbErr> {
+pub async fn ticket_types(scope: Option<&str>) -> Result<Vec<TicketType::Model>, DbErr> {
     let txn = crate::Database::new("default").await?.txn;
 
-    TicketType::Entity::find().all(&txn).await
+    match scope {
+        Some(scope) => {
+            TicketType::Entity::find()
+                .filter(TicketType::Column::Scope.contains(scope))
+                .all(&txn)
+                .await
+        }
+        None => TicketType::Entity::find().all(&txn).await,
+    }
 }

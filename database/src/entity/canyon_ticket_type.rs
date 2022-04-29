@@ -14,6 +14,7 @@ pub struct Model {
     name: String,
     price: Decimal,
     items: Option<Json>,
+    scope: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

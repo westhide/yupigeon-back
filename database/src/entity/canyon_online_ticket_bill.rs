@@ -14,6 +14,7 @@ pub struct Model {
     out_order_no: String,
     order_datetime: DateTime,
     visit_datetime: DateTime,
+    ticket_type: String,
     ticket_price: Decimal,
     ticket_num: i32,
     ticket_amount: Decimal,

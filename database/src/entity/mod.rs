@@ -6,6 +6,7 @@
 pub mod canyon_link_ticket_type;
 pub mod canyon_offline_ticket_bill;
 pub mod canyon_online_ticket_bill;
+pub mod canyon_ticket_client;
 pub mod canyon_ticket_type;
 pub mod canyon_ticket_type_item;
 pub mod finance_account;
