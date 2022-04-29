@@ -64,7 +64,7 @@ pub async fn daily_sales(
                     ,ont.check_in_datetime trade_time
                     ,'线上' channel
                     ,ont.client operator
-                    ,( CASE tc.type WHEN 'online' THEN '挂账' WHEN 'travelAgency' THEN '返利' END ) payment_method
+                    ,IFNULL(tc.payment_type, '') payment_method
                     ,ont.client
                     ,ont.ticket_type ticket_type_raw
                     ,ont.ticket_price
