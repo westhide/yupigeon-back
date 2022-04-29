@@ -65,7 +65,7 @@ pub struct TicketTypeParams {
 pub async fn ticket_types(Query(params): Query<TicketTypeParams>) -> Result<impl IntoResponse> {
     let TicketTypeParams { scope } = params;
 
-    query::canyon::ticket_types(scope.as_ref().map(String::as_str))
+    query::canyon::ticket_types(scope.as_deref())
         .await
         .map_err(BadRequest)
         .map(Json)
@@ -90,7 +90,7 @@ pub async fn daily_sales(Json(params): Json<DailySalesParams>) -> Result<impl In
 
     let where_condition = where_condition
         .map(|s| format!(" AND {}", s))
-        .unwrap_or("".to_string());
+        .unwrap_or_else(|| "".into());
 
     query::canyon::daily_sales(begin_time, end_time, &where_condition)
         .await
@@ -104,4 +104,9 @@ pub async fn operators() -> Result<impl IntoResponse> {
         .await
         .map_err(BadRequest)
         .map(Json)
+}
+
+#[handler]
+pub async fn clients() -> Result<impl IntoResponse> {
+    query::canyon::clients().await.map_err(BadRequest).map(Json)
 }
