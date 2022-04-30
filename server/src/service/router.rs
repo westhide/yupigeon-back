@@ -106,6 +106,10 @@ pub fn generate() -> impl IntoEndpoint {
             post(api::canyon::upload_daily_sales_append),
         )
         .at("/canyon/daily_sales", post(api::canyon::daily_sales))
+        .at(
+            "/canyon/daily_sales_appends",
+            get(api::canyon::daily_sales_appends),
+        )
         .at("/canyon/operators", get(api::canyon::operators))
         .at("/canyon/clients", get(api::canyon::clients))
         .with(Auth)

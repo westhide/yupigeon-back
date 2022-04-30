@@ -121,6 +121,18 @@ pub async fn daily_sales(Json(params): Json<DailySalesParams>) -> Result<impl In
 }
 
 #[handler]
+pub async fn daily_sales_appends(
+    Query(params): Query<DateTimeParams>,
+) -> Result<impl IntoResponse> {
+    let (begin_time, end_time) = params.get_datetime_params()?;
+
+    query::canyon::daily_sales_appends(begin_time, end_time)
+        .await
+        .map_err(BadRequest)
+        .map(Json)
+}
+
+#[handler]
 pub async fn operators() -> Result<impl IntoResponse> {
     query::canyon::operators()
         .await

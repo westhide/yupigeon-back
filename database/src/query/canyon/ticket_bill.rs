@@ -1,6 +1,8 @@
 use sea_orm::{entity::prelude::*, FromQueryResult, InsertResult};
 use serde::{Deserialize, Serialize};
 
+use crate::entity::canyon_daily_sales_append as DailySalesAppend;
+
 pub async fn insert_many<E, A>(models: Vec<E::Model>) -> Result<InsertResult<A>, DbErr>
 where
     E: EntityTrait,
@@ -20,6 +22,7 @@ where
 #[serde(rename_all = "camelCase")]
 pub struct DailySales {
     source: String,
+    id: Option<u32>,
     date: Date,
     channel: String,
     operator: String,
@@ -78,6 +81,7 @@ pub async fn daily_sales(
             ) , ds AS
             (
                 SELECT  'system' source
+                    ,NULL id
                     ,DATE( trade_time ) date
                     ,channel
                     ,operator
@@ -100,6 +104,7 @@ pub async fn daily_sales(
                         ,ticket_price
                 UNION ALL
                 SELECT  'append' source
+                    ,id
                     ,date
                     ,channel
                     ,operator
@@ -121,5 +126,18 @@ pub async fn daily_sales(
 
     database
         .find_by_sql_and_values(&sql, vec![datetime_from.into(), datetime_end.into()])
+        .await
+}
+
+pub async fn daily_sales_appends(
+    datetime_from: DateTime,
+    datetime_end: DateTime,
+) -> Result<Vec<DailySalesAppend::Model>, DbErr> {
+    let txn = crate::Database::new("default").await?.txn;
+
+    DailySalesAppend::Entity::find()
+        .filter(DailySalesAppend::Column::Date.between(datetime_from, datetime_end))
+        .filter(DailySalesAppend::Column::IsAppend.eq(true))
+        .all(&txn)
         .await
 }
