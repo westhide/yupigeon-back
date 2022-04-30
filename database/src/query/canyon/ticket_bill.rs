@@ -29,6 +29,7 @@ pub struct DailySales {
     ticket_price: Decimal,
     sum_ticket_num: Decimal,
     sum_ticket_amount: Decimal,
+    remark: Option<String>,
 }
 
 pub async fn daily_sales(
@@ -49,8 +50,7 @@ pub async fn daily_sales(
                 FROM canyon_online_ticket_bill
             ), tb AS
             (
-                SELECT  'system' source
-                    ,trade_type
+                SELECT  trade_type
                     ,trade_time
                     ,'窗口' channel
                     ,operator
@@ -62,8 +62,7 @@ pub async fn daily_sales(
                     ,ticket_amount
                 FROM offt
                 UNION ALL
-                SELECT  'system' source
-                    ,'sale' trade_type
+                SELECT  'sale' trade_type
                     ,ont.check_in_datetime trade_time
                     ,'线上' channel
                     ,ont.client operator
@@ -76,36 +75,31 @@ pub async fn daily_sales(
                 FROM ont
                 LEFT JOIN canyon_ticket_client tc
                 ON tc.name=ont.client
-                UNION ALL
-                SELECT  'append' source
-                    ,'sale' trade_type
-                    ,date trade_time
+            ) , ds AS
+            (
+                SELECT  'system' source
+                    ,DATE( trade_time ) date
                     ,channel
                     ,operator
                     ,payment_method
                     ,client
-                    ,ticket_type ticket_type_raw
+                    ,IFNULL(mdv.to_value,tb.ticket_type_raw) ticket_type
                     ,ticket_price
-                    ,ticket_num
-                    ,ticket_amount
-                FROM canyon_daily_sales_append
-                WHERE is_append = 1
-            )
-            SELECT  source
-                ,DATE( trade_time ) date
-                ,channel
-                ,operator
-                ,payment_method
-                ,client
-                ,IFNULL(mdv.to_value,tb.ticket_type_raw) ticket_type
-                ,ticket_price
-                ,SUM( CASE trade_type WHEN 'sale' THEN ticket_num WHEN 'refund' THEN - ticket_num END ) sum_ticket_num
-                ,SUM( CASE trade_type WHEN 'sale' THEN ticket_amount WHEN 'refund' THEN - ticket_amount END ) sum_ticket_amount
-            FROM tb
-            LEFT JOIN mapper_domain_value mdv
-            ON mdv.domain='CanyonTicket' AND mdv.type='ticket_type' AND tb.ticket_type_raw=mdv.from_value
-            WHERE trade_time BETWEEN ? AND ? {}
-            GROUP BY  source
+                    ,SUM( CASE trade_type WHEN 'sale' THEN ticket_num WHEN 'refund' THEN - ticket_num END ) sum_ticket_num
+                    ,SUM( CASE trade_type WHEN 'sale' THEN ticket_amount WHEN 'refund' THEN - ticket_amount END ) sum_ticket_amount
+                    ,NULL remark
+                FROM tb
+                LEFT JOIN mapper_domain_value mdv
+                ON mdv.domain='CanyonTicket' AND mdv.type='ticket_type' AND tb.ticket_type_raw=mdv.from_value
+                GROUP BY  date
+                        ,channel
+                        ,operator
+                        ,payment_method
+                        ,client
+                        ,ticket_type
+                        ,ticket_price
+                UNION ALL
+                SELECT  'append' source
                     ,date
                     ,channel
                     ,operator
@@ -113,6 +107,15 @@ pub async fn daily_sales(
                     ,client
                     ,ticket_type
                     ,ticket_price
+                    ,ticket_num sum_ticket_num
+                    ,ticket_amount sum_ticket_amount
+                    ,remark
+                FROM canyon_daily_sales_append
+                WHERE is_append = 1
+            )
+            SELECT  *
+            FROM ds
+            WHERE date BETWEEN DATE(?) AND DATE(?) {}
             ;
         ",where_condition);
 
