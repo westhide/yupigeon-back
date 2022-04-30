@@ -49,7 +49,8 @@ pub async fn daily_sales(
                 FROM canyon_online_ticket_bill
             ), tb AS
             (
-                SELECT  trade_type
+                SELECT  'system' source
+                    ,trade_type
                     ,trade_time
                     ,'窗口' channel
                     ,operator
@@ -60,12 +61,13 @@ pub async fn daily_sales(
                     ,ticket_num
                     ,ticket_amount
                 FROM offt
-                UNION ALL(
-                SELECT  'sale' trade_type
+                UNION ALL
+                SELECT  'system' source
+                    ,'sale' trade_type
                     ,ont.check_in_datetime trade_time
                     ,'线上' channel
                     ,ont.client operator
-                    ,IFNULL(tc.payment_type, '') payment_method
+                    ,IFNULL(tc.payment_type,'') payment_method
                     ,ont.client
                     ,ont.ticket_type ticket_type_raw
                     ,ont.ticket_price
@@ -73,9 +75,23 @@ pub async fn daily_sales(
                     ,ont.ticket_amount
                 FROM ont
                 LEFT JOIN canyon_ticket_client tc
-                ON tc.name=ont.client )
+                ON tc.name=ont.client
+                UNION ALL
+                SELECT  'append' source
+                    ,'sale' trade_type
+                    ,date trade_time
+                    ,channel
+                    ,operator
+                    ,payment_method
+                    ,client
+                    ,ticket_type ticket_type_raw
+                    ,ticket_price
+                    ,ticket_num
+                    ,ticket_amount
+                FROM canyon_daily_sales_append
+                WHERE is_append = 1
             )
-            SELECT  'system' source
+            SELECT  source
                 ,DATE( trade_time ) date
                 ,channel
                 ,operator
@@ -88,9 +104,9 @@ pub async fn daily_sales(
             FROM tb
             LEFT JOIN mapper_domain_value mdv
             ON mdv.domain='CanyonTicket' AND mdv.type='ticket_type' AND tb.ticket_type_raw=mdv.from_value
-            WHERE trade_time BETWEEN ? AND ?
-            {}
-            GROUP BY  date
+            WHERE trade_time BETWEEN ? AND ? {}
+            GROUP BY  source
+                    ,date
                     ,channel
                     ,operator
                     ,payment_method

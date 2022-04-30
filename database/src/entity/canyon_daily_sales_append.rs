@@ -20,6 +20,8 @@ pub struct Model {
     ticket_price: Decimal,
     ticket_amount: Decimal,
     remark: Option<String>,
+    #[sea_orm(default_value = true)]
+    is_append: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
