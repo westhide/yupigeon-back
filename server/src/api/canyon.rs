@@ -1,5 +1,5 @@
 use database::{
-    entity::{canyon_offline_ticket_bill, canyon_online_ticket_bill},
+    entity::{canyon_daily_sales_append, canyon_offline_ticket_bill, canyon_online_ticket_bill},
     query,
 };
 use poem::{
@@ -45,6 +45,28 @@ pub async fn upload_ticket_data(Json(params): Json<TicketData>) -> Result<impl I
     }
 
     Response::<String>::new(None, "导入成功")
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DailySalesAppend {
+    append_data: Vec<canyon_daily_sales_append::Model>,
+}
+
+#[handler]
+pub async fn upload_daily_sales_append(
+    Json(params): Json<DailySalesAppend>,
+) -> Result<impl IntoResponse> {
+    let DailySalesAppend { append_data } = params;
+
+    query::canyon::insert_many::<
+        canyon_daily_sales_append::Entity,
+        canyon_daily_sales_append::ActiveModel,
+    >(append_data)
+    .await
+    .map_err(BadRequest)?;
+
+    Response::<String>::new(None, "录入成功")
 }
 
 #[handler]

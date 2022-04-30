@@ -19,6 +19,7 @@ where
 #[derive(Debug, FromQueryResult, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DailySales {
+    source: String,
     date: Date,
     channel: String,
     operator: String,
@@ -74,7 +75,8 @@ pub async fn daily_sales(
                 LEFT JOIN canyon_ticket_client tc
                 ON tc.name=ont.client )
             )
-            SELECT  DATE( trade_time ) date
+            SELECT  'system' source
+                ,DATE( trade_time ) date
                 ,channel
                 ,operator
                 ,payment_method

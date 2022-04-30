@@ -3,6 +3,7 @@
 // @Last Modified by:   westhide.yzw
 // @Last Modified time: 2022-03-20 17:45:02
 
+pub mod canyon_daily_sales_append;
 pub mod canyon_link_ticket_type;
 pub mod canyon_offline_ticket_bill;
 pub mod canyon_online_ticket_bill;
