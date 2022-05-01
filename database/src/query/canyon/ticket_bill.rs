@@ -18,6 +18,31 @@ where
     Ok(result)
 }
 
+pub async fn replace_daily_sales_append(
+    models: Vec<DailySalesAppend::ReplaceModel>,
+) -> Result<(), DbErr> {
+    let txn = crate::Database::new("default").await?.txn;
+
+    for model in models {
+        let id = model.id;
+        let model_json = serde_json::json!(model);
+
+        let is_insert = model_json["id"].is_null();
+
+        if is_insert {
+            DailySalesAppend::ActiveModel::from_json(model_json)?
+                .insert(&txn)
+                .await?;
+        } else {
+            let mut active_model = DailySalesAppend::ActiveModel::from_json(model_json)?;
+            active_model.set(DailySalesAppend::Column::Id, id.into());
+            active_model.update(&txn).await?;
+        }
+    }
+
+    txn.commit().await
+}
+
 #[derive(Debug, FromQueryResult, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DailySales {

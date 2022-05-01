@@ -102,8 +102,8 @@ pub fn generate() -> impl IntoEndpoint {
             post(api::canyon::upload_ticket_data),
         )
         .at(
-            "/canyon/upload_daily_sales_append",
-            post(api::canyon::upload_daily_sales_append),
+            "/canyon/replace_daily_sales_append",
+            post(api::canyon::replace_daily_sales_append),
         )
         .at("/canyon/daily_sales", post(api::canyon::daily_sales))
         .at(

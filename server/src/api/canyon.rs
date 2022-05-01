@@ -1,5 +1,9 @@
 use database::{
-    entity::{canyon_daily_sales_append, canyon_offline_ticket_bill, canyon_online_ticket_bill},
+    entity::{
+        canyon_daily_sales_append as DailySalesAppend,
+        canyon_offline_ticket_bill as OfflineTicketBill,
+        canyon_online_ticket_bill as OnlineTicketBill,
+    },
     query,
 };
 use poem::{
@@ -8,15 +12,15 @@ use poem::{
     web::{Json, Query},
     IntoResponse, Result,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::service::utils::{DateTimeParams, ParseDateTimeParams, Response};
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TicketData {
-    offline_tickets: Option<Vec<canyon_offline_ticket_bill::Model>>,
-    online_tickets: Option<Vec<canyon_online_ticket_bill::Model>>,
+    offline_tickets: Option<Vec<OfflineTicketBill::Model>>,
+    online_tickets: Option<Vec<OnlineTicketBill::Model>>,
 }
 
 #[handler]
@@ -27,19 +31,17 @@ pub async fn upload_ticket_data(Json(params): Json<TicketData>) -> Result<impl I
     } = params;
 
     if let Some(offline_tickets) = offline_tickets {
-        query::canyon::insert_many::<
-            canyon_offline_ticket_bill::Entity,
-            canyon_offline_ticket_bill::ActiveModel,
-        >(offline_tickets)
+        query::canyon::insert_many::<OfflineTicketBill::Entity, OfflineTicketBill::ActiveModel>(
+            offline_tickets,
+        )
         .await
         .map_err(BadRequest)?;
     }
 
     if let Some(online_tickets) = online_tickets {
-        query::canyon::insert_many::<
-            canyon_online_ticket_bill::Entity,
-            canyon_online_ticket_bill::ActiveModel,
-        >(online_tickets)
+        query::canyon::insert_many::<OnlineTicketBill::Entity, OnlineTicketBill::ActiveModel>(
+            online_tickets,
+        )
         .await
         .map_err(BadRequest)?;
     }
@@ -47,24 +49,21 @@ pub async fn upload_ticket_data(Json(params): Json<TicketData>) -> Result<impl I
     Response::<String>::new(None, "导入成功")
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct DailySalesAppend {
-    append_data: Vec<canyon_daily_sales_append::Model>,
+pub struct ReplaceDailySalesAppend {
+    append_data: Vec<DailySalesAppend::ReplaceModel>,
 }
 
 #[handler]
-pub async fn upload_daily_sales_append(
-    Json(params): Json<DailySalesAppend>,
+pub async fn replace_daily_sales_append(
+    Json(params): Json<ReplaceDailySalesAppend>,
 ) -> Result<impl IntoResponse> {
-    let DailySalesAppend { append_data } = params;
+    let ReplaceDailySalesAppend { append_data } = params;
 
-    query::canyon::insert_many::<
-        canyon_daily_sales_append::Entity,
-        canyon_daily_sales_append::ActiveModel,
-    >(append_data)
-    .await
-    .map_err(BadRequest)?;
+    query::canyon::replace_daily_sales_append(append_data)
+        .await
+        .map_err(BadRequest)?;
 
     Response::<String>::new(None, "录入成功")
 }
@@ -77,7 +76,7 @@ pub async fn update_ticket_type_items() -> Result<impl IntoResponse> {
         .map(Json)
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TicketTypeParams {
     scope: Option<String>,
@@ -93,7 +92,7 @@ pub async fn ticket_types(Query(params): Query<TicketTypeParams>) -> Result<impl
         .map(Json)
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DailySalesParams {
     #[serde(flatten)]

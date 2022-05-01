@@ -1,4 +1,4 @@
-use sea_orm::{entity::prelude::*, EntityTrait, Set};
+use sea_orm::{entity::prelude::*, EntityTrait};
 use serde::Serialize;
 
 use crate::entity::{
@@ -34,7 +34,7 @@ where
             None => return Err(DbErr::RecordNotFound("RecordNotFound".into())),
         };
 
-    sub_account.items = Set(items_json.into());
+    sub_account.set(SubAccount::Column::Items, items_json.into());
 
     let result = sub_account.update(&txn).await?;
 

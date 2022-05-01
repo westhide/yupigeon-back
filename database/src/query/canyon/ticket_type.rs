@@ -1,4 +1,4 @@
-use sea_orm::{entity::prelude::*, Set};
+use sea_orm::entity::prelude::*;
 
 use crate::entity::{canyon_ticket_type as TicketType, canyon_ticket_type::Link2TicketTypeItem};
 
@@ -16,7 +16,7 @@ pub async fn update_ticket_type_items() -> Result<Vec<TicketType::Model>, DbErr>
         let items_json = serde_json::json!(items);
 
         let mut ticket_type_active: TicketType::ActiveModel = ticket_type.into();
-        ticket_type_active.items = Set(items_json.into());
+        ticket_type_active.set(TicketType::Column::Items, items_json.into());
 
         let result = ticket_type_active.update(&txn).await?;
         results.push(result);
