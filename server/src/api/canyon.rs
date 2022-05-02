@@ -52,7 +52,7 @@ pub async fn upload_ticket_data(Json(params): Json<TicketData>) -> Result<impl I
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ReplaceDailySalesAppend {
-    append_data: Vec<DailySalesAppend::ReplaceModel>,
+    append_data: Vec<DailySalesAppend::Model>,
 }
 
 #[handler]
@@ -61,9 +61,11 @@ pub async fn replace_daily_sales_append(
 ) -> Result<impl IntoResponse> {
     let ReplaceDailySalesAppend { append_data } = params;
 
-    query::canyon::replace_daily_sales_append(append_data)
-        .await
-        .map_err(BadRequest)?;
+    query::canyon::replace_many::<DailySalesAppend::Entity, DailySalesAppend::ActiveModel>(
+        append_data,
+    )
+    .await
+    .map_err(BadRequest)?;
 
     Response::<String>::new(None, "录入成功")
 }

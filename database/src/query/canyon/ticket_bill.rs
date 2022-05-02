@@ -1,4 +1,7 @@
-use sea_orm::{entity::prelude::*, FromQueryResult, InsertResult};
+use sea_orm::{
+    entity::prelude::*, ActiveModelTrait, FromQueryResult, InsertResult, IntoActiveModel, Iterable,
+    Value,
+};
 use serde::{Deserialize, Serialize};
 
 use crate::entity::canyon_daily_sales_append as DailySalesAppend;
@@ -18,25 +21,37 @@ where
     Ok(result)
 }
 
-pub async fn replace_daily_sales_append(
-    models: Vec<DailySalesAppend::ReplaceModel>,
-) -> Result<(), DbErr> {
+pub async fn replace_many<E, A>(models: Vec<E::Model>) -> Result<(), DbErr>
+where
+    E: EntityTrait,
+    E::Model: IntoActiveModel<A>,
+    A: ActiveModelTrait<Entity = E> + ActiveModelBehavior + From<E::Model> + std::marker::Send,
+{
     let txn = crate::Database::new("default").await?.txn;
 
     for model in models {
-        let id = model.id;
-        let model_json = serde_json::json!(model);
+        let mut active_model: A = model.into();
+        let mut is_update = true;
 
-        let is_insert = model_json["id"].is_null();
+        for pk in E::PrimaryKey::iter() {
+            let col = pk.into_column();
+            if let Some(pk_value) = active_model.get(col).into_value() {
+                if pk_value == Value::Unsigned(Some(0)) {
+                    is_update = false;
+                    break;
+                }
+            }
+        }
 
-        if is_insert {
-            DailySalesAppend::ActiveModel::from_json(model_json)?
-                .insert(&txn)
-                .await?;
-        } else {
-            let mut active_model = DailySalesAppend::ActiveModel::from_json(model_json)?;
-            active_model.set(DailySalesAppend::Column::Id, id.into());
+        if is_update {
+            for col in E::Column::iter() {
+                if let Some(value) = active_model.get(col).into_value() {
+                    active_model.set(col, value);
+                }
+            }
             active_model.update(&txn).await?;
+        } else {
+            active_model.insert(&txn).await?;
         }
     }
 
