@@ -31,7 +31,7 @@ pub async fn upload_ticket_data(Json(params): Json<TicketData>) -> Result<impl I
     } = params;
 
     if let Some(offline_tickets) = offline_tickets {
-        query::canyon::insert_many::<OfflineTicketBill::Entity, OfflineTicketBill::ActiveModel>(
+        query::common::insert_many::<OfflineTicketBill::Entity, OfflineTicketBill::ActiveModel>(
             offline_tickets,
         )
         .await
@@ -39,7 +39,7 @@ pub async fn upload_ticket_data(Json(params): Json<TicketData>) -> Result<impl I
     }
 
     if let Some(online_tickets) = online_tickets {
-        query::canyon::insert_many::<OnlineTicketBill::Entity, OnlineTicketBill::ActiveModel>(
+        query::common::insert_many::<OnlineTicketBill::Entity, OnlineTicketBill::ActiveModel>(
             online_tickets,
         )
         .await
@@ -61,7 +61,7 @@ pub async fn replace_daily_sales_append(
 ) -> Result<impl IntoResponse> {
     let ReplaceDailySalesAppend { append_data } = params;
 
-    query::canyon::replace_many::<DailySalesAppend::Entity, DailySalesAppend::ActiveModel>(
+    query::common::replace_many::<DailySalesAppend::Entity, DailySalesAppend::ActiveModel>(
         append_data,
     )
     .await
