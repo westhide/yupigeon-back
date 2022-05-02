@@ -134,6 +134,17 @@ pub async fn daily_sales_appends(
 }
 
 #[handler]
+pub async fn delete_ticket_bill(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
+    let (begin_time, end_time) = params.get_datetime_params()?;
+
+    query::canyon::delete_ticket_bill(begin_time, end_time)
+        .await
+        .map_err(BadRequest)?;
+
+    Response::<String>::new(None, "删除成功")
+}
+
+#[handler]
 pub async fn operators() -> Result<impl IntoResponse> {
     query::canyon::operators()
         .await

@@ -1,7 +1,10 @@
-use sea_orm::{entity::prelude::*, FromQueryResult};
+use sea_orm::{entity::prelude::*, sea_query::Expr, FromQueryResult};
 use serde::{Deserialize, Serialize};
 
-use crate::entity::canyon_daily_sales_append as DailySalesAppend;
+use crate::entity::{
+    canyon_daily_sales_append as DailySalesAppend, canyon_offline_ticket_bill as OfflineTicketBill,
+    canyon_online_ticket_bill as OnlineTicketBill,
+};
 
 #[derive(Debug, FromQueryResult, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -30,12 +33,14 @@ pub async fn daily_sales(
     let sql = format!("
             WITH offt AS
             (
-                SELECT  DISTINCT *
+                SELECT  *
                 FROM canyon_offline_ticket_bill
+                WHERE is_deleted=0
             ), ont AS
             (
-                SELECT  DISTINCT *
+                SELECT  *
                 FROM canyon_online_ticket_bill
+                WHERE is_deleted=0
             ), tb AS
             (
                 SELECT  trade_type
@@ -125,4 +130,33 @@ pub async fn daily_sales_appends(
         .filter(DailySalesAppend::Column::IsAppend.eq(true))
         .all(&txn)
         .await
+}
+
+pub async fn delete_ticket_bill(
+    datetime_from: DateTime,
+    datetime_end: DateTime,
+) -> Result<(), DbErr> {
+    let txn = crate::Database::new("default").await?.txn;
+
+    OfflineTicketBill::Entity::update_many()
+        .col_expr(
+            OfflineTicketBill::Column::IsDeleted,
+            Expr::value(Value::TinyInt(Some(1))),
+        )
+        .filter(OfflineTicketBill::Column::TradeTime.between(datetime_from, datetime_end))
+        .filter(OfflineTicketBill::Column::IsDeleted.eq(0))
+        .exec(&txn)
+        .await?;
+
+    OnlineTicketBill::Entity::update_many()
+        .col_expr(
+            OnlineTicketBill::Column::IsDeleted,
+            Expr::value(Value::TinyInt(Some(1))),
+        )
+        .filter(OnlineTicketBill::Column::CheckInDatetime.between(datetime_from, datetime_end))
+        .filter(OnlineTicketBill::Column::IsDeleted.eq(0))
+        .exec(&txn)
+        .await?;
+
+    txn.commit().await
 }

@@ -26,6 +26,7 @@ pub struct Model {
     ticket_amount: Decimal,
     payment_method: String,
     remark: Option<String>,
+    is_deleted: i8,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

@@ -25,6 +25,7 @@ pub struct Model {
     client: String,
     conductor: String,
     check_in_datetime: DateTime,
+    is_deleted: i8,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
