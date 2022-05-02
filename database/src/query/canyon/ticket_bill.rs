@@ -9,11 +9,15 @@ use crate::entity::canyon_daily_sales_append as DailySalesAppend;
 pub async fn insert_many<E, A>(models: Vec<E::Model>) -> Result<InsertResult<A>, DbErr>
 where
     E: EntityTrait,
-    A: ActiveModelTrait<Entity = E> + From<E::Model>,
+    E::Model: IntoActiveModel<A>,
+    A: ActiveModelTrait<Entity = E>,
 {
     let txn = crate::Database::new("default").await?.txn;
 
-    let records: Vec<A> = models.iter().map(|model| model.to_owned().into()).collect();
+    let records: Vec<A> = models
+        .iter()
+        .map(|model| model.to_owned().into_active_model())
+        .collect();
 
     let result = E::insert_many(records).exec(&txn).await?;
 
@@ -25,12 +29,12 @@ pub async fn replace_many<E, A>(models: Vec<E::Model>) -> Result<(), DbErr>
 where
     E: EntityTrait,
     E::Model: IntoActiveModel<A>,
-    A: ActiveModelTrait<Entity = E> + ActiveModelBehavior + From<E::Model> + std::marker::Send,
+    A: ActiveModelTrait<Entity = E> + ActiveModelBehavior + std::marker::Send,
 {
     let txn = crate::Database::new("default").await?.txn;
 
     for model in models {
-        let mut active_model: A = model.into();
+        let mut active_model: A = model.into_active_model();
         let mut is_update = true;
 
         for pk in E::PrimaryKey::iter() {
