@@ -4,7 +4,7 @@ use database::{
         canyon_offline_ticket_bill as OfflineTicketBill,
         canyon_online_ticket_bill as OnlineTicketBill,
     },
-    query,
+    query::{self, common::QueryTrait},
 };
 use poem::{
     error::BadRequest,
@@ -31,19 +31,15 @@ pub async fn upload_ticket_data(Json(params): Json<TicketData>) -> Result<impl I
     } = params;
 
     if let Some(offline_tickets) = offline_tickets {
-        query::common::insert_many::<OfflineTicketBill::Entity, OfflineTicketBill::ActiveModel>(
-            offline_tickets,
-        )
-        .await
-        .map_err(BadRequest)?;
+        OfflineTicketBill::Entity::insert_many(offline_tickets)
+            .await
+            .map_err(BadRequest)?;
     }
 
     if let Some(online_tickets) = online_tickets {
-        query::common::insert_many::<OnlineTicketBill::Entity, OnlineTicketBill::ActiveModel>(
-            online_tickets,
-        )
-        .await
-        .map_err(BadRequest)?;
+        OnlineTicketBill::Entity::insert_many(online_tickets)
+            .await
+            .map_err(BadRequest)?;
     }
 
     Response::<String>::new(None, "导入成功")
@@ -61,11 +57,9 @@ pub async fn replace_daily_sales_append(
 ) -> Result<impl IntoResponse> {
     let ReplaceDailySalesAppend { append_data } = params;
 
-    query::common::replace_many::<DailySalesAppend::Entity, DailySalesAppend::ActiveModel>(
-        append_data,
-    )
-    .await
-    .map_err(BadRequest)?;
+    DailySalesAppend::Entity::replace_many(append_data)
+        .await
+        .map_err(BadRequest)?;
 
     Response::<String>::new(None, "录入成功")
 }

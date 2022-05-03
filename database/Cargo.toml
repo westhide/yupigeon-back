@@ -25,3 +25,5 @@ sea-orm = { version = "^0.7", features = [
 ], default-features = false }
 
 async-recursion = "^1.0"
+
+async-trait = "^0.1"
