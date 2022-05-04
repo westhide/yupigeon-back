@@ -1,5 +1,5 @@
 [workspace]
-members = ["server", "file-server", "database"]
+members = ["server", "file-server", "database", "collection"]
 
 [profile.release]
 opt-level = 'z'
