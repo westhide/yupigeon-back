@@ -21,7 +21,7 @@ impl ResponseError for MyError {
 
     fn as_response(&self) -> Response {
         let body = Body::from_json(serde_json::json!({
-            "errMessage": self.message,
+            "errorMessage": self.message,
         }))
         .unwrap();
 
@@ -29,6 +29,6 @@ impl ResponseError for MyError {
     }
 }
 
-pub fn error_msg(message: &str) -> MyError {
+pub fn error_message(message: &str) -> MyError {
     MyError::new(message)
 }

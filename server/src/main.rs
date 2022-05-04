@@ -25,6 +25,8 @@ async fn main() -> std::io::Result<()> {
         .await
         .expect("Database init failed");
 
+    mongo::Mongo::init().await.expect("Mongo init failed");
+
     let bind_ip = GLOBAL_CONFIG
         .get::<String>("BIND_HOST")
         .unwrap_or_else(|_| "127.0.0.1".into());

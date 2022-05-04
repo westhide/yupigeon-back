@@ -5,6 +5,7 @@
 
 mod base;
 mod config;
+
 pub mod entity;
 pub mod query;
 
