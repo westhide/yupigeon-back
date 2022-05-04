@@ -7,6 +7,7 @@ COPY log.txt ./
 COPY Cargo.toml ./
 COPY Cargo.lock ./
 COPY database ./database
+COPY collection ./collection
 COPY server ./server
 
 RUN cargo build --release
