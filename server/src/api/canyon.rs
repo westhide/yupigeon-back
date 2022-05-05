@@ -7,14 +7,17 @@ use database::{
     query::{self, common::QueryTrait},
 };
 use poem::{
-    error::BadRequest,
     handler,
     web::{Json, Query},
     IntoResponse, Result,
 };
 use serde::{Deserialize, Serialize};
 
-use crate::service::utils::{DateTimeParams, ParseDateTimeParams, Response};
+use crate::service::{
+    common::{Response, ResponseTrait},
+    error::DbError,
+    utils::{DateTimeParams, ParseDateTimeParams},
+};
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -33,16 +36,16 @@ pub async fn upload_ticket_data(Json(params): Json<TicketData>) -> Result<impl I
     if let Some(offline_tickets) = offline_tickets {
         OfflineTicketBill::Entity::insert_many(offline_tickets)
             .await
-            .map_err(BadRequest)?;
+            .map_err(DbError)?;
     }
 
     if let Some(online_tickets) = online_tickets {
         OnlineTicketBill::Entity::insert_many(online_tickets)
             .await
-            .map_err(BadRequest)?;
+            .map_err(DbError)?;
     }
 
-    Response::<String>::new(None, "导入成功")
+    Response::message("导入成功")
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -59,17 +62,18 @@ pub async fn replace_daily_sales_append(
 
     DailySalesAppend::Entity::replace_many(append_data)
         .await
-        .map_err(BadRequest)?;
+        .map_err(DbError)?;
 
-    Response::<String>::new(None, "录入成功")
+    Response::message("录入成功")
 }
 
 #[handler]
 pub async fn update_ticket_type_items() -> Result<impl IntoResponse> {
-    query::canyon::update_ticket_type_items()
+    let res = query::canyon::update_ticket_type_items()
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[derive(Deserialize)]
@@ -82,10 +86,11 @@ pub struct TicketTypeParams {
 pub async fn ticket_types(Query(params): Query<TicketTypeParams>) -> Result<impl IntoResponse> {
     let TicketTypeParams { scope } = params;
 
-    query::canyon::ticket_types(scope.as_deref())
+    let res = query::canyon::ticket_types(scope.as_deref())
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[derive(Deserialize)]
@@ -109,10 +114,11 @@ pub async fn daily_sales(Json(params): Json<DailySalesParams>) -> Result<impl In
         .map(|s| format!(" AND {}", s))
         .unwrap_or_else(|| "".into());
 
-    query::canyon::daily_sales(begin_time, end_time, &where_condition)
+    let res = query::canyon::daily_sales(begin_time, end_time, &where_condition)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[handler]
@@ -121,10 +127,11 @@ pub async fn daily_sales_appends(
 ) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    query::canyon::daily_sales_appends(begin_time, end_time)
+    let res = query::canyon::daily_sales_appends(begin_time, end_time)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[handler]
@@ -133,20 +140,21 @@ pub async fn delete_ticket_bill(Query(params): Query<DateTimeParams>) -> Result<
 
     query::canyon::delete_ticket_bill(begin_time, end_time)
         .await
-        .map_err(BadRequest)?;
+        .map_err(DbError)?;
 
-    Response::<String>::new(None, "删除成功")
+    Response::message("删除成功")
 }
 
 #[handler]
 pub async fn operators() -> Result<impl IntoResponse> {
-    query::canyon::operators()
-        .await
-        .map_err(BadRequest)
-        .map(Json)
+    let res = query::canyon::operators().await.map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[handler]
 pub async fn clients() -> Result<impl IntoResponse> {
-    query::canyon::clients().await.map_err(BadRequest).map(Json)
+    let res = query::canyon::clients().await.map_err(DbError)?;
+
+    Response::json(res)
 }

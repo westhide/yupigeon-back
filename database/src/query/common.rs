@@ -9,7 +9,7 @@ pub trait QueryTrait {
     where
         Self: EntityTrait,
         Self::Model: IntoActiveModel<A>,
-        A: ActiveModelTrait<Entity = Self> + std::marker::Send,
+        A: ActiveModelTrait<Entity = Self> + Send,
     {
         let txn = crate::Database::new("default").await?.txn;
 
@@ -30,7 +30,7 @@ pub trait QueryTrait {
     where
         Self: EntityTrait,
         Self::Model: IntoActiveModel<A>,
-        A: ActiveModelTrait<Entity = Self> + ActiveModelBehavior + std::marker::Send,
+        A: ActiveModelTrait<Entity = Self> + ActiveModelBehavior + Send,
     {
         let txn = crate::Database::new("default").await?.txn;
 

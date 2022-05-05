@@ -29,9 +29,11 @@ impl<E: Endpoint> Endpoint for AuthEndpoint<E> {
         if req.uri() == "/login" {
             return self.ep.call(req).await;
         }
+
         if let Some(_auth) = req.headers().typed_get::<headers::Authorization<Bearer>>() {
-            return self.ep.call(req).await;
+            self.ep.call(req).await
+        } else {
+            Err(Error::from_status(StatusCode::UNAUTHORIZED))
         }
-        Err(Error::from_status(StatusCode::UNAUTHORIZED))
     }
 }

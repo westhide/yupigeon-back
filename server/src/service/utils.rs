@@ -1,6 +1,6 @@
 use chrono::NaiveDateTime;
-use poem::{error::BadRequest, web::Json, Result};
-use serde::{Deserialize, Serialize};
+use poem::{error::BadRequest, Result};
+use serde::Deserialize;
 
 pub fn parse_datetime(time_str: &str) -> Result<NaiveDateTime> {
     NaiveDateTime::parse_from_str(time_str, "%Y-%m-%d %H:%M:%S").map_err(BadRequest)
@@ -29,22 +29,5 @@ impl ParseDateTimeParams for DateTimeParams {
         let end_time = parse_datetime(end_time_str)?;
 
         Ok((begin_time, end_time))
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Response<T> {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    data: Option<T>,
-    message: String,
-}
-
-impl<T> Response<T> {
-    pub fn new(data: Option<T>, message: &str) -> Result<Json<Self>> {
-        Ok(Json(Response {
-            data,
-            message: message.into(),
-        }))
     }
 }

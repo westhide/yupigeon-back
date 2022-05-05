@@ -1,7 +1,6 @@
 use chrono::offset::Local;
 use database::query;
 use poem::{
-    error::BadRequest,
     handler,
     web::{Json, Query},
     IntoResponse, Result,
@@ -10,17 +9,22 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     global_data::get_global_data,
-    service::utils::{DateTimeParams, ParseDateTimeParams},
+    service::{
+        common::{Response, ResponseTrait},
+        error::DbError,
+        utils::{DateTimeParams, ParseDateTimeParams},
+    },
 };
 
 #[handler]
 pub async fn bill(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    query::ship_ticket::bill(begin_time, end_time)
+    let res = query::ship_ticket::bill(begin_time, end_time)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[derive(Debug, Deserialize)]
@@ -45,26 +49,25 @@ pub async fn refund_bill(Json(params): Json<RefundBillParams>) -> Result<impl In
         None => "".into(),
     };
 
-    query::ship_ticket::refund_bill(begin_time, end_time, &where_condition)
+    let res = query::ship_ticket::refund_bill(begin_time, end_time, &where_condition)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[handler]
 pub async fn clients() -> Result<impl IntoResponse> {
-    query::ship_ticket::clients()
-        .await
-        .map_err(BadRequest)
-        .map(Json)
+    let res = query::ship_ticket::clients().await.map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[handler]
 pub async fn conductors() -> Result<impl IntoResponse> {
-    query::ship_ticket::conductors()
-        .await
-        .map_err(BadRequest)
-        .map(Json)
+    let res = query::ship_ticket::conductors().await.map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[derive(Debug, Deserialize, Serialize, Default)]
@@ -75,7 +78,7 @@ pub struct RefreshStatus {
 }
 
 #[handler]
-pub fn refresh_status() -> Result<Json<RefreshStatus>> {
+pub fn refresh_status() -> Result<impl IntoResponse> {
     let global_data = get_global_data()?;
 
     let default_datetime = String::from("");
@@ -84,10 +87,12 @@ pub fn refresh_status() -> Result<Json<RefreshStatus>> {
         .as_ref()
         .unwrap_or(&default_datetime);
 
-    Ok(Json(RefreshStatus {
+    let res = RefreshStatus {
         is_refresh: global_data.is_ship_ticket_bill_refresh,
         last_refresh_datetime: last_refresh_datetime.clone(),
-    }))
+    };
+
+    Response::json(res)
 }
 
 #[handler]
@@ -105,30 +110,34 @@ pub async fn refresh() -> Result<impl IntoResponse> {
         });
     }
 
-    Ok(Json(RefreshStatus {
+    let res = RefreshStatus {
         is_refresh: true,
         ..Default::default()
-    }))
+    };
+
+    Response::json(res)
 }
 
 #[handler]
 pub async fn daily_sales(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    query::ship_ticket::daily_sales(begin_time, end_time)
+    let res = query::ship_ticket::daily_sales(begin_time, end_time)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[handler]
 pub async fn daily_receipt(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    query::ship_ticket::daily_receipt(begin_time, end_time)
+    let res = query::ship_ticket::daily_receipt(begin_time, end_time)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[derive(Debug, Deserialize)]
@@ -153,10 +162,11 @@ pub async fn client_sales(Json(params): Json<ClientSalesParams>) -> Result<impl 
         None => "".into(),
     };
 
-    query::ship_ticket::client_sales(begin_time, end_time, &where_condition)
+    let res = query::ship_ticket::client_sales(begin_time, end_time, &where_condition)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[derive(Debug, Deserialize)]
@@ -183,28 +193,31 @@ pub async fn conductor_daily_receipt(
         None => "".into(),
     };
 
-    query::ship_ticket::conductor_daily_receipt(begin_time, end_time, &where_condition)
+    let res = query::ship_ticket::conductor_daily_receipt(begin_time, end_time, &where_condition)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[handler]
 pub async fn ticket_revenue(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    query::ship_ticket::ticket_revenue(begin_time, end_time)
+    let res = query::ship_ticket::ticket_revenue(begin_time, end_time)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[handler]
 pub async fn fee_revenue(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    query::ship_ticket::fee_revenue(begin_time, end_time)
+    let res = query::ship_ticket::fee_revenue(begin_time, end_time)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }

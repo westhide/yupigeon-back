@@ -1,19 +1,19 @@
 use database::query;
-use poem::{
-    error::BadRequest,
-    handler,
-    web::{Json, Query},
-    IntoResponse, Result,
-};
+use poem::{handler, web::Query, IntoResponse, Result};
 
-use crate::service::utils::{DateTimeParams, ParseDateTimeParams};
+use crate::service::{
+    common::{Response, ResponseTrait},
+    error::DbError,
+    utils::{DateTimeParams, ParseDateTimeParams},
+};
 
 #[handler]
 pub async fn daily_receipt(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    query::tenpay::daily_receipt(begin_time, end_time)
+    let res = query::tenpay::daily_receipt(begin_time, end_time)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }

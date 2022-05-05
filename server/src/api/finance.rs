@@ -1,11 +1,11 @@
 use database::query;
-use poem::{
-    error::BadRequest,
-    handler,
-    web::{Json, Query},
-    IntoResponse, Result,
-};
+use poem::{handler, web::Query, IntoResponse, Result};
 use serde::Deserialize;
+
+use crate::service::{
+    common::{Response, ResponseTrait},
+    error::DbError,
+};
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -15,36 +15,38 @@ pub struct Params {
 
 #[handler]
 pub async fn finance_accounts() -> Result<impl IntoResponse> {
-    query::finance::finance_accounts()
-        .await
-        .map_err(BadRequest)
-        .map(Json)
+    let res = query::finance::finance_accounts().await.map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[handler]
 pub async fn finance_account_info(Query(params): Query<Params>) -> Result<impl IntoResponse> {
     let Params { code } = params;
 
-    query::finance::finance_account_info(&code)
+    let res = query::finance::finance_account_info(&code)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[handler]
 pub async fn subsidiary_clients() -> Result<impl IntoResponse> {
-    query::finance::subsidiary_clients()
+    let res = query::finance::subsidiary_clients()
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[handler]
 pub async fn update_subsidiary_account_items() -> Result<impl IntoResponse> {
-    query::finance::update_subsidiary_account_items()
+    let res = query::finance::update_subsidiary_account_items()
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[derive(Debug, Deserialize)]
@@ -59,10 +61,11 @@ pub async fn subsidiary_account(
 ) -> Result<impl IntoResponse> {
     let SubsidiaryAccountParams { code } = params;
 
-    query::finance::find_subsidiary_account_by_code(&code)
+    let res = query::finance::find_subsidiary_account_by_code(&code)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[derive(Debug, Deserialize)]
@@ -77,10 +80,11 @@ pub async fn subsidiary_group_info(
 ) -> Result<impl IntoResponse> {
     let SubsidiaryGroupParams { id } = params;
 
-    query::finance::subsidiary_group_info(id)
+    let res = query::finance::subsidiary_group_info(id)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[derive(Debug, Deserialize)]
@@ -95,10 +99,11 @@ pub async fn voucher_template(
 ) -> Result<impl IntoResponse> {
     let VoucherTemplateParams { code } = params;
 
-    query::finance::voucher_template(&code)
+    let res = query::finance::voucher_template(&code)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[handler]
@@ -107,10 +112,11 @@ pub async fn voucher_template_info(
 ) -> Result<impl IntoResponse> {
     let VoucherTemplateParams { code } = params;
 
-    query::finance::voucher_template_info(&code)
+    let res = query::finance::voucher_template_info(&code)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
 
 #[handler]
@@ -119,8 +125,9 @@ pub async fn voucher_template_group(
 ) -> Result<impl IntoResponse> {
     let VoucherTemplateParams { code } = params;
 
-    query::finance::voucher_template_group(&code)
+    let res = query::finance::voucher_template_group(&code)
         .await
-        .map_err(BadRequest)
-        .map(Json)
+        .map_err(DbError)?;
+
+    Response::json(res)
 }
