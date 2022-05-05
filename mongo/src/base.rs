@@ -24,8 +24,8 @@ impl Mongo {
         Ok(())
     }
 
-    pub async fn database() -> Database {
+    pub async fn database<'a>() -> Result<&'a Database> {
         let mongo = MONGO.get().expect("Mongo is not exists");
-        mongo.database.clone()
+        Ok(&mongo.database)
     }
 }

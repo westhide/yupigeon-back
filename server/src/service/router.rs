@@ -116,6 +116,10 @@ pub fn generate() -> impl IntoEndpoint {
         )
         .at("/canyon/operators", get(api::canyon::operators))
         .at("/canyon/clients", get(api::canyon::clients))
+        .at(
+            "/mongo/mongo_info/collection_names",
+            get(api::mongo_info::collection_names),
+        )
         .with(Auth)
         .with(Tracing)
         .with(Compression)
