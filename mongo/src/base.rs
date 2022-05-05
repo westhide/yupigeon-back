@@ -1,4 +1,8 @@
-use mongodb::{error::Result, options::ClientOptions, Client, Database};
+use mongodb::{
+    error::Result,
+    options::{ClientOptions, Compressor},
+    Client, Database,
+};
 use once_cell::sync::OnceCell;
 
 use crate::config::GLOBAL_CONFIG;
@@ -15,6 +19,7 @@ impl Mongo {
 
         let mut client_options = ClientOptions::parse(db_url).await?;
         client_options.app_name = Some("Mongo".to_string());
+        client_options.compressors = Some(vec![Compressor::Zstd { level: Some(3) }]);
 
         let client = Client::with_options(client_options)?;
         let database = client.database("yupigeon");

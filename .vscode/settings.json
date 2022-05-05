@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
         "actix",
+        "bson",
         "chrono",
         "datetime",
         "dotenv",
@@ -29,6 +30,7 @@
         "thiserror",
         "TINYINT",
         "westhide",
-        "yupigeon"
+        "yupigeon",
+        "zstd"
     ]
 }

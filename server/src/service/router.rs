@@ -120,6 +120,10 @@ pub fn generate() -> impl IntoEndpoint {
             "/mongo/mongo_info/collection_names",
             get(api::mongo_info::collection_names),
         )
+        .at(
+            "/mongo/mongo_organization/insert_organization_company",
+            post(api::mongo_organization::insert_organization_company),
+        )
         .with(Auth)
         .with(Tracing)
         .with(Compression)

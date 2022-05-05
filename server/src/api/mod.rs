@@ -10,6 +10,7 @@ pub mod greet;
 pub mod login;
 pub mod mapper;
 pub mod mongo_info;
+pub mod mongo_organization;
 pub mod ship_ticket;
 pub mod tenpay;
 pub mod user;
