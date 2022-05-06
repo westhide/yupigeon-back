@@ -116,13 +116,18 @@ pub fn generate() -> impl IntoEndpoint {
         )
         .at("/canyon/operators", get(api::canyon::operators))
         .at("/canyon/clients", get(api::canyon::clients))
+        .at("/mongo/collection_names", get(api::mongo::collection_names))
         .at(
-            "/mongo/mongo_info/collection_names",
-            get(api::mongo_info::collection_names),
+            "/mongo/organization/insert_organization_company",
+            post(api::mongo_organization::insert_organization_company),
         )
         .at(
-            "/mongo/mongo_organization/insert_organization_company",
-            post(api::mongo_organization::insert_organization_company),
+            "/mongo/organization/insert_organization_group",
+            post(api::mongo_organization::insert_organization_group),
+        )
+        .at(
+            "/mongo/finance/update_assist_account_items",
+            post(api::mongo_finance::update_assist_account_items),
         )
         .with(Auth)
         .with(Tracing)

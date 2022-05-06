@@ -5,15 +5,15 @@ use crate::query::common::CollectionTrait;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct OrganizationCompany {
+pub struct FinanceAssistSupplier {
     #[serde(rename = "_id")]
     pub _id: ObjectId,
+    code: String,
     name: String,
-    finance_code: String,
 }
 
-impl CollectionTrait for OrganizationCompany {
+impl CollectionTrait for FinanceAssistSupplier {
     fn collection_name<'a>() -> &'a str {
-        "OrganizationCompany"
+        "FinanceAssistSupplier"
     }
 }

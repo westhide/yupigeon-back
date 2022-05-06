@@ -1325,7 +1325,9 @@ dependencies = [
 name = "mongo"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "config",
+ "futures",
  "mongodb",
  "once_cell",
  "serde",
