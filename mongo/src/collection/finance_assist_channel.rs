@@ -16,4 +16,8 @@ impl CollectionTrait for FinanceAssistChannel {
     fn collection_name<'a>() -> &'a str {
         "FinanceAssistChannel"
     }
+
+    fn primary_key(&self) -> ObjectId {
+        self._id
+    }
 }

@@ -40,4 +40,8 @@ impl CollectionTrait for FinanceVoucherTemplate {
     fn collection_name<'a>() -> &'a str {
         "FinanceVoucherTemplate"
     }
+
+    fn primary_key(&self) -> ObjectId {
+        self._id
+    }
 }

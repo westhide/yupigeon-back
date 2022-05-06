@@ -16,4 +16,8 @@ impl CollectionTrait for FinanceAssistReceipt {
     fn collection_name<'a>() -> &'a str {
         "FinanceAssistReceipt"
     }
+
+    fn primary_key(&self) -> ObjectId {
+        self._id
+    }
 }

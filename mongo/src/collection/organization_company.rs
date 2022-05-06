@@ -16,4 +16,8 @@ impl CollectionTrait for OrganizationCompany {
     fn collection_name<'a>() -> &'a str {
         "OrganizationCompany"
     }
+
+    fn primary_key(&self) -> ObjectId {
+        self._id
+    }
 }

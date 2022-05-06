@@ -18,4 +18,8 @@ impl CollectionTrait for FinanceAccount {
     fn collection_name<'a>() -> &'a str {
         "FinanceAccount"
     }
+
+    fn primary_key(&self) -> ObjectId {
+        self._id
+    }
 }

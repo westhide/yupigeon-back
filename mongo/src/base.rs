@@ -39,8 +39,6 @@ impl Mongo {
     where
         T: Serialize + CollectionTrait,
     {
-        let db = Self::database();
-
-        db.collection::<T>(T::collection_name())
+        T::collection()
     }
 }
