@@ -1,6 +1,11 @@
 use async_trait::async_trait;
-use mongodb::{bson::oid::ObjectId, error::Result, results::InsertManyResult, Collection};
-use serde::{Deserialize, Serialize};
+use mongodb::{
+    bson::{doc, oid::ObjectId},
+    error::Result,
+    results::InsertManyResult,
+    Collection,
+};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct DBRef {
@@ -20,7 +25,27 @@ impl DBRef {
 }
 
 #[async_trait]
-pub trait CollectionTrait: Serialize {
+pub trait DBRefTrait {
+    async fn fetch<T>(&self) -> Result<Option<T>>
+    where
+        T: Serialize + DeserializeOwned + Unpin + Send + Sync;
+}
+
+#[async_trait]
+impl DBRefTrait for DBRef {
+    async fn fetch<T>(&self) -> Result<Option<T>>
+    where
+        T: Serialize + DeserializeOwned + Unpin + Send + Sync,
+    {
+        let db = crate::Mongo::database();
+
+        let collection = db.collection::<T>(&self._ref);
+        collection.find_one(doc! {"_id":self._id}, None).await
+    }
+}
+
+#[async_trait]
+pub trait CollectionTrait: Serialize + Sized {
     fn collection_name<'a>() -> &'a str;
 
     fn primary_key(&self) -> ObjectId;
@@ -29,10 +54,7 @@ pub trait CollectionTrait: Serialize {
         Self::collection_name()
     }
 
-    fn collection() -> Collection<Self>
-    where
-        Self: Sized,
-    {
+    fn collection() -> Collection<Self> {
         let db = crate::Mongo::database();
 
         db.collection::<Self>(Self::collection_name())
@@ -44,7 +66,7 @@ pub trait CollectionTrait: Serialize {
 
     async fn insert_many(items: Vec<Self>) -> Result<InsertManyResult>
     where
-        Self: Send + Sync + Sized,
+        Self: Send + Sync,
     {
         let collection = Self::collection();
         collection.insert_many(items, None).await

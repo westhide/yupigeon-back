@@ -11,7 +11,7 @@ use crate::{
         FinanceAssistAccount, FinanceAssistChannel, FinanceAssistClient, FinanceAssistPayment,
         FinanceAssistProduct, FinanceAssistSupplier, FinanceAssistTool,
     },
-    query::common::{CollectionTrait, DBRef},
+    query::common::{CollectionTrait, DBRef, DBRefTrait},
 };
 
 async fn update_items<T>(name: &str) -> Result<Option<FinanceAssistAccount>>
@@ -35,7 +35,7 @@ where
     FinanceAssistAccount::collection()
         .find_one_and_update(
             doc! {"name":name},
-            doc! {"$set":{"assist_items":items}},
+            doc! {"$set":{"assistItems":items}},
             None,
         )
         .await
@@ -50,4 +50,14 @@ pub async fn update_assist_account_items() -> Result<Vec<impl Serialize>> {
         update_items::<FinanceAssistTool>("运营工具").await?,
         update_items::<FinanceAssistPayment>("收款方式").await?,
     ])
+}
+
+pub async fn assist_account() -> Result<Option<FinanceAssistChannel>> {
+    let assist_account = FinanceAssistAccount::collection()
+        .find_one(doc! {}, None)
+        .await?
+        .unwrap();
+    assist_account.assist_items.unwrap()[0]
+        .fetch::<FinanceAssistChannel>()
+        .await
 }

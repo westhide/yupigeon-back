@@ -129,6 +129,10 @@ pub fn generate() -> impl IntoEndpoint {
             "/mongo/finance/update_assist_account_items",
             post(api::mongo_finance::update_assist_account_items),
         )
+        .at(
+            "/mongo/finance/assist_account",
+            get(api::mongo_finance::assist_account),
+        )
         .with(Auth)
         .with(Tracing)
         .with(Compression)

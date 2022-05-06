@@ -14,3 +14,12 @@ pub async fn update_assist_account_items() -> Result<impl IntoResponse> {
 
     Response::json(res)
 }
+
+#[handler]
+pub async fn assist_account() -> Result<impl IntoResponse> {
+    let res = query::finance::assist::assist_account()
+        .await
+        .map_err(MongoError)?;
+
+    Response::json(res)
+}

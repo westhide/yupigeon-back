@@ -10,7 +10,7 @@ pub struct FinanceAssistAccount {
     pub _id: ObjectId,
     code: Option<String>,
     name: String,
-    assist_items: Option<Vec<DBRef>>,
+    pub assist_items: Option<Vec<DBRef>>,
 }
 
 impl CollectionTrait for FinanceAssistAccount {
