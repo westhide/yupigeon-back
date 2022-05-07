@@ -6,6 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+macro-lib = { path = "../macro-lib" }
+
 mongodb = { version = "^2", features = [
     "tokio-runtime",
     "bson-chrono-0_4",

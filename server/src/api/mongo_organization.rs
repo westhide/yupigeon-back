@@ -1,6 +1,6 @@
 use mongo::{
     collection::{OrganizationCompany, OrganizationGroup},
-    query::common::CollectionTrait,
+    query::common::QueryTrait,
 };
 use poem::{handler, web::Json, IntoResponse, Result};
 

@@ -11,7 +11,7 @@ use crate::{
         FinanceAssistAccount, FinanceAssistChannel, FinanceAssistClient, FinanceAssistPayment,
         FinanceAssistProduct, FinanceAssistSupplier, FinanceAssistTool,
     },
-    query::common::{CollectionTrait, DBRef, DBRefTrait},
+    common::{CollectionTrait, DBRef, DBRefTrait},
 };
 
 async fn update_items<T>(name: &str) -> Result<Option<FinanceAssistAccount>>

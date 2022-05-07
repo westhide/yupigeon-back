@@ -1,9 +1,9 @@
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
-use crate::query::common::{CollectionTrait, DBRef};
+use crate::common::{CollectionTrait, DBRef, DeriveCollection};
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, DeriveCollection)]
 #[serde(rename_all = "camelCase")]
 pub struct FinanceAccount {
     #[serde(rename = "_id")]
@@ -12,14 +12,4 @@ pub struct FinanceAccount {
     name: String,
     direction: String,
     subsidiary_group: DBRef,
-}
-
-impl CollectionTrait for FinanceAccount {
-    fn collection_name<'a>() -> &'a str {
-        "FinanceAccount"
-    }
-
-    fn primary_key(&self) -> ObjectId {
-        self._id
-    }
 }

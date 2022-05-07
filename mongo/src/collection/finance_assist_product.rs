@@ -1,23 +1,13 @@
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
-use crate::query::common::CollectionTrait;
+use crate::common::{CollectionTrait, DeriveCollection};
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, DeriveCollection)]
 #[serde(rename_all = "camelCase")]
 pub struct FinanceAssistProduct {
     #[serde(rename = "_id")]
     pub _id: ObjectId,
     code: String,
     name: String,
-}
-
-impl CollectionTrait for FinanceAssistProduct {
-    fn collection_name<'a>() -> &'a str {
-        "FinanceAssistProduct"
-    }
-
-    fn primary_key(&self) -> ObjectId {
-        self._id
-    }
 }

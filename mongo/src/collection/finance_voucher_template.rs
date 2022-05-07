@@ -1,9 +1,9 @@
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
-use crate::query::common::{CollectionTrait, DBRef};
+use crate::common::{CollectionTrait, DBRef, DeriveCollection};
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, DeriveCollection)]
 #[serde(rename_all = "camelCase")]
 pub struct FinanceVoucherTemplate {
     #[serde(rename = "_id")]
@@ -34,14 +34,4 @@ pub struct FinanceVoucherTemplate {
     amount: Option<f32>,
     cashflow: DBRef,
     supplement: DBRef,
-}
-
-impl CollectionTrait for FinanceVoucherTemplate {
-    fn collection_name<'a>() -> &'a str {
-        "FinanceVoucherTemplate"
-    }
-
-    fn primary_key(&self) -> ObjectId {
-        self._id
-    }
 }

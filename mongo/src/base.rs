@@ -6,7 +6,7 @@ use mongodb::{
 use once_cell::sync::OnceCell;
 use serde::Serialize;
 
-use crate::{config::GLOBAL_CONFIG, query::common::CollectionTrait};
+use crate::{common::CollectionTrait, config::GLOBAL_CONFIG};
 
 pub struct Mongo {
     database: Database,
