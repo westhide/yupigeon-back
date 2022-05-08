@@ -10,9 +10,9 @@ use serde::{de::DeserializeOwned, Deserialize, Serialize};
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct DBRef {
     #[serde(rename = "$ref")]
-    _ref: String,
+    pub _ref: String,
     #[serde(rename = "$id")]
-    _id: ObjectId,
+    pub _id: ObjectId,
 }
 
 impl DBRef {
@@ -44,7 +44,7 @@ impl DBRefTrait for DBRef {
     }
 }
 
-pub trait CollectionTrait: Serialize + Sized {
+pub trait CollectionTrait: Serialize + Sized + Send + Sync {
     fn collection_name<'a>() -> &'a str;
 
     fn primary_key(&self) -> ObjectId;

@@ -1,12 +1,11 @@
 use mongodb::{
     error::Result,
     options::{ClientOptions, Compressor},
-    Client, Collection, Database,
+    Client, Database,
 };
 use once_cell::sync::OnceCell;
-use serde::Serialize;
 
-use crate::{common::CollectionTrait, config::GLOBAL_CONFIG};
+use crate::config::GLOBAL_CONFIG;
 
 pub struct Mongo {
     database: Database,
@@ -33,12 +32,5 @@ impl Mongo {
     pub fn database<'a>() -> &'a Database {
         let mongo = MONGO.get().expect("Mongo is not exists");
         &mongo.database
-    }
-
-    pub fn collection<T>() -> Collection<T>
-    where
-        T: Serialize + CollectionTrait,
-    {
-        T::collection()
     }
 }

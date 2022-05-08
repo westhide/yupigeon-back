@@ -8,8 +8,8 @@ use crate::common::{CollectionTrait, DBRef, DeriveCollection};
 pub struct FinanceAccount {
     #[serde(rename = "_id")]
     pub _id: ObjectId,
-    code: String,
-    name: String,
-    direction: String,
-    subsidiary_group: DBRef,
+    pub code: String,
+    pub name: String,
+    pub direction: String,
+    pub assist_account_group: Option<DBRef>,
 }

@@ -25,6 +25,7 @@ pub struct AuthEndpoint<E> {
 impl<E: Endpoint> Endpoint for AuthEndpoint<E> {
     type Output = E::Output;
 
+    // TODO
     async fn call(&self, req: Request) -> Result<Self::Output> {
         if req.uri() == "/login" {
             return self.ep.call(req).await;
