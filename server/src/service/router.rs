@@ -126,6 +126,10 @@ pub fn generate() -> impl IntoEndpoint {
             post(api::mongo_organization::insert_organization_group),
         )
         .at(
+            "/mongo/organization/organization_company",
+            get(api::mongo_organization::organization_company),
+        )
+        .at(
             "/mongo/finance/update_assist_account_items",
             post(api::mongo_finance::update_assist_account_items),
         )
@@ -140,6 +144,14 @@ pub fn generate() -> impl IntoEndpoint {
         .at(
             "/mongo/finance/finance_account_info",
             get(api::mongo_finance::finance_account_info),
+        )
+        .at(
+            "/mongo/finance/insert_finance_voucher_template",
+            post(api::mongo_finance::insert_finance_voucher_template),
+        )
+        .at(
+            "/mongo/finance/voucher_template_info",
+            get(api::mongo_finance::voucher_template_info),
         )
         .with(Auth)
         .with(Auth)

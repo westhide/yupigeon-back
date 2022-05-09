@@ -1,5 +1,12 @@
-use mongo::query;
-use poem::{handler, web::Query, IntoResponse, Result};
+use mongo::{
+    collection::FinanceVoucherTemplate,
+    query::{self, common::QueryTrait},
+};
+use poem::{
+    handler,
+    web::{Json, Query},
+    IntoResponse, Result,
+};
 use serde::Deserialize;
 
 use crate::service::{
@@ -59,6 +66,28 @@ pub async fn finance_account_info(Query(params): Query<CodeParams>) -> Result<im
     let CodeParams { code } = params;
 
     let res = query::finance::account::finance_account_info(&code)
+        .await
+        .map_err(MongoError)?;
+
+    Response::json(res)
+}
+
+#[handler]
+pub async fn insert_finance_voucher_template(
+    Json(params): Json<Vec<FinanceVoucherTemplate>>,
+) -> Result<impl IntoResponse> {
+    let res = FinanceVoucherTemplate::insert_many(params)
+        .await
+        .map_err(MongoError)?;
+
+    Response::json(res)
+}
+
+#[handler]
+pub async fn voucher_template_info(Query(params): Query<CodeParams>) -> Result<impl IntoResponse> {
+    let CodeParams { code } = params;
+
+    let res = query::finance::voucher::voucher_template_info(&code)
         .await
         .map_err(MongoError)?;
 

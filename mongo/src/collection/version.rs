@@ -6,7 +6,7 @@ use crate::common::{CollectionTrait, DeriveCollection};
 #[derive(Clone, Debug, Deserialize, Serialize, DeriveCollection)]
 #[serde(rename_all = "camelCase")]
 pub struct Version {
-    #[serde(rename = "_id")]
+    #[serde(rename = "_id", default)]
     pub _id: ObjectId,
     pub version: String,
 }

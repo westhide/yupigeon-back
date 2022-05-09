@@ -6,10 +6,10 @@ use crate::common::{CollectionTrait, DBRef, DeriveCollection};
 #[derive(Clone, Debug, Deserialize, Serialize, DeriveCollection)]
 #[serde(rename_all = "camelCase")]
 pub struct FinanceAccount {
-    #[serde(rename = "_id")]
+    #[serde(rename = "_id", default)]
     pub _id: ObjectId,
     pub code: String,
     pub name: String,
     pub direction: String,
-    pub assist_account_group: Option<DBRef>,
+    pub assist_account_group_ref: Option<DBRef>,
 }
