@@ -7,7 +7,7 @@ use crate::service::error::{Result, WrapError};
 pub fn parse_datetime(time_str: &str) -> Result<NaiveDateTime> {
     NaiveDateTime::parse_from_str(time_str, "%Y-%m-%d %H:%M:%S")
         .map_err(BadRequest)
-        .map_err(WrapError::PoemError)
+        .map_err(WrapError::Poem)
 }
 
 #[derive(Debug, Deserialize)]
