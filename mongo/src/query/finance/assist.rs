@@ -39,7 +39,7 @@ where
             None,
         )
         .await?
-        .ok_or_else(|| MongoErr::not_found("FinanceAssistAccount"))
+        .ok_or_else(|| MongoErr::message_error("FinanceAssistAccount Not Found"))
 }
 
 pub async fn update_assist_account_items() -> Result<Vec<impl Serialize>> {
@@ -75,7 +75,7 @@ async fn find_assist_account_info(
     let assist_account = FinanceAssistAccount::collection()
         .find_one(filter, options)
         .await?
-        .ok_or_else(|| MongoErr::not_found("FinanceAssistAccount"))?;
+        .ok_or_else(|| MongoErr::message_error("FinanceAssistAccount Not Found"))?;
 
     let collection_name = &assist_account.collection_name;
     let items = find_all_by_collection::<AssistAccountItem>(collection_name).await?;
@@ -106,7 +106,7 @@ pub async fn find_assist_account_group_info(
     let assist_account_group = FinanceAssistAccountGroup::collection()
         .find_one(filter, options)
         .await?
-        .ok_or_else(|| MongoErr::not_found("FinanceAssistAccountGroup"))?;
+        .ok_or_else(|| MongoErr::message_error("FinanceAssistAccountGroup Not Found"))?;
 
     let mut assist_account_group_info = AssistAccountGroupInfo {
         assist_account_group,

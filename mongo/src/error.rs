@@ -7,12 +7,12 @@ pub enum MongoErr {
     #[error("{0}")]
     Error(#[from] Error),
 
-    #[error("NotFoundError: {0} Not Found")]
-    NotFound(String),
+    #[error("MongodbMessage: {0}")]
+    Message(String),
 }
 
 impl MongoErr {
-    pub fn not_found(message: &str) -> Self {
-        Self::NotFound(message.into())
+    pub fn message_error(message: &str) -> Self {
+        Self::Message(message.into())
     }
 }

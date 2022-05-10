@@ -26,7 +26,7 @@ pub async fn find_finance_account_info(
     let finance_account = FinanceAccount::collection()
         .find_one(filter, options)
         .await?
-        .ok_or_else(|| MongoErr::not_found("FinanceAccount"))?;
+        .ok_or_else(|| MongoErr::message_error("FinanceAccount Not Found"))?;
 
     let finance_account_info = FinanceAccountInfo {
         assist_account_group_info: if let Some(db_ref) = &finance_account.assist_account_group_ref {

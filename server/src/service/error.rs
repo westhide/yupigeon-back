@@ -10,7 +10,7 @@ pub type Result<T, E = WrapError> = poem::Result<T, E>;
 
 #[derive(Debug, thiserror::Error)]
 pub enum WrapError {
-    #[error("{0}")]
+    #[error("ServiceMessage: {0}")]
     Message(String),
 
     #[error("{0}")]

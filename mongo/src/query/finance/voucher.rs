@@ -21,7 +21,7 @@ pub async fn voucher_template_info(code: &str) -> Result<VoucherTemplateInfo> {
     let template = FinanceVoucherTemplate::collection()
         .find_one(doc! {"code":code}, None)
         .await?
-        .ok_or_else(|| MongoErr::not_found("FinanceVoucherTemplate"))?;
+        .ok_or_else(|| MongoErr::message_error("FinanceVoucherTemplate Not Found"))?;
 
     let debit_ref = &template.debit_finance_account_ref;
     let credit_ref = &template.debit_finance_account_ref;
@@ -32,7 +32,7 @@ pub async fn voucher_template_info(code: &str) -> Result<VoucherTemplateInfo> {
     let organization_company = company_ref
         .fetch()
         .await?
-        .ok_or_else(|| MongoErr::not_found("OrganizationCompany"))?;
+        .ok_or_else(|| MongoErr::message_error("OrganizationCompany Not Found"))?;
 
     Ok(VoucherTemplateInfo {
         template,
