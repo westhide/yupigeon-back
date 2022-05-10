@@ -1,23 +1,21 @@
 use database::query;
-use poem::{error::BadRequest, handler, IntoResponse, Result};
+use poem::{handler, IntoResponse};
 
 use crate::service::{
-    common::{Response, ResponseTrait},
-    error::DbError,
+    error::Result,
+    response::{Response, ResponseTrait},
 };
 
 #[handler]
 pub async fn bill() -> Result<impl IntoResponse> {
-    let res = query::commercial_street::bill().await.map_err(DbError)?;
+    let res = query::commercial_street::bill().await?;
 
     Response::json(res)
 }
 
 #[handler]
 pub async fn rent_revenue() -> Result<impl IntoResponse> {
-    let res = query::commercial_street::rent_revenue()
-        .await
-        .map_err(BadRequest)?;
+    let res = query::commercial_street::rent_revenue().await?;
 
     Response::json(res)
 }

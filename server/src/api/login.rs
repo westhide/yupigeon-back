@@ -1,10 +1,10 @@
 use database::query;
-use poem::{handler, web::Json, IntoResponse, Result};
+use poem::{handler, web::Json, IntoResponse};
 use serde::Deserialize;
 
 use crate::service::{
-    common::{Response, ResponseTrait},
-    error::DbError,
+    error::Result,
+    response::{Response, ResponseTrait},
 };
 
 #[derive(Debug, Deserialize)]
@@ -17,9 +17,7 @@ pub struct Params {
 #[handler]
 pub async fn post(Json(params): Json<Params>) -> Result<impl IntoResponse> {
     let Params { username, password } = params;
-    let res = query::user::user(username, password)
-        .await
-        .map_err(DbError)?;
+    let res = query::user::user(username, password).await?;
 
     Response::json(res)
 }

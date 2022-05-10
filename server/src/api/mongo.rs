@@ -1,16 +1,14 @@
 use mongo::query;
-use poem::{handler, IntoResponse, Result};
+use poem::{handler, IntoResponse};
 
 use crate::service::{
-    common::{Response, ResponseTrait},
-    error::MongoError,
+    error::Result,
+    response::{Response, ResponseTrait},
 };
 
 #[handler]
 pub async fn collection_names() -> Result<impl IntoResponse> {
-    let res = query::database_info::collection_names()
-        .await
-        .map_err(MongoError)?;
+    let res = query::database_info::collection_names().await?;
 
     Response::json(res)
 }

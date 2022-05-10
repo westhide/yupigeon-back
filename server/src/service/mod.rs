@@ -4,8 +4,8 @@
 // @Last Modified time: 2022-03-19 22:43:26
 
 pub mod auth;
-pub mod common;
 pub mod error;
 pub mod global_data;
+pub mod params;
+pub mod response;
 pub mod router;
-pub mod utils;

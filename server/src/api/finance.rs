@@ -1,10 +1,10 @@
 use database::query;
-use poem::{handler, web::Query, IntoResponse, Result};
+use poem::{handler, web::Query, IntoResponse};
 use serde::Deserialize;
 
 use crate::service::{
-    common::{Response, ResponseTrait},
-    error::DbError,
+    error::Result,
+    response::{Response, ResponseTrait},
 };
 
 #[derive(Debug, Deserialize)]
@@ -15,7 +15,7 @@ pub struct Params {
 
 #[handler]
 pub async fn finance_accounts() -> Result<impl IntoResponse> {
-    let res = query::finance::finance_accounts().await.map_err(DbError)?;
+    let res = query::finance::finance_accounts().await?;
 
     Response::json(res)
 }
@@ -24,27 +24,21 @@ pub async fn finance_accounts() -> Result<impl IntoResponse> {
 pub async fn finance_account_info(Query(params): Query<Params>) -> Result<impl IntoResponse> {
     let Params { code } = params;
 
-    let res = query::finance::finance_account_info(&code)
-        .await
-        .map_err(DbError)?;
+    let res = query::finance::finance_account_info(&code).await?;
 
     Response::json(res)
 }
 
 #[handler]
 pub async fn subsidiary_clients() -> Result<impl IntoResponse> {
-    let res = query::finance::subsidiary_clients()
-        .await
-        .map_err(DbError)?;
+    let res = query::finance::subsidiary_clients().await?;
 
     Response::json(res)
 }
 
 #[handler]
 pub async fn update_subsidiary_account_items() -> Result<impl IntoResponse> {
-    let res = query::finance::update_subsidiary_account_items()
-        .await
-        .map_err(DbError)?;
+    let res = query::finance::update_subsidiary_account_items().await?;
 
     Response::json(res)
 }
@@ -61,9 +55,7 @@ pub async fn subsidiary_account(
 ) -> Result<impl IntoResponse> {
     let SubsidiaryAccountParams { code } = params;
 
-    let res = query::finance::find_subsidiary_account_by_code(&code)
-        .await
-        .map_err(DbError)?;
+    let res = query::finance::find_subsidiary_account_by_code(&code).await?;
 
     Response::json(res)
 }
@@ -80,9 +72,7 @@ pub async fn subsidiary_group_info(
 ) -> Result<impl IntoResponse> {
     let SubsidiaryGroupParams { id } = params;
 
-    let res = query::finance::subsidiary_group_info(id)
-        .await
-        .map_err(DbError)?;
+    let res = query::finance::subsidiary_group_info(id).await?;
 
     Response::json(res)
 }
@@ -99,9 +89,7 @@ pub async fn voucher_template(
 ) -> Result<impl IntoResponse> {
     let VoucherTemplateParams { code } = params;
 
-    let res = query::finance::voucher_template(&code)
-        .await
-        .map_err(DbError)?;
+    let res = query::finance::voucher_template(&code).await?;
 
     Response::json(res)
 }
@@ -112,9 +100,7 @@ pub async fn voucher_template_info(
 ) -> Result<impl IntoResponse> {
     let VoucherTemplateParams { code } = params;
 
-    let res = query::finance::voucher_template_info(&code)
-        .await
-        .map_err(DbError)?;
+    let res = query::finance::voucher_template_info(&code).await?;
 
     Response::json(res)
 }
@@ -125,9 +111,7 @@ pub async fn voucher_template_group(
 ) -> Result<impl IntoResponse> {
     let VoucherTemplateParams { code } = params;
 
-    let res = query::finance::voucher_template_group(&code)
-        .await
-        .map_err(DbError)?;
+    let res = query::finance::voucher_template_group(&code).await?;
 
     Response::json(res)
 }

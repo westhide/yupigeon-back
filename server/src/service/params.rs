@@ -1,9 +1,13 @@
 use chrono::NaiveDateTime;
-use poem::{error::BadRequest, Result};
+use poem::error::BadRequest;
 use serde::Deserialize;
 
+use crate::service::error::{Result, WrapError};
+
 pub fn parse_datetime(time_str: &str) -> Result<NaiveDateTime> {
-    NaiveDateTime::parse_from_str(time_str, "%Y-%m-%d %H:%M:%S").map_err(BadRequest)
+    NaiveDateTime::parse_from_str(time_str, "%Y-%m-%d %H:%M:%S")
+        .map_err(BadRequest)
+        .map_err(WrapError::PoemError)
 }
 
 #[derive(Debug, Deserialize)]

@@ -5,20 +5,18 @@ use mongo::{
 use poem::{
     handler,
     web::{Json, Query},
-    IntoResponse, Result,
+    IntoResponse,
 };
 use serde::Deserialize;
 
 use crate::service::{
-    common::{Response, ResponseTrait},
-    error::MongoError,
+    error::Result,
+    response::{Response, ResponseTrait},
 };
 
 #[handler]
 pub async fn update_assist_account_items() -> Result<impl IntoResponse> {
-    let res = query::finance::assist::update_assist_account_items()
-        .await
-        .map_err(MongoError)?;
+    let res = query::finance::assist::update_assist_account_items().await?;
 
     Response::json(res)
 }
@@ -35,9 +33,7 @@ pub async fn assist_account_info(
 ) -> Result<impl IntoResponse> {
     let AssistAccountInfoParams { name } = params;
 
-    let res = query::finance::assist::assist_account_info(&name)
-        .await
-        .map_err(MongoError)?;
+    let res = query::finance::assist::assist_account_info(&name).await?;
 
     Response::json(res)
 }
@@ -54,9 +50,7 @@ pub async fn assist_account_group_info(
 ) -> Result<impl IntoResponse> {
     let CodeParams { code } = params;
 
-    let res = query::finance::assist::assist_account_group_info(&code)
-        .await
-        .map_err(MongoError)?;
+    let res = query::finance::assist::assist_account_group_info(&code).await?;
 
     Response::json(res)
 }
@@ -65,9 +59,7 @@ pub async fn assist_account_group_info(
 pub async fn finance_account_info(Query(params): Query<CodeParams>) -> Result<impl IntoResponse> {
     let CodeParams { code } = params;
 
-    let res = query::finance::account::finance_account_info(&code)
-        .await
-        .map_err(MongoError)?;
+    let res = query::finance::account::finance_account_info(&code).await?;
 
     Response::json(res)
 }
@@ -76,9 +68,7 @@ pub async fn finance_account_info(Query(params): Query<CodeParams>) -> Result<im
 pub async fn insert_finance_voucher_template(
     Json(params): Json<Vec<FinanceVoucherTemplate>>,
 ) -> Result<impl IntoResponse> {
-    let res = FinanceVoucherTemplate::insert_many(params)
-        .await
-        .map_err(MongoError)?;
+    let res = FinanceVoucherTemplate::insert_many(params).await?;
 
     Response::json(res)
 }
@@ -87,9 +77,7 @@ pub async fn insert_finance_voucher_template(
 pub async fn voucher_template_info(Query(params): Query<CodeParams>) -> Result<impl IntoResponse> {
     let CodeParams { code } = params;
 
-    let res = query::finance::voucher::voucher_template_info(&code)
-        .await
-        .map_err(MongoError)?;
+    let res = query::finance::voucher::voucher_template_info(&code).await?;
 
     Response::json(res)
 }

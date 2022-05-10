@@ -1,8 +1,7 @@
 use once_cell::sync::OnceCell;
-use poem::Result;
 use tokio::sync::{Mutex, MutexGuard};
 
-use crate::service::error::MessageError;
+use crate::service::error::{Result, WrapError};
 
 #[derive(Debug, Clone)]
 pub struct GlobalData {
@@ -26,7 +25,7 @@ pub fn init_global_data() {
 pub fn get_global_data() -> Result<MutexGuard<'static, GlobalData>> {
     GLOBAL_DATA
         .get()
-        .ok_or_else(|| MessageError::new("Can Not Get GLOBAL_DATA"))?
+        .ok_or_else(|| WrapError::message_error("Can Not Get GLOBAL_DATA"))?
         .try_lock()
-        .map_err(|_| MessageError::new("数据更新中").into())
+        .map_err(|_| WrapError::message_error("数据更新中"))
 }

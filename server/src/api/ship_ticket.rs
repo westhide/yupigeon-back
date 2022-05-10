@@ -3,16 +3,16 @@ use database::query;
 use poem::{
     handler,
     web::{Json, Query},
-    IntoResponse, Result,
+    IntoResponse,
 };
 use serde::{Deserialize, Serialize};
 
 use crate::{
     global_data::get_global_data,
     service::{
-        common::{Response, ResponseTrait},
-        error::DbError,
-        utils::{DateTimeParams, ParseDateTimeParams},
+        error::Result,
+        params::{DateTimeParams, ParseDateTimeParams},
+        response::{Response, ResponseTrait},
     },
 };
 
@@ -20,9 +20,7 @@ use crate::{
 pub async fn bill(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    let res = query::ship_ticket::bill(begin_time, end_time)
-        .await
-        .map_err(DbError)?;
+    let res = query::ship_ticket::bill(begin_time, end_time).await?;
 
     Response::json(res)
 }
@@ -49,23 +47,21 @@ pub async fn refund_bill(Json(params): Json<RefundBillParams>) -> Result<impl In
         None => "".into(),
     };
 
-    let res = query::ship_ticket::refund_bill(begin_time, end_time, &where_condition)
-        .await
-        .map_err(DbError)?;
+    let res = query::ship_ticket::refund_bill(begin_time, end_time, &where_condition).await?;
 
     Response::json(res)
 }
 
 #[handler]
 pub async fn clients() -> Result<impl IntoResponse> {
-    let res = query::ship_ticket::clients().await.map_err(DbError)?;
+    let res = query::ship_ticket::clients().await?;
 
     Response::json(res)
 }
 
 #[handler]
 pub async fn conductors() -> Result<impl IntoResponse> {
-    let res = query::ship_ticket::conductors().await.map_err(DbError)?;
+    let res = query::ship_ticket::conductors().await?;
 
     Response::json(res)
 }
@@ -122,9 +118,7 @@ pub async fn refresh() -> Result<impl IntoResponse> {
 pub async fn daily_sales(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    let res = query::ship_ticket::daily_sales(begin_time, end_time)
-        .await
-        .map_err(DbError)?;
+    let res = query::ship_ticket::daily_sales(begin_time, end_time).await?;
 
     Response::json(res)
 }
@@ -133,9 +127,7 @@ pub async fn daily_sales(Query(params): Query<DateTimeParams>) -> Result<impl In
 pub async fn daily_receipt(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    let res = query::ship_ticket::daily_receipt(begin_time, end_time)
-        .await
-        .map_err(DbError)?;
+    let res = query::ship_ticket::daily_receipt(begin_time, end_time).await?;
 
     Response::json(res)
 }
@@ -162,9 +154,7 @@ pub async fn client_sales(Json(params): Json<ClientSalesParams>) -> Result<impl 
         None => "".into(),
     };
 
-    let res = query::ship_ticket::client_sales(begin_time, end_time, &where_condition)
-        .await
-        .map_err(DbError)?;
+    let res = query::ship_ticket::client_sales(begin_time, end_time, &where_condition).await?;
 
     Response::json(res)
 }
@@ -193,9 +183,8 @@ pub async fn conductor_daily_receipt(
         None => "".into(),
     };
 
-    let res = query::ship_ticket::conductor_daily_receipt(begin_time, end_time, &where_condition)
-        .await
-        .map_err(DbError)?;
+    let res =
+        query::ship_ticket::conductor_daily_receipt(begin_time, end_time, &where_condition).await?;
 
     Response::json(res)
 }
@@ -204,9 +193,7 @@ pub async fn conductor_daily_receipt(
 pub async fn ticket_revenue(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    let res = query::ship_ticket::ticket_revenue(begin_time, end_time)
-        .await
-        .map_err(DbError)?;
+    let res = query::ship_ticket::ticket_revenue(begin_time, end_time).await?;
 
     Response::json(res)
 }
@@ -215,9 +202,7 @@ pub async fn ticket_revenue(Query(params): Query<DateTimeParams>) -> Result<impl
 pub async fn fee_revenue(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
 
-    let res = query::ship_ticket::fee_revenue(begin_time, end_time)
-        .await
-        .map_err(DbError)?;
+    let res = query::ship_ticket::fee_revenue(begin_time, end_time).await?;
 
     Response::json(res)
 }

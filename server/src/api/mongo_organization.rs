@@ -5,22 +5,20 @@ use mongo::{
 use poem::{
     handler,
     web::{Json, Query},
-    IntoResponse, Result,
+    IntoResponse,
 };
 use serde::Deserialize;
 
 use crate::service::{
-    common::{Response, ResponseTrait},
-    error::MongoError,
+    error::Result,
+    response::{Response, ResponseTrait},
 };
 
 #[handler]
 pub async fn insert_organization_company(
     Json(params): Json<Vec<OrganizationCompany>>,
 ) -> Result<impl IntoResponse> {
-    let res = OrganizationCompany::insert_many(params)
-        .await
-        .map_err(MongoError)?;
+    let res = OrganizationCompany::insert_many(params).await?;
 
     Response::json(res)
 }
@@ -29,9 +27,7 @@ pub async fn insert_organization_company(
 pub async fn insert_organization_group(
     Json(params): Json<Vec<OrganizationGroup>>,
 ) -> Result<impl IntoResponse> {
-    let res = OrganizationGroup::insert_many(params)
-        .await
-        .map_err(MongoError)?;
+    let res = OrganizationGroup::insert_many(params).await?;
 
     Response::json(res)
 }
@@ -46,9 +42,7 @@ pub struct CodeParams {
 pub async fn organization_company(Query(params): Query<CodeParams>) -> Result<impl IntoResponse> {
     let CodeParams { finance_code } = params;
 
-    let res = query::organization::organization_company(&finance_code)
-        .await
-        .map_err(MongoError)?;
+    let res = query::organization::organization_company(&finance_code).await?;
 
     Response::json(res)
 }
