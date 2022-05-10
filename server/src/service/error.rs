@@ -28,7 +28,7 @@ impl ResponseError for MessageError {
 
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
-pub struct DbError(pub DbErr);
+pub struct DbError(#[from] pub DbErr);
 
 impl ResponseError for DbError {
     fn status(&self) -> StatusCode {
@@ -47,15 +47,9 @@ impl ResponseError for DbError {
     }
 }
 
-impl From<DbErr> for DbError {
-    fn from(db_err: DbErr) -> Self {
-        DbError(db_err)
-    }
-}
-
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]
-pub struct MongoError(pub MongoErr);
+pub struct MongoError(#[from] pub MongoErr);
 
 impl ResponseError for MongoError {
     fn status(&self) -> StatusCode {
@@ -71,11 +65,5 @@ impl ResponseError for MongoError {
         .unwrap();
 
         Response::builder().status(self.status()).body(body)
-    }
-}
-
-impl From<MongoErr> for MongoError {
-    fn from(mongo_err: MongoErr) -> Self {
-        MongoError(mongo_err)
     }
 }
