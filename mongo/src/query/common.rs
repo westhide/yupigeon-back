@@ -1,19 +1,21 @@
 use async_trait::async_trait;
 use futures::stream::{TryStream, TryStreamExt};
-use mongodb::{
-    error::{Error, Result},
-    results::InsertManyResult,
-    Cursor,
-};
+use mongodb::{error::Error, results::InsertManyResult, Cursor};
 use serde::Serialize;
 
-use crate::common::CollectionTrait;
+use crate::{
+    common::CollectionTrait,
+    error::{MongoErr, Result},
+};
 
 #[async_trait]
 pub trait QueryTrait: CollectionTrait {
     async fn insert_many(items: Vec<Self>) -> Result<InsertManyResult> {
         let collection = Self::collection();
-        collection.insert_many(items, None).await
+        collection
+            .insert_many(items, None)
+            .await
+            .map_err(Into::<MongoErr>::into)
     }
 
     async fn find_all() -> Result<Vec<Self>>
@@ -39,6 +41,7 @@ where
         .find(None, None)
         .await?
         .try_collect::<Vec<T>>()
-        .await?;
+        .await
+        .map_err(Into::<Error>::into)?;
     Ok(res)
 }

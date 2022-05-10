@@ -31,7 +31,7 @@ pub struct FinanceVoucherTemplate {
     unit_price: Option<f32>,
     currency_code: String,
     currency_name: String,
+    currency_rate: f32,
     amount: Option<f32>,
     pub cashflow_ref: Option<DBRef>,
-    pub supplement_ref: Option<DBRef>,
 }

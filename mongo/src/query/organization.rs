@@ -1,10 +1,13 @@
 use mongodb::{
     bson::{doc, Document},
-    error::Result,
     options::FindOneOptions,
 };
 
-use crate::{collection::OrganizationCompany, common::CollectionTrait};
+use crate::{
+    collection::OrganizationCompany,
+    common::CollectionTrait,
+    error::{MongoErr, Result},
+};
 
 pub async fn find_organization_company(
     filter: impl Into<Option<Document>>,
@@ -13,6 +16,7 @@ pub async fn find_organization_company(
     OrganizationCompany::collection()
         .find_one(filter, options)
         .await
+        .map_err(Into::<MongoErr>::into)
 }
 
 pub async fn organization_company(finance_code: &str) -> Result<Option<OrganizationCompany>> {

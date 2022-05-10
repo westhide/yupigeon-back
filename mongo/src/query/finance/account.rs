@@ -1,12 +1,15 @@
 use mongodb::{
     bson::{doc, Document},
-    error::Result,
     options::FindOneOptions,
 };
 use serde::{Deserialize, Serialize};
 
 use super::assist::{find_assist_account_group_info, AssistAccountGroupInfo};
-use crate::{collection::FinanceAccount, common::CollectionTrait};
+use crate::{
+    collection::FinanceAccount,
+    common::CollectionTrait,
+    error::{MongoErr, Result},
+};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -19,31 +22,24 @@ pub struct FinanceAccountInfo {
 pub async fn find_finance_account_info(
     filter: impl Into<Option<Document>>,
     options: impl Into<Option<FindOneOptions>>,
-) -> Result<Option<FinanceAccountInfo>> {
+) -> Result<FinanceAccountInfo> {
     let finance_account = FinanceAccount::collection()
         .find_one(filter, options)
-        .await?;
+        .await?
+        .ok_or_else(|| MongoErr::not_found("FinanceAccount"))?;
 
-    if let Some(finance_account) = finance_account {
-        let mut finance_account_info = FinanceAccountInfo {
-            finance_account,
-            assist_account_group_info: None,
-        };
+    let finance_account_info = FinanceAccountInfo {
+        assist_account_group_info: if let Some(db_ref) = &finance_account.assist_account_group_ref {
+            Some(find_assist_account_group_info(doc! {"_id":db_ref._id}, None).await?)
+        } else {
+            None
+        },
+        finance_account,
+    };
 
-        if let Some(db_ref) = &finance_account_info
-            .finance_account
-            .assist_account_group_ref
-        {
-            finance_account_info.assist_account_group_info =
-                find_assist_account_group_info(doc! {"_id":db_ref._id}, None).await?;
-        }
-
-        Ok(Some(finance_account_info))
-    } else {
-        Ok(None)
-    }
+    Ok(finance_account_info)
 }
 
-pub async fn finance_account_info(code: &str) -> Result<Option<FinanceAccountInfo>> {
+pub async fn finance_account_info(code: &str) -> Result<FinanceAccountInfo> {
     find_finance_account_info(doc! {"code":code}, None).await
 }

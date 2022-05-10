@@ -1,5 +1,5 @@
 use database::sea_orm::DbErr;
-use mongo::mongodb::error::Error as MongoErr;
+use mongo::error::MongoErr;
 use poem::{error::ResponseError, http::StatusCode, Body, Response};
 #[derive(Debug, thiserror::Error)]
 #[error("{0}")]

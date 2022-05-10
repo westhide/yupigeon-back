@@ -1,7 +1,7 @@
 use futures::stream::TryStream;
 use mongodb::{
     bson::{doc, to_bson, Document},
-    error::{Error, Result},
+    error::Error,
     options::FindOneOptions,
     Cursor,
 };
@@ -13,10 +13,11 @@ use crate::{
         FinanceAssistPayment, FinanceAssistProduct, FinanceAssistSupplier, FinanceAssistTool,
     },
     common::{CollectionTrait, DBRef},
+    error::{MongoErr, Result},
     query::common::{find_all_by_collection, QueryTrait},
 };
 
-async fn update_items<T>() -> Result<Option<FinanceAssistAccount>>
+async fn update_items<T>() -> Result<FinanceAssistAccount>
 where
     T: CollectionTrait,
     Cursor<T>: TryStream,
@@ -29,7 +30,7 @@ where
         .map(|item| item.db_ref())
         .collect::<Vec<DBRef>>();
 
-    let assist_refs_bson = to_bson(&assist_refs)?;
+    let assist_refs_bson = to_bson(&assist_refs).map_err(Into::<Error>::into)?;
 
     FinanceAssistAccount::collection()
         .find_one_and_update(
@@ -37,7 +38,8 @@ where
             doc! {"$set":{"assistRefs":assist_refs_bson}},
             None,
         )
-        .await
+        .await?
+        .ok_or_else(|| MongoErr::not_found("FinanceAssistAccount"))
 }
 
 pub async fn update_assist_account_items() -> Result<Vec<impl Serialize>> {
@@ -69,26 +71,23 @@ pub struct AssistAccountInfo {
 async fn find_assist_account_info(
     filter: impl Into<Option<Document>>,
     options: impl Into<Option<FindOneOptions>>,
-) -> Result<Option<AssistAccountInfo>> {
+) -> Result<AssistAccountInfo> {
     let assist_account = FinanceAssistAccount::collection()
         .find_one(filter, options)
-        .await?;
+        .await?
+        .ok_or_else(|| MongoErr::not_found("FinanceAssistAccount"))?;
 
-    if let Some(assist_account) = assist_account {
-        let collection_name = &assist_account.collection_name;
-        let items = find_all_by_collection::<AssistAccountItem>(collection_name).await?;
+    let collection_name = &assist_account.collection_name;
+    let items = find_all_by_collection::<AssistAccountItem>(collection_name).await?;
 
-        let assist_account_info = AssistAccountInfo {
-            assist_account,
-            items,
-        };
-        Ok(Some(assist_account_info))
-    } else {
-        Ok(None)
-    }
+    let assist_account_info = AssistAccountInfo {
+        assist_account,
+        items,
+    };
+    Ok(assist_account_info)
 }
 
-pub async fn assist_account_info(name: &str) -> Result<Option<AssistAccountInfo>> {
+pub async fn assist_account_info(name: &str) -> Result<AssistAccountInfo> {
     find_assist_account_info(doc! {"name":name}, None).await
 }
 
@@ -97,38 +96,34 @@ pub async fn assist_account_info(name: &str) -> Result<Option<AssistAccountInfo>
 pub struct AssistAccountGroupInfo {
     #[serde(flatten)]
     assist_account_group: FinanceAssistAccountGroup,
-    items: Vec<Option<AssistAccountInfo>>,
+    items: Vec<AssistAccountInfo>,
 }
 
 pub async fn find_assist_account_group_info(
     filter: impl Into<Option<Document>>,
     options: impl Into<Option<FindOneOptions>>,
-) -> Result<Option<AssistAccountGroupInfo>> {
+) -> Result<AssistAccountGroupInfo> {
     let assist_account_group = FinanceAssistAccountGroup::collection()
         .find_one(filter, options)
-        .await?;
+        .await?
+        .ok_or_else(|| MongoErr::not_found("FinanceAssistAccountGroup"))?;
 
-    if let Some(assist_account_group) = assist_account_group {
-        let mut assist_account_group_info = AssistAccountGroupInfo {
-            assist_account_group,
-            items: vec![],
-        };
+    let mut assist_account_group_info = AssistAccountGroupInfo {
+        assist_account_group,
+        items: vec![],
+    };
 
-        for db_ref in &assist_account_group_info
-            .assist_account_group
-            .assist_account_refs
-        {
-            let assist_account_info =
-                find_assist_account_info(doc! {"_id":db_ref._id}, None).await?;
-            assist_account_group_info.items.push(assist_account_info);
-        }
-
-        Ok(Some(assist_account_group_info))
-    } else {
-        Ok(None)
+    for db_ref in &assist_account_group_info
+        .assist_account_group
+        .assist_account_refs
+    {
+        let assist_account_info = find_assist_account_info(doc! {"_id":db_ref._id}, None).await?;
+        assist_account_group_info.items.push(assist_account_info);
     }
+
+    Ok(assist_account_group_info)
 }
 
-pub async fn assist_account_group_info(code: &str) -> Result<Option<AssistAccountGroupInfo>> {
+pub async fn assist_account_group_info(code: &str) -> Result<AssistAccountGroupInfo> {
     find_assist_account_group_info(doc! {"code":code}, None).await
 }

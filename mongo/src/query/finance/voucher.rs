@@ -1,10 +1,11 @@
-use mongodb::{bson::doc, error::Result};
+use mongodb::bson::doc;
 use serde::{Deserialize, Serialize};
 
 use super::account::{find_finance_account_info, FinanceAccountInfo};
 use crate::{
     collection::{FinanceVoucherTemplate, OrganizationCompany},
     common::{CollectionTrait, DBRefTrait},
+    error::{MongoErr, Result},
 };
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -12,35 +13,31 @@ use crate::{
 pub struct VoucherTemplateInfo {
     #[serde(flatten)]
     template: FinanceVoucherTemplate,
-    debit_account_info: Option<FinanceAccountInfo>,
-    credit_account_info: Option<FinanceAccountInfo>,
-    organization_company: Option<OrganizationCompany>,
+    debit_account_info: FinanceAccountInfo,
+    credit_account_info: FinanceAccountInfo,
+    organization_company: OrganizationCompany,
 }
-pub async fn voucher_template_info(code: &str) -> Result<Option<VoucherTemplateInfo>> {
+pub async fn voucher_template_info(code: &str) -> Result<VoucherTemplateInfo> {
     let template = FinanceVoucherTemplate::collection()
         .find_one(doc! {"code":code}, None)
-        .await?;
+        .await?
+        .ok_or_else(|| MongoErr::not_found("FinanceVoucherTemplate"))?;
 
-    if let Some(template) = template {
-        let mut template_info = VoucherTemplateInfo {
-            template,
-            debit_account_info: None,
-            credit_account_info: None,
-            organization_company: None,
-        };
+    let debit_ref = &template.debit_finance_account_ref;
+    let credit_ref = &template.debit_finance_account_ref;
+    let company_ref = &template.organization_company_ref;
 
-        let debit_ref = &template_info.template.debit_finance_account_ref;
-        let credit_ref = &template_info.template.debit_finance_account_ref;
-        let company_ref = &template_info.template.organization_company_ref;
+    let debit_account_info = find_finance_account_info(doc! {"_id":debit_ref._id}, None).await?;
+    let credit_account_info = find_finance_account_info(doc! {"_id":credit_ref._id}, None).await?;
+    let organization_company = company_ref
+        .fetch()
+        .await?
+        .ok_or_else(|| MongoErr::not_found("OrganizationCompany"))?;
 
-        template_info.debit_account_info =
-            find_finance_account_info(doc! {"_id":debit_ref._id}, None).await?;
-        template_info.credit_account_info =
-            find_finance_account_info(doc! {"_id":credit_ref._id}, None).await?;
-        template_info.organization_company = company_ref.fetch().await?;
-
-        Ok(Some(template_info))
-    } else {
-        Ok(None)
-    }
+    Ok(VoucherTemplateInfo {
+        template,
+        debit_account_info,
+        credit_account_info,
+        organization_company,
+    })
 }
