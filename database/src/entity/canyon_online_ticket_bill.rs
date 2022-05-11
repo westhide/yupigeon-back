@@ -28,5 +28,5 @@ pub struct Model {
     is_deleted: i8,
 }
 
-#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+#[derive(Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}

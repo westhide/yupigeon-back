@@ -49,5 +49,5 @@ pub struct Model {
     ticket_no: i64,
 }
 
-#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+#[derive(Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}

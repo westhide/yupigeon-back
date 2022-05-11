@@ -14,7 +14,7 @@ pub struct Model {
     name: String,
 }
 
-#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+#[derive(Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}
 
 #[derive(Debug)]

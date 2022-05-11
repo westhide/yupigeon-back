@@ -16,7 +16,7 @@ pub struct Model {
     subsidiary_group_id: Option<u32>,
 }
 
-#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+#[derive(Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
         belongs_to = "super::finance_subsidiary_group::Entity",

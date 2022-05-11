@@ -14,7 +14,7 @@ pub struct Model {
     voucher_template_id: u32,
 }
 
-#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+#[derive(Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
         belongs_to = "super::finance_voucher_template_group::Entity",

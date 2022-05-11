@@ -50,5 +50,5 @@ pub struct Model {
     due_date: Option<Date>,
 }
 
-#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+#[derive(Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}

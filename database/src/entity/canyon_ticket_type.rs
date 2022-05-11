@@ -17,7 +17,7 @@ pub struct Model {
     scope: Option<String>,
 }
 
-#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+#[derive(Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}
 
 #[derive(Debug)]

@@ -36,7 +36,7 @@ impl ResponseError for WrapError {
 
     fn as_response(&self) -> Response {
         let message = match self {
-            Self::Message(message) => message.clone(),
+            Self::Message(message) => message.into(),
             Self::Db(err) => err.to_string(),
             Self::Mongo(err) => err.to_string(),
             Self::Poem(err) => err.to_string(),

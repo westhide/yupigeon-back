@@ -13,7 +13,7 @@ pub struct Model {
     name: String,
 }
 
-#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+#[derive(Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(has_many = "super::finance_account::Entity")]
     FinanceAccount,

@@ -16,7 +16,7 @@ pub struct Model {
     ticket_item_num: i32,
 }
 
-#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+#[derive(Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
         belongs_to = "super::canyon_ticket_type::Entity",

@@ -22,7 +22,7 @@ pub fn init_global_data() {
         .expect("Can not set global_data");
 }
 
-pub fn get_global_data() -> Result<MutexGuard<'static, GlobalData>> {
+pub fn get_global_data<'a>() -> Result<MutexGuard<'a, GlobalData>> {
     GLOBAL_DATA
         .get()
         .ok_or_else(|| WrapError::message_error("Can Not Get GLOBAL_DATA"))?
