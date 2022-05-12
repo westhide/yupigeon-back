@@ -1,5 +1,5 @@
 use mongo::{
-    collection::FinanceVoucherTemplate,
+    collection::{FinanceAssistChannel, FinanceAssistPayment, FinanceVoucherTemplate},
     query::{self, common::QueryTrait},
 };
 use poem::{
@@ -89,6 +89,20 @@ pub async fn kingdee_cloud_voucher_template(
     let CodeParams { code } = params;
 
     let res = query::finance::voucher::kingdee_cloud_voucher_template(&code).await?;
+
+    Response::json(res)
+}
+
+#[handler]
+pub async fn assist_channels() -> Result<impl IntoResponse> {
+    let res = FinanceAssistChannel::find_all().await?;
+
+    Response::json(res)
+}
+
+#[handler]
+pub async fn assist_payments() -> Result<impl IntoResponse> {
+    let res = FinanceAssistPayment::find_all().await?;
 
     Response::json(res)
 }

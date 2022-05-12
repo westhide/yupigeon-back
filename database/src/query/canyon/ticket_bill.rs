@@ -12,7 +12,7 @@ pub struct DailySales {
     source: String,
     id: Option<u32>,
     date: Date,
-    channel: String,
+    channel: Option<String>,
     operator: String,
     payment_method: String,
     client: String,
@@ -45,9 +45,9 @@ pub async fn daily_sales(
             (
                 SELECT  trade_type
                     ,trade_time
-                    ,'窗口' channel
+                    ,'窗口-售票员' channel
                     ,operator
-                    ,payment_method
+                    ,payment_method payment_method_raw
                     ,client
                     ,ticket_type ticket_type_raw
                     ,ticket_price
@@ -57,9 +57,9 @@ pub async fn daily_sales(
                 UNION ALL
                 SELECT  'sale' trade_type
                     ,ont.check_in_datetime trade_time
-                    ,'线上' channel
+                    ,tc.online_channel channel
                     ,ont.client operator
-                    ,IFNULL(tc.payment_type,'') payment_method
+                    ,IFNULL(tc.online_payment_type,'') payment_method_raw
                     ,ont.client
                     ,ont.ticket_type ticket_type_raw
                     ,ont.ticket_price
@@ -75,16 +75,18 @@ pub async fn daily_sales(
                     ,DATE( trade_time ) date
                     ,channel
                     ,operator
-                    ,payment_method
+                    ,IFNULL(mdv_pm.to_value,tb.payment_method_raw) payment_method
                     ,client
-                    ,IFNULL(mdv.to_value,tb.ticket_type_raw) ticket_type
+                    ,IFNULL(mdv_tt.to_value,tb.ticket_type_raw) ticket_type
                     ,ticket_price
                     ,SUM( CASE trade_type WHEN 'sale' THEN ticket_num WHEN 'refund' THEN - ticket_num END ) sum_ticket_num
                     ,SUM( CASE trade_type WHEN 'sale' THEN ticket_amount WHEN 'refund' THEN - ticket_amount END ) sum_ticket_amount
                     ,NULL remark
                 FROM tb
-                LEFT JOIN mapper_domain_value mdv
-                ON mdv.domain='CanyonTicket' AND mdv.type='ticket_type' AND tb.ticket_type_raw=mdv.from_value
+                LEFT JOIN mapper_domain_value mdv_tt
+                ON mdv_tt.domain='CanyonTicket' AND mdv_tt.type='ticket_type' AND tb.ticket_type_raw=mdv_tt.from_value
+                LEFT JOIN mapper_domain_value mdv_pm
+                ON mdv_pm.domain='CanyonTicket' AND mdv_pm.type='payment_method' AND tb.payment_method_raw=mdv_pm.from_value
                 GROUP BY  date
                         ,channel
                         ,operator
@@ -111,6 +113,10 @@ pub async fn daily_sales(
             SELECT  *
             FROM ds
             WHERE date BETWEEN DATE(?) AND DATE(?) {}
+            ORDER BY source DESC
+                    ,date
+                    ,channel
+                    ,operator
             ;
         ",where_condition);
 

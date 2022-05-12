@@ -13,6 +13,8 @@ pub struct Model {
     #[sea_orm(unique)]
     name: String,
     r#type: String,
+    online_payment_type: Option<String>,
+    online_channel: Option<String>,
 }
 
 #[derive(Debug, EnumIter, DeriveRelation)]
