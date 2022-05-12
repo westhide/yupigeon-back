@@ -15,8 +15,8 @@ use crate::{
 #[serde(rename_all = "camelCase")]
 pub struct FinanceAccountInfo {
     #[serde(flatten)]
-    finance_account: FinanceAccount,
-    assist_account_group_info: Option<AssistAccountGroupInfo>,
+    pub finance_account: FinanceAccount,
+    pub assist_account_group_info: Option<AssistAccountGroupInfo>,
 }
 
 pub async fn find_finance_account_info(

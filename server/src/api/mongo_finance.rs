@@ -81,3 +81,14 @@ pub async fn voucher_template_info(Query(params): Query<CodeParams>) -> Result<i
 
     Response::json(res)
 }
+
+#[handler]
+pub async fn kingdee_cloud_voucher_template(
+    Query(params): Query<CodeParams>,
+) -> Result<impl IntoResponse> {
+    let CodeParams { code } = params;
+
+    let res = query::finance::voucher::kingdee_cloud_voucher_template(&code).await?;
+
+    Response::json(res)
+}

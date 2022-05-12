@@ -153,6 +153,10 @@ pub fn generate() -> impl IntoEndpoint {
             "/mongo/finance/voucher_template_info",
             get(api::mongo_finance::voucher_template_info),
         )
+        .at(
+            "/mongo/finance/kingdee_cloud_voucher_template",
+            get(api::mongo_finance::kingdee_cloud_voucher_template),
+        )
         .with(Auth)
         .with(Auth)
         .with(Tracing)

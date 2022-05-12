@@ -64,8 +64,8 @@ pub struct AssistAccountItem {
 #[serde(rename_all = "camelCase")]
 pub struct AssistAccountInfo {
     #[serde(flatten)]
-    assist_account: FinanceAssistAccount,
-    items: Vec<AssistAccountItem>,
+    pub assist_account: FinanceAssistAccount,
+    pub items: Vec<AssistAccountItem>,
 }
 
 async fn find_assist_account_info(
@@ -95,8 +95,8 @@ pub async fn assist_account_info(name: &str) -> Result<AssistAccountInfo> {
 #[serde(rename_all = "camelCase")]
 pub struct AssistAccountGroupInfo {
     #[serde(flatten)]
-    assist_account_group: FinanceAssistAccountGroup,
-    items: Vec<AssistAccountInfo>,
+    pub assist_account_group: FinanceAssistAccountGroup,
+    pub items: Vec<AssistAccountInfo>,
 }
 
 pub async fn find_assist_account_group_info(

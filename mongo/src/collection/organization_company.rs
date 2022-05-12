@@ -8,6 +8,6 @@ use crate::common::{CollectionTrait, DeriveCollection};
 pub struct OrganizationCompany {
     #[serde(rename = "_id", default)]
     pub _id: ObjectId,
-    name: String,
-    finance_code: String,
+    pub name: String,
+    pub finance_code: String,
 }
