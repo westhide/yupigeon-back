@@ -39,7 +39,12 @@ where
             None,
         )
         .await?
-        .ok_or_else(|| MongoErr::message_error("FinanceAssistAccount Not Found"))
+        .ok_or_else(|| {
+            MongoErr::message_error(&format!(
+                "FinanceAssistAccount:{} Update Not Found",
+                T::collection_name()
+            ))
+        })
 }
 
 pub async fn update_assist_account_items() -> Result<Vec<impl Serialize>> {

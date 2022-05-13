@@ -48,7 +48,7 @@ pub async fn daily_sales(
                     ,'窗口-售票员' channel
                     ,operator
                     ,payment_method payment_method_raw
-                    ,client
+                    ,client client_raw
                     ,ticket_type ticket_type_raw
                     ,ticket_price
                     ,ticket_num
@@ -60,7 +60,7 @@ pub async fn daily_sales(
                     ,tc.online_channel channel
                     ,ont.client operator
                     ,IFNULL(tc.online_payment_type,'') payment_method_raw
-                    ,ont.client
+                    ,ont.client client_raw
                     ,ont.ticket_type ticket_type_raw
                     ,ont.ticket_price
                     ,ont.ticket_num
@@ -76,7 +76,7 @@ pub async fn daily_sales(
                     ,channel
                     ,operator
                     ,IFNULL(mdv_pm.to_value,tb.payment_method_raw) payment_method
-                    ,client
+                    ,IFNULL(mdv_c.to_value,tb.client_raw) client
                     ,IFNULL(mdv_tt.to_value,tb.ticket_type_raw) ticket_type
                     ,ticket_price
                     ,SUM( CASE trade_type WHEN 'sale' THEN ticket_num WHEN 'refund' THEN - ticket_num END ) sum_ticket_num
@@ -87,6 +87,8 @@ pub async fn daily_sales(
                 ON mdv_tt.domain='CanyonTicket' AND mdv_tt.type='ticket_type' AND tb.ticket_type_raw=mdv_tt.from_value
                 LEFT JOIN mapper_domain_value mdv_pm
                 ON mdv_pm.domain='CanyonTicket' AND mdv_pm.type='payment_method' AND tb.payment_method_raw=mdv_pm.from_value
+                LEFT JOIN mapper_domain_value mdv_c
+                ON mdv_c.domain='CanyonTicket' AND mdv_c.type='client' AND tb.client_raw=mdv_c.from_value
                 GROUP BY  date
                         ,channel
                         ,operator
@@ -96,18 +98,20 @@ pub async fn daily_sales(
                         ,ticket_price
                 UNION ALL
                 SELECT  'append' source
-                    ,id
-                    ,date
-                    ,channel
-                    ,operator
-                    ,payment_method
-                    ,client
-                    ,ticket_type
-                    ,ticket_price
-                    ,ticket_num sum_ticket_num
-                    ,ticket_amount sum_ticket_amount
-                    ,remark
-                FROM canyon_daily_sales_append
+                    ,dsa.id
+                    ,dsa.date
+                    ,dsa.channel
+                    ,dsa.operator
+                    ,dsa.payment_method
+                    ,IFNULL(mdv_c.to_value,dsa.client) client
+                    ,dsa.ticket_type
+                    ,dsa.ticket_price
+                    ,dsa.ticket_num sum_ticket_num
+                    ,dsa.ticket_amount sum_ticket_amount
+                    ,dsa.remark
+                FROM canyon_daily_sales_append dsa
+                LEFT JOIN mapper_domain_value mdv_c
+                ON mdv_c.domain='CanyonTicket' AND mdv_c.type='client' AND dsa.client=mdv_c.from_value
                 WHERE is_append = 1
             )
             SELECT  *
