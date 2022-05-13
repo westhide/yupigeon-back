@@ -3,9 +3,9 @@ FROM rust
 WORKDIR /usr/src/myapp
 
 COPY config  /usr/local/cargo
-COPY log.txt ./
 COPY Cargo.toml ./
 COPY Cargo.lock ./
+COPY macro-lib ./macro-lib
 COPY database ./database
 COPY mongo ./mongo
 COPY server ./server
