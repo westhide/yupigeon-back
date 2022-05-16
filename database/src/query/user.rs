@@ -22,7 +22,7 @@ pub async fn user(username: String, password: String) -> Result<UserInfo, DbErr>
         .filter(Column::Password.eq(password))
         .one(&txn)
         .await?
-        .ok_or_else(|| DbErr::RecordNotFound("RecordNotFound".into()))?;
+        .ok_or_else(|| DbErr::RecordNotFound("用户名或密码错误".into()))?;
 
     let (user, token_info) = user_relate_token;
 
