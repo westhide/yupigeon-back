@@ -14,13 +14,6 @@ use crate::service::{
     response::{Response, ResponseTrait},
 };
 
-#[handler]
-pub async fn update_assist_account_items() -> Result<impl IntoResponse> {
-    let res = query::finance::assist::update_assist_account_items().await?;
-
-    Response::json(res)
-}
-
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AssistAccountInfoParams {
@@ -42,17 +35,6 @@ pub async fn assist_account_info(
 #[serde(rename_all = "camelCase")]
 pub struct CodeParams {
     code: String,
-}
-
-#[handler]
-pub async fn assist_account_group_info(
-    Query(params): Query<CodeParams>,
-) -> Result<impl IntoResponse> {
-    let CodeParams { code } = params;
-
-    let res = query::finance::assist::assist_account_group_info(&code).await?;
-
-    Response::json(res)
 }
 
 #[handler]

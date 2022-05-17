@@ -130,16 +130,8 @@ pub fn generate() -> impl IntoEndpoint {
             get(api::mongo_organization::organization_company),
         )
         .at(
-            "/mongo/finance/update_assist_account_items",
-            post(api::mongo_finance::update_assist_account_items),
-        )
-        .at(
             "/mongo/finance/assist_account_info",
             get(api::mongo_finance::assist_account_info),
-        )
-        .at(
-            "/mongo/finance/assist_account_group_info",
-            get(api::mongo_finance::assist_account_group_info),
         )
         .at(
             "/mongo/finance/finance_account_info",

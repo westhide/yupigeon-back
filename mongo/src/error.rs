@@ -7,7 +7,7 @@ pub enum MongoErr {
     #[error("{0}")]
     Error(#[from] Error),
 
-    #[error("MongodbMessage: {0}")]
+    #[error("@Mongodb {0}")]
     Message(String),
 }
 

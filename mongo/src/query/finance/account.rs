@@ -4,7 +4,7 @@ use mongodb::{
 };
 use serde::{Deserialize, Serialize};
 
-use super::assist::{find_assist_account_group_info, AssistAccountGroupInfo};
+use super::assist::{find_assist_account_info, AssistAccountInfo};
 use crate::{
     collection::FinanceAccount,
     common::CollectionTrait,
@@ -16,7 +16,7 @@ use crate::{
 pub struct FinanceAccountInfo {
     #[serde(flatten)]
     pub finance_account: FinanceAccount,
-    pub assist_account_group_info: Option<AssistAccountGroupInfo>,
+    pub assist_account_infos: Vec<AssistAccountInfo>,
 }
 
 pub async fn find_finance_account_info(
@@ -28,13 +28,17 @@ pub async fn find_finance_account_info(
         .await?
         .ok_or_else(|| MongoErr::message_error("FinanceAccount Not Found"))?;
 
+    let mut assist_account_infos = vec![];
+    if let Some(assist_account_refs) = &finance_account.assist_account_refs {
+        for db_ref in assist_account_refs {
+            let assist_account_info =
+                find_assist_account_info(doc! {"_id":db_ref.ref_id}, None).await?;
+            assist_account_infos.push(assist_account_info);
+        }
+    };
     let finance_account_info = FinanceAccountInfo {
-        assist_account_group_info: if let Some(db_ref) = &finance_account.assist_account_group_ref {
-            Some(find_assist_account_group_info(doc! {"_id":db_ref._id}, None).await?)
-        } else {
-            None
-        },
         finance_account,
+        assist_account_infos,
     };
 
     Ok(finance_account_info)

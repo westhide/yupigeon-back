@@ -1,6 +1,7 @@
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
+use super::{FinanceAccount, OrganizationCompany};
 use crate::common::{CollectionTrait, DBRef, DeriveCollection};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -37,8 +38,8 @@ pub struct FinanceVoucherTemplate {
     pub _id: ObjectId,
     #[serde(flatten)]
     pub template_base: TemplateBase,
-    pub organization_company_ref: DBRef,
-    pub debit_finance_account_ref: DBRef,
-    pub credit_finance_account_ref: DBRef,
-    pub cashflow_ref: Option<DBRef>,
+    pub organization_company_ref: DBRef<OrganizationCompany>,
+    pub debit_finance_account_ref: DBRef<FinanceAccount>,
+    pub credit_finance_account_ref: DBRef<FinanceAccount>,
+    // pub cashflow_ref: Option<DBRef<_>>,
 }

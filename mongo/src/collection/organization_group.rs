@@ -1,6 +1,7 @@
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
+use super::OrganizationCompany;
 use crate::common::{CollectionTrait, DBRef, DeriveCollection};
 
 #[derive(Clone, Debug, Deserialize, Serialize, DeriveCollection)]
@@ -9,5 +10,5 @@ pub struct OrganizationGroup {
     #[serde(rename = "_id", default)]
     pub _id: ObjectId,
     name: String,
-    organization_company_refs: Vec<DBRef>,
+    organization_company_refs: Vec<DBRef<OrganizationCompany>>,
 }

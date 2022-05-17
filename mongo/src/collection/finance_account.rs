@@ -1,6 +1,7 @@
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
+use super::FinanceAssistAccount;
 use crate::common::{CollectionTrait, DBRef, DeriveCollection};
 
 #[derive(Clone, Debug, Deserialize, Serialize, DeriveCollection)]
@@ -11,5 +12,5 @@ pub struct FinanceAccount {
     pub code: String,
     pub name: String,
     pub direction: String,
-    pub assist_account_group_ref: Option<DBRef>,
+    pub assist_account_refs: Option<Vec<DBRef<FinanceAssistAccount>>>,
 }

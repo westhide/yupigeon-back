@@ -22,7 +22,7 @@ impl Mongo {
         client_options.compressors = Some(vec![Compressor::Zstd { level: Some(3) }]);
 
         let client = Client::with_options(client_options)?;
-        let database = client.database("yupigeon");
+        let database = client.database("yupigeon01");
 
         let mongo = Mongo { database };
         MONGO.set(mongo).ok();

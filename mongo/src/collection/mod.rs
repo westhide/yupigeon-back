@@ -1,11 +1,9 @@
 pub mod finance_account;
 pub mod finance_assist_account;
-pub mod finance_assist_account_group;
 pub mod finance_assist_channel;
 pub mod finance_assist_client;
 pub mod finance_assist_payment;
 pub mod finance_assist_product;
-pub mod finance_assist_receipt;
 pub mod finance_assist_ship;
 pub mod finance_assist_supplier;
 pub mod finance_assist_tool;
@@ -16,12 +14,10 @@ pub mod version;
 
 pub use finance_account::FinanceAccount;
 pub use finance_assist_account::FinanceAssistAccount;
-pub use finance_assist_account_group::FinanceAssistAccountGroup;
 pub use finance_assist_channel::FinanceAssistChannel;
 pub use finance_assist_client::FinanceAssistClient;
 pub use finance_assist_payment::FinanceAssistPayment;
 pub use finance_assist_product::FinanceAssistProduct;
-pub use finance_assist_receipt::FinanceAssistReceipt;
 pub use finance_assist_ship::FinanceAssistShip;
 pub use finance_assist_supplier::FinanceAssistSupplier;
 pub use finance_assist_tool::FinanceAssistTool;

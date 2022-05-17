@@ -3,15 +3,16 @@ use serde::{Deserialize, Serialize};
 
 use super::{
     account::{find_finance_account_info, FinanceAccountInfo},
-    assist::{AssistAccountGroupInfo, AssistAccountInfo, AssistAccountItem},
+    assist::{AssistAccountInfo, AssistAccountItem},
 };
 use crate::{
     collection::{
         finance_voucher_template::TemplateBase, FinanceAccount, FinanceVoucherTemplate,
         OrganizationCompany,
     },
-    common::{CollectionTrait, DBRefTrait},
+    common::CollectionTrait,
     error::{MongoErr, Result},
+    query::common::DBRefTrait,
 };
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -28,7 +29,10 @@ pub async fn voucher_template_info(code: &str) -> Result<VoucherTemplateInfo> {
         .find_one(doc! {"code":code}, None)
         .await?
         .ok_or_else(|| {
-            MongoErr::message_error(&format!("FinanceVoucherTemplate:{} Not Found", code))
+            MongoErr::message_error(&format!(
+                "FinanceVoucherTemplate Not Found: code='{}'",
+                code
+            ))
         })?;
 
     let FinanceVoucherTemplate {
@@ -38,14 +42,10 @@ pub async fn voucher_template_info(code: &str) -> Result<VoucherTemplateInfo> {
         ..
     } = &template;
 
-    let debit_account_info = find_finance_account_info(doc! {"_id":debit_ref._id}, None).await?;
-    let credit_account_info = find_finance_account_info(doc! {"_id":credit_ref._id}, None).await?;
-    let organization_company = company_ref.fetch().await?.ok_or_else(|| {
-        MongoErr::message_error(&format!(
-            "OrganizationCompany:{} Not Found",
-            company_ref._id
-        ))
-    })?;
+    let debit_account_info = find_finance_account_info(doc! {"_id":debit_ref.ref_id}, None).await?;
+    let credit_account_info =
+        find_finance_account_info(doc! {"_id":credit_ref.ref_id}, None).await?;
+    let organization_company = company_ref.fetch().await?;
 
     Ok(VoucherTemplateInfo {
         template,
@@ -59,6 +59,7 @@ pub async fn voucher_template_info(code: &str) -> Result<VoucherTemplateInfo> {
 pub struct KingdeeAssistAccount {
     code: String,
     name: String,
+    field: String,
     items: Vec<AssistAccountItem>,
 }
 
@@ -67,7 +68,7 @@ pub struct KingdeeAssistAccount {
 pub struct KingdeeAccount {
     finance_account_code: String,
     finance_account_name: String,
-    assists_accounts: Option<Vec<KingdeeAssistAccount>>,
+    assists_accounts: Vec<KingdeeAssistAccount>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -83,30 +84,25 @@ pub struct KingdeeCloudVoucherTemplate {
 
 fn parse_kingdee_account(
     finance_account: FinanceAccount,
-    assist_info: Option<AssistAccountGroupInfo>,
+    assist_infos: Vec<AssistAccountInfo>,
 ) -> KingdeeAccount {
     KingdeeAccount {
         finance_account_code: finance_account.code,
         finance_account_name: finance_account.name,
-        assists_accounts: if let Some(assist_info) = assist_info {
-            let AssistAccountGroupInfo { items: assists, .. } = assist_info;
-            let assist_accounts = assists
-                .iter()
-                .map(
-                    |AssistAccountInfo {
-                         assist_account,
-                         items,
-                     }| KingdeeAssistAccount {
-                        code: assist_account.code.to_owned(),
-                        name: assist_account.name.to_owned(),
-                        items: items.to_owned(),
-                    },
-                )
-                .collect();
-            Some(assist_accounts)
-        } else {
-            None
-        },
+        assists_accounts: assist_infos
+            .iter()
+            .map(
+                |AssistAccountInfo {
+                     assist_account,
+                     items,
+                 }| KingdeeAssistAccount {
+                    code: assist_account.code.to_owned(),
+                    name: assist_account.name.to_owned(),
+                    field: assist_account.field.to_owned(),
+                    items: items.to_owned(),
+                },
+            )
+            .collect(),
     }
 }
 
@@ -123,12 +119,12 @@ pub async fn kingdee_cloud_voucher_template(code: &str) -> Result<KingdeeCloudVo
         debit_account_info:
             FinanceAccountInfo {
                 finance_account: debit_finance_account,
-                assist_account_group_info: debit_assist_info,
+                assist_account_infos: debit_assist_infos,
             },
         credit_account_info:
             FinanceAccountInfo {
                 finance_account: credit_finance_account,
-                assist_account_group_info: credit_assist_info,
+                assist_account_infos: credit_assist_infos,
             },
     } = template_info;
 
@@ -136,8 +132,8 @@ pub async fn kingdee_cloud_voucher_template(code: &str) -> Result<KingdeeCloudVo
         template_base,
         company_finance_code,
         company_name,
-        debit_account: parse_kingdee_account(debit_finance_account, debit_assist_info),
-        credit_account: parse_kingdee_account(credit_finance_account, credit_assist_info),
+        debit_account: parse_kingdee_account(debit_finance_account, debit_assist_infos),
+        credit_account: parse_kingdee_account(credit_finance_account, credit_assist_infos),
     };
 
     Ok(voucher_template)
