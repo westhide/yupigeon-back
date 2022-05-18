@@ -48,3 +48,7 @@ pub async fn find_assist_account_info(
 pub async fn assist_account_info(name: &str) -> Result<AssistAccountInfo> {
     find_assist_account_info(doc! {"name":name}, None).await
 }
+
+pub async fn finance_assist(collection_name: &str) -> Result<Vec<AssistAccountItem>> {
+    find_all_by_collection::<AssistAccountItem>(collection_name).await
+}

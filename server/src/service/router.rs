@@ -157,6 +157,10 @@ pub fn generate() -> impl IntoEndpoint {
             "/mongo/finance/assist_payments",
             get(api::mongo_finance::assist_payments),
         )
+        .at(
+            "/mongo/finance/finance_assist",
+            get(api::mongo_finance::finance_assist),
+        )
         .with(Auth)
         .with(Auth)
         .with(Tracing)

@@ -16,15 +16,13 @@ use crate::service::{
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct AssistAccountInfoParams {
+pub struct NameParams {
     name: String,
 }
 
 #[handler]
-pub async fn assist_account_info(
-    Query(params): Query<AssistAccountInfoParams>,
-) -> Result<impl IntoResponse> {
-    let AssistAccountInfoParams { name } = params;
+pub async fn assist_account_info(Query(params): Query<NameParams>) -> Result<impl IntoResponse> {
+    let NameParams { name } = params;
 
     let res = query::finance::assist::assist_account_info(&name).await?;
 
@@ -85,6 +83,15 @@ pub async fn assist_channels() -> Result<impl IntoResponse> {
 #[handler]
 pub async fn assist_payments() -> Result<impl IntoResponse> {
     let res = FinanceAssistPayment::find_all().await?;
+
+    Response::json(res)
+}
+
+#[handler]
+pub async fn finance_assist(Query(params): Query<NameParams>) -> Result<impl IntoResponse> {
+    let NameParams { name } = params;
+
+    let res = query::finance::assist::finance_assist(&name).await?;
 
     Response::json(res)
 }
