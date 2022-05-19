@@ -23,12 +23,13 @@ pub struct AssistAccountItem {
 pub struct AssistAccountInfo {
     #[serde(flatten)]
     pub assist_account: FinanceAssistAccount,
-    pub items: Vec<AssistAccountItem>,
+    pub items: Option<Vec<AssistAccountItem>>,
 }
 
 pub async fn find_assist_account_info(
     filter: impl Into<Option<Document>>,
     options: impl Into<Option<FindOneOptions>>,
+    is_simple: bool,
 ) -> Result<AssistAccountInfo> {
     let assist_account = FinanceAssistAccount::collection()
         .find_one(filter, options)
@@ -36,7 +37,11 @@ pub async fn find_assist_account_info(
         .ok_or_else(|| MongoErr::message_error("FinanceAssistAccount Not Found"))?;
 
     let collection_name = &assist_account.collection_name;
-    let items = find_all_by_collection::<AssistAccountItem>(collection_name).await?;
+    let items = if is_simple {
+        None
+    } else {
+        Some(find_all_by_collection::<AssistAccountItem>(collection_name).await?)
+    };
 
     let assist_account_info = AssistAccountInfo {
         assist_account,
@@ -46,7 +51,7 @@ pub async fn find_assist_account_info(
 }
 
 pub async fn assist_account_info(name: &str) -> Result<AssistAccountInfo> {
-    find_assist_account_info(doc! {"name":name}, None).await
+    find_assist_account_info(doc! {"name":name}, None, false).await
 }
 
 pub async fn finance_assist(collection_name: &str) -> Result<Vec<AssistAccountItem>> {

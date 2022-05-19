@@ -11,5 +11,4 @@ pub struct FinanceAssistAccount {
     pub code: String,
     pub name: String,
     pub collection_name: String,
-    pub field: String,
 }

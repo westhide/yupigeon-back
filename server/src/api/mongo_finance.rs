@@ -53,22 +53,33 @@ pub async fn insert_finance_voucher_template(
     Response::json(res)
 }
 
-#[handler]
-pub async fn voucher_template_info(Query(params): Query<CodeParams>) -> Result<impl IntoResponse> {
-    let CodeParams { code } = params;
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VoucherTemplateParams {
+    code: String,
+    is_simple: Option<bool>,
+}
 
-    let res = query::finance::voucher::voucher_template_info(&code).await?;
+#[handler]
+pub async fn voucher_template_info(
+    Query(params): Query<VoucherTemplateParams>,
+) -> Result<impl IntoResponse> {
+    let VoucherTemplateParams { code, is_simple } = params;
+    let is_simple = is_simple.unwrap_or(false);
+
+    let res = query::finance::voucher::voucher_template_info(&code, is_simple).await?;
 
     Response::json(res)
 }
 
 #[handler]
 pub async fn kingdee_cloud_voucher_template(
-    Query(params): Query<CodeParams>,
+    Query(params): Query<VoucherTemplateParams>,
 ) -> Result<impl IntoResponse> {
-    let CodeParams { code } = params;
+    let VoucherTemplateParams { code, is_simple } = params;
+    let is_simple = is_simple.unwrap_or(false);
 
-    let res = query::finance::voucher::kingdee_cloud_voucher_template(&code).await?;
+    let res = query::finance::voucher::kingdee_cloud_voucher_template(&code, is_simple).await?;
 
     Response::json(res)
 }

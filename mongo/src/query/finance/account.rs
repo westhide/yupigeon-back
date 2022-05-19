@@ -22,6 +22,7 @@ pub struct FinanceAccountInfo {
 pub async fn find_finance_account_info(
     filter: impl Into<Option<Document>>,
     options: impl Into<Option<FindOneOptions>>,
+    is_simple: bool,
 ) -> Result<FinanceAccountInfo> {
     let finance_account = FinanceAccount::collection()
         .find_one(filter, options)
@@ -32,7 +33,7 @@ pub async fn find_finance_account_info(
     if let Some(assist_account_refs) = &finance_account.assist_account_refs {
         for db_ref in assist_account_refs {
             let assist_account_info =
-                find_assist_account_info(doc! {"_id":db_ref.ref_id}, None).await?;
+                find_assist_account_info(doc! {"_id":db_ref.ref_id}, None, is_simple).await?;
             assist_account_infos.push(assist_account_info);
         }
     };
@@ -45,5 +46,5 @@ pub async fn find_finance_account_info(
 }
 
 pub async fn finance_account_info(code: &str) -> Result<FinanceAccountInfo> {
-    find_finance_account_info(doc! {"code":code}, None).await
+    find_finance_account_info(doc! {"code":code}, None, false).await
 }

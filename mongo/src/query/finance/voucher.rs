@@ -24,7 +24,7 @@ pub struct VoucherTemplateInfo {
     credit_account_info: FinanceAccountInfo,
     organization_company: OrganizationCompany,
 }
-pub async fn voucher_template_info(code: &str) -> Result<VoucherTemplateInfo> {
+pub async fn voucher_template_info(code: &str, is_simple: bool) -> Result<VoucherTemplateInfo> {
     let template = FinanceVoucherTemplate::collection()
         .find_one(doc! {"code":code}, None)
         .await?
@@ -42,9 +42,10 @@ pub async fn voucher_template_info(code: &str) -> Result<VoucherTemplateInfo> {
         ..
     } = &template;
 
-    let debit_account_info = find_finance_account_info(doc! {"_id":debit_ref.ref_id}, None).await?;
+    let debit_account_info =
+        find_finance_account_info(doc! {"_id":debit_ref.ref_id}, None, is_simple).await?;
     let credit_account_info =
-        find_finance_account_info(doc! {"_id":credit_ref.ref_id}, None).await?;
+        find_finance_account_info(doc! {"_id":credit_ref.ref_id}, None, is_simple).await?;
     let organization_company = company_ref.fetch().await?;
 
     Ok(VoucherTemplateInfo {
@@ -59,8 +60,8 @@ pub async fn voucher_template_info(code: &str) -> Result<VoucherTemplateInfo> {
 pub struct KingdeeAssistAccount {
     code: String,
     name: String,
-    field: String,
-    items: Vec<AssistAccountItem>,
+    collection_name: String,
+    items: Option<Vec<AssistAccountItem>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -98,7 +99,7 @@ fn parse_kingdee_account(
                  }| KingdeeAssistAccount {
                     code: assist_account.code.to_owned(),
                     name: assist_account.name.to_owned(),
-                    field: assist_account.field.to_owned(),
+                    collection_name: assist_account.collection_name.to_owned(),
                     items: items.to_owned(),
                 },
             )
@@ -106,8 +107,11 @@ fn parse_kingdee_account(
     }
 }
 
-pub async fn kingdee_cloud_voucher_template(code: &str) -> Result<KingdeeCloudVoucherTemplate> {
-    let template_info = voucher_template_info(code).await?;
+pub async fn kingdee_cloud_voucher_template(
+    code: &str,
+    is_simple: bool,
+) -> Result<KingdeeCloudVoucherTemplate> {
+    let template_info = voucher_template_info(code, is_simple).await?;
     let VoucherTemplateInfo {
         template: FinanceVoucherTemplate { template_base, .. },
         organization_company:
