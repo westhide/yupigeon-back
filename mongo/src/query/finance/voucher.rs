@@ -42,10 +42,20 @@ pub async fn voucher_template_info(code: &str, is_simple: bool) -> Result<Vouche
         ..
     } = &template;
 
-    let debit_account_info =
-        find_finance_account_info(doc! {"_id":debit_ref.ref_id}, None, is_simple).await?;
-    let credit_account_info =
-        find_finance_account_info(doc! {"_id":credit_ref.ref_id}, None, is_simple).await?;
+    let debit_account_info = find_finance_account_info(
+        doc! {"_id":debit_ref.ref_id},
+        None,
+        is_simple,
+        &format!("FinanceAccount Not Found: _id='{}'", debit_ref.ref_id),
+    )
+    .await?;
+    let credit_account_info = find_finance_account_info(
+        doc! {"_id":credit_ref.ref_id},
+        None,
+        is_simple,
+        &format!("FinanceAccount Not Found: _id='{}'", credit_ref.ref_id),
+    )
+    .await?;
     let organization_company = company_ref.fetch().await?;
 
     Ok(VoucherTemplateInfo {

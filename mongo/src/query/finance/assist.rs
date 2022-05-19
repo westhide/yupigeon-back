@@ -30,11 +30,12 @@ pub async fn find_assist_account_info(
     filter: impl Into<Option<Document>>,
     options: impl Into<Option<FindOneOptions>>,
     is_simple: bool,
+    not_found_error_message: &str,
 ) -> Result<AssistAccountInfo> {
     let assist_account = FinanceAssistAccount::collection()
         .find_one(filter, options)
         .await?
-        .ok_or_else(|| MongoErr::message_error("FinanceAssistAccount Not Found"))?;
+        .ok_or_else(|| MongoErr::message_error(not_found_error_message))?;
 
     let collection_name = &assist_account.collection_name;
     let items = if is_simple {
@@ -51,7 +52,13 @@ pub async fn find_assist_account_info(
 }
 
 pub async fn assist_account_info(name: &str) -> Result<AssistAccountInfo> {
-    find_assist_account_info(doc! {"name":name}, None, false).await
+    find_assist_account_info(
+        doc! {"name":name},
+        None,
+        false,
+        &format!("FinanceAssistAccount Not Found: name='{}'", name),
+    )
+    .await
 }
 
 pub async fn finance_assist(collection_name: &str) -> Result<Vec<AssistAccountItem>> {
