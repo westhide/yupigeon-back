@@ -4,3 +4,4 @@
 
 /**/.env
 /**/Config.toml
+.DS_Store
