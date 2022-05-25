@@ -2,6 +2,9 @@
 /poem
 /sea-orm
 
+.idea
+.vscode
+
 /**/.env
 /**/Config.toml
 .DS_Store
