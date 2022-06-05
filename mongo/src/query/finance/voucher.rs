@@ -79,7 +79,7 @@ pub struct KingdeeAssistAccount {
 pub struct KingdeeAccount {
     finance_account_code: String,
     finance_account_name: String,
-    assists_accounts: Vec<KingdeeAssistAccount>,
+    assist_accounts: Vec<KingdeeAssistAccount>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -100,7 +100,7 @@ fn parse_kingdee_account(
     KingdeeAccount {
         finance_account_code: finance_account.code,
         finance_account_name: finance_account.name,
-        assists_accounts: assist_infos
+        assist_accounts: assist_infos
             .iter()
             .map(
                 |AssistAccountInfo {
