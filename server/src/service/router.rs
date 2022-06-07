@@ -14,6 +14,10 @@ use crate::api;
 
 pub fn generate() -> impl IntoEndpoint {
     Route::new()
+        .at(
+            "/websocket",
+            get(api::websocket::websocket.data(tokio::sync::broadcast::channel::<String>(32).0)),
+        )
         .at("/greet/:name", get(api::greet::get))
         .at("/login", post(api::login::post))
         .at("/user", get(api::user::get))
@@ -161,7 +165,6 @@ pub fn generate() -> impl IntoEndpoint {
             "/mongo/finance/finance_assist",
             get(api::mongo_finance::finance_assist),
         )
-        .with(Auth)
         .with(Auth)
         .with(Tracing)
         .with(Compression)
