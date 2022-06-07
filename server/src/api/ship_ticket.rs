@@ -5,10 +5,10 @@ use poem::{
     web::{Json, Query},
     IntoResponse,
 };
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 use crate::{
-    global_data::get_global_data,
+    global_data::{get_websocket_sender, ShipTicketRefreshStatus},
     service::{
         error::Result,
         params::{DateTimeParams, ParseDateTimeParams},
@@ -66,52 +66,31 @@ pub async fn conductors() -> Result<impl IntoResponse> {
     Response::json(res)
 }
 
-#[derive(Debug, Deserialize, Serialize, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct RefreshStatus {
-    is_refresh: bool,
-    last_refresh_datetime: String,
-}
-
 #[handler]
 pub fn refresh_status() -> Result<impl IntoResponse> {
-    let global_data = get_global_data()?;
-
-    let default_datetime = String::from("");
-    let last_refresh_datetime = global_data
-        .last_refresh_datetime
-        .as_ref()
-        .unwrap_or(&default_datetime);
-
-    let res = RefreshStatus {
-        is_refresh: global_data.is_ship_ticket_bill_refresh,
-        last_refresh_datetime: last_refresh_datetime.clone(),
-    };
+    let res = ShipTicketRefreshStatus::get()?;
 
     Response::json(res)
 }
 
 #[handler]
 pub async fn refresh() -> Result<impl IntoResponse> {
-    let mut global_data = get_global_data()?;
-
-    if !global_data.is_ship_ticket_bill_refresh {
+    let ship_ticket_refresh_status = ShipTicketRefreshStatus::get()?;
+    if !ship_ticket_refresh_status.is_refresh {
         tokio::spawn(async move {
-            global_data.is_ship_ticket_bill_refresh = true;
-
+            ShipTicketRefreshStatus::set(true, None).ok();
             query::ship_ticket::refresh().await.ok();
 
-            global_data.is_ship_ticket_bill_refresh = false;
-            global_data.last_refresh_datetime = Some(Local::now().to_string());
+            ShipTicketRefreshStatus::set(false, Some(Local::now().to_string())).ok();
+            if let Ok(sender) = get_websocket_sender("default") {
+                sender
+                    .send(r#"{"message":"船票明细已更新"}"#.to_string())
+                    .ok();
+            }
         });
-    }
-
-    let res = RefreshStatus {
-        is_refresh: true,
-        ..Default::default()
     };
 
-    Response::json(res)
+    Response::json(ship_ticket_refresh_status)
 }
 
 #[handler]

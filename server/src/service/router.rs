@@ -14,9 +14,10 @@ use crate::api;
 
 pub fn generate() -> impl IntoEndpoint {
     Route::new()
+        .at("/websocket", get(api::websocket::websocket))
         .at(
-            "/websocket",
-            get(api::websocket::websocket.data(tokio::sync::broadcast::channel::<String>(32).0)),
+            "/websocket/broadcast",
+            post(api::websocket::broadcast_message),
         )
         .at("/greet/:name", get(api::greet::get))
         .at("/login", post(api::login::post))

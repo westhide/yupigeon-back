@@ -3,26 +3,28 @@ use poem::{
     handler,
     web::{
         websocket::{Message, WebSocket},
-        Data,
+        Json,
     },
     IntoResponse,
 };
 
+use crate::{
+    global_data::{get_websocket_sender, set_websocket_sender},
+    service::{error::Result, response::Response},
+};
+
 #[handler]
-pub fn websocket(
-    ws: WebSocket,
-    sender: Data<&tokio::sync::broadcast::Sender<String>>,
-) -> impl IntoResponse {
-    let sender = sender.clone();
+pub fn websocket(ws: WebSocket) -> Result<impl IntoResponse> {
+    let sender = set_websocket_sender("default".to_string())?;
     let mut receiver = sender.subscribe();
 
-    ws.on_upgrade(move |socket| async move {
+    let res = ws.on_upgrade(move |socket| async move {
         let (mut sink, mut stream) = socket.split();
 
         tokio::spawn(async move {
-            while let Some(Ok(msg)) = stream.next().await {
-                if let Message::Text(text) = msg {
-                    if sender.send(format!("websocket:{}", text)).is_err() {
+            while let Some(Ok(message)) = stream.next().await {
+                if let Message::Text(text) = message {
+                    if sender.send(text).is_err() {
                         break;
                     }
                 }
@@ -30,11 +32,23 @@ pub fn websocket(
         });
 
         tokio::spawn(async move {
-            while let Ok(msg) = receiver.recv().await {
-                if sink.send(Message::Text(msg)).await.is_err() {
+            while let Ok(text) = receiver.recv().await {
+                if sink.send(Message::Text(text)).await.is_err() {
                     break;
                 }
             }
         });
-    })
+    });
+
+    Ok(res)
+}
+
+#[handler]
+pub fn broadcast_message(Json(data): Json<Response>) -> Result<impl IntoResponse> {
+    let message = serde_json::json!(data).to_string();
+
+    let sender = get_websocket_sender("default")?;
+    sender.send(message).ok();
+
+    Response::message("Web socket broadcast success")
 }

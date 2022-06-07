@@ -31,6 +31,10 @@ impl<E: Endpoint> Endpoint for AuthEndpoint<E> {
             return self.ep.call(req).await;
         }
 
+        if req.uri() == "/websocket" {
+            return self.ep.call(req).await;
+        }
+
         if let Some(_auth) = req.headers().typed_get::<headers::Authorization<Bearer>>() {
             self.ep.call(req).await
         } else {

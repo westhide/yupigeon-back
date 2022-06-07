@@ -3,13 +3,13 @@ use serde::{Deserialize, Serialize};
 
 use crate::service::error::Result;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Response<T = String> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    result: Option<T>,
+    pub result: Option<T>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    message: Option<String>,
+    pub message: Option<String>,
 }
 
 pub trait ResponseTrait {
@@ -27,14 +27,11 @@ pub trait ResponseTrait {
         }))
     }
 
-    fn json_response<E>(self) -> Result<Json<Response<Self>>, E>
+    fn json_response(self) -> Json<Self>
     where
         Self: Sized,
     {
-        Ok(Json(Response {
-            result: Some(self),
-            message: None,
-        }))
+        Json(self)
     }
 }
 
