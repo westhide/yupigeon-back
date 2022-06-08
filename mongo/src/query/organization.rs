@@ -13,7 +13,7 @@ pub async fn find_organization_company(
     filter: impl Into<Option<Document>>,
     options: impl Into<Option<FindOneOptions>>,
 ) -> Result<Option<OrganizationCompany>> {
-    OrganizationCompany::collection()
+    OrganizationCompany::collection()?
         .find_one(filter, options)
         .await
         .map_err(Into::<MongoErr>::into)

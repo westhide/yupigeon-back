@@ -25,7 +25,7 @@ pub async fn find_finance_account_info(
     is_simple: bool,
     not_found_error_message: &str,
 ) -> Result<FinanceAccountInfo> {
-    let finance_account = FinanceAccount::collection()
+    let finance_account = FinanceAccount::collection()?
         .find_one(filter, options)
         .await?
         .ok_or_else(|| MongoErr::message_error(not_found_error_message))?;

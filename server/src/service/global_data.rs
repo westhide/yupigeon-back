@@ -24,7 +24,7 @@ pub struct GlobalData {
 
 pub static GLOBAL_DATA: OnceCell<GlobalData> = OnceCell::new();
 
-pub fn init_global_data() {
+pub fn init_global_data() -> Result<()> {
     let ship_ticket_refresh_status = Mutex::new(ShipTicketRefreshStatus {
         is_refresh: false,
         last_refresh_datetime: String::from(""),
@@ -36,7 +36,9 @@ pub fn init_global_data() {
         websocket_sender_book,
     };
 
-    GLOBAL_DATA.set(global_data).ok();
+    GLOBAL_DATA
+        .set(global_data)
+        .map_err(|_| WrapError::message_error("Can Not Set GLOBAL_DATA twice"))
 }
 
 pub fn get_global_data<'a>() -> Result<&'a GlobalData> {

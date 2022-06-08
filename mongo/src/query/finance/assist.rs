@@ -32,7 +32,7 @@ pub async fn find_assist_account_info(
     is_simple: bool,
     not_found_error_message: &str,
 ) -> Result<AssistAccountInfo> {
-    let assist_account = FinanceAssistAccount::collection()
+    let assist_account = FinanceAssistAccount::collection()?
         .find_one(filter, options)
         .await?
         .ok_or_else(|| MongoErr::message_error(not_found_error_message))?;

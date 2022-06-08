@@ -6,9 +6,22 @@ use sea_orm::{
     FromQueryResult, Statement, TransactionTrait,
 };
 
-use crate::config::GLOBAL_CONFIG;
+use crate::config::get_global_config;
 
-pub static DB: OnceCell<HashMap<String, DatabaseConnection>> = OnceCell::new();
+type DatabasePool = HashMap<String, DatabaseConnection>;
+pub static DATABASE_POOL: OnceCell<DatabasePool> = OnceCell::new();
+
+fn set_database_pool(db_pool: DatabasePool) -> Result<(), DbErr> {
+    DATABASE_POOL
+        .set(db_pool)
+        .map_err(|_| DbErr::Custom("Can Not Set DATABASE_POOL twice".to_string()))
+}
+
+fn get_database_pool<'a>() -> Result<&'a DatabasePool, DbErr> {
+    DATABASE_POOL
+        .get()
+        .ok_or_else(|| DbErr::Custom("DATABASE_POOL Not Found".to_string()))
+}
 
 pub struct Database {
     pub txn: DatabaseTransaction,
@@ -23,31 +36,31 @@ impl Database {
     }
 
     async fn connect(key: &str) -> Result<DatabaseConnection, DbErr> {
-        let db_url = GLOBAL_CONFIG.get::<String>(key).unwrap();
+        let db_url = get_global_config(key)?;
         sea_orm::Database::connect(db_url).await
     }
 
     pub async fn init() -> Result<(), DbErr> {
-        let mut db_list = HashMap::<String, DatabaseConnection>::new();
+        let mut db_pool = HashMap::<String, DatabaseConnection>::new();
 
         let db_default = Self::connect("MYSQL_URL_DEFAULT").await?;
         let db_laiu8 = Self::connect("MYSQL_URL_LAIU8").await?;
 
-        db_list.insert("default".into(), db_default);
-        db_list.insert("laiu8".into(), db_laiu8);
+        db_pool.insert("default".into(), db_default);
+        db_pool.insert("laiu8".into(), db_laiu8);
 
-        DB.set(db_list)
-            .expect("Can not set global database connection list");
-        Ok(())
+        set_database_pool(db_pool)
     }
 
-    pub fn connection(key: &str) -> &DatabaseConnection {
-        let db_list = DB.get().expect("Database is not initialized");
-        db_list.get(key).expect("Database is not exists")
+    pub fn connection(key: &str) -> Result<&DatabaseConnection, DbErr> {
+        let db_pool = get_database_pool()?;
+        db_pool
+            .get(key)
+            .ok_or_else(|| DbErr::Custom("Database Connection Not Found".to_string()))
     }
 
     async fn txn(key: &str) -> Result<DatabaseTransaction, DbErr> {
-        let connection = Self::connection(key);
+        let connection = Self::connection(key)?;
         connection.begin().await
     }
 

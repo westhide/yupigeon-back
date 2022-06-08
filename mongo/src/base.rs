@@ -1,21 +1,35 @@
 use mongodb::{
-    error::Result,
     options::{ClientOptions, Compressor},
     Client, Database,
 };
 use once_cell::sync::OnceCell;
 
-use crate::config::GLOBAL_CONFIG;
+use crate::{
+    config::get_global_config,
+    error::{MongoErr, Result},
+};
 
-pub struct Mongo {
+pub struct MongoPool {
     database: Database,
 }
 
-pub static MONGO: OnceCell<Mongo> = OnceCell::new();
+pub static MONGO_POOL: OnceCell<MongoPool> = OnceCell::new();
 
-impl Mongo {
+impl MongoPool {
+    fn set_mongo_pool(pool: Self) -> Result<()> {
+        MONGO_POOL
+            .set(pool)
+            .map_err(|_| MongoErr::message_error("Can Not Set MONGO_POOL twice"))
+    }
+
+    fn get_mongo_pool<'a>() -> Result<&'a Self> {
+        MONGO_POOL
+            .get()
+            .ok_or_else(|| MongoErr::message_error("MONGO_POOL Not Found"))
+    }
+
     pub async fn init() -> Result<()> {
-        let db_url = GLOBAL_CONFIG.get::<String>("MONGODB_URL").unwrap();
+        let db_url = get_global_config("MONGODB_URL")?;
 
         let mut client_options = ClientOptions::parse(db_url).await?;
         client_options.app_name = Some("Mongo".to_string());
@@ -24,13 +38,12 @@ impl Mongo {
         let client = Client::with_options(client_options)?;
         let database = client.database("yupigeon01");
 
-        let mongo = Mongo { database };
-        MONGO.set(mongo).ok();
-        Ok(())
+        let mongo_pool = Self { database };
+        Self::set_mongo_pool(mongo_pool)
     }
 
-    pub fn database<'a>() -> &'a Database {
-        let mongo = MONGO.get().expect("Mongo is not exists");
-        &mongo.database
+    pub fn database<'a>() -> Result<&'a Database> {
+        let mongo_pool = Self::get_mongo_pool()?;
+        Ok(&mongo_pool.database)
     }
 }

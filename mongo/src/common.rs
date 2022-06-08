@@ -7,6 +7,8 @@ use mongodb::{
 };
 use serde::{Deserialize, Serialize};
 
+use crate::error::Result;
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct DBRef<T> {
     #[serde(rename = "$ref")]
@@ -36,10 +38,10 @@ pub trait CollectionTrait: Serialize + Sized + Send + Sync {
         Self::collection_name()
     }
 
-    fn collection() -> Collection<Self> {
-        let db = crate::Mongo::database();
+    fn collection() -> Result<Collection<Self>> {
+        let db = crate::MongoPool::database()?;
 
-        db.collection::<Self>(Self::collection_name())
+        Ok(db.collection::<Self>(Self::collection_name()))
     }
 
     fn db_ref<T>(&self) -> DBRef<T> {

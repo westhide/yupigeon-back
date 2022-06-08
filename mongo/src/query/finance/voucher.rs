@@ -25,7 +25,7 @@ pub struct VoucherTemplateInfo {
     organization_company: OrganizationCompany,
 }
 pub async fn voucher_template_info(code: &str, is_simple: bool) -> Result<VoucherTemplateInfo> {
-    let template = FinanceVoucherTemplate::collection()
+    let template = FinanceVoucherTemplate::collection()?
         .find_one(doc! {"code":code}, None)
         .await?
         .ok_or_else(|| {

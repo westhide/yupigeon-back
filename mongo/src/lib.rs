@@ -6,5 +6,5 @@ pub mod common;
 pub mod error;
 pub mod query;
 
-pub use base::Mongo;
+pub use base::MongoPool;
 pub use mongodb;

@@ -43,10 +43,13 @@ impl ResponseError for WrapError {
         };
         let body = Body::from_json(serde_json::json!({
             "errorMessage": message,
-        }))
-        .unwrap();
+        }));
 
-        Response::builder().status(self.status()).body(body)
+        let response_builder = Response::builder().status(self.status());
+        match body {
+            Ok(body) => response_builder.body(body),
+            Err(_) => response_builder.body(()),
+        }
     }
 }
 

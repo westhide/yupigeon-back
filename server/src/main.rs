@@ -9,32 +9,34 @@ mod service;
 
 use poem::{listener::TcpListener, Server};
 
-pub use crate::service::global_data;
-use crate::{config::GLOBAL_CONFIG, service::router};
+use crate::{
+    config::get_config,
+    service::{
+        error::{Result, WrapError},
+        global_data, router,
+    },
+};
 
 #[tokio::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> Result<()> {
     if std::env::var_os("RUST_LOG").is_none() {
         std::env::set_var("RUST_LOG", "poem=debug,sea_orm=debug");
     };
     tracing_subscriber::fmt::init();
 
-    global_data::init_global_data();
+    global_data::init_global_data()?;
 
-    database::Database::init()
-        .await
-        .expect("Database init failed");
+    database::Database::init().await?;
 
-    mongo::Mongo::init().await.expect("Mongo init failed");
+    mongo::MongoPool::init().await?;
 
-    let bind_ip = GLOBAL_CONFIG
-        .get::<String>("BIND_HOST")
-        .unwrap_or_else(|_| "127.0.0.1".into());
-    let bind_port = GLOBAL_CONFIG
-        .get::<String>("BIND_PORT")
-        .unwrap_or_else(|_| "9901".into());
+    let bind_ip = get_config("BIND_HOST")?;
+    let bind_port = get_config("BIND_PORT")?;
 
     let address = format!("{}:{}", bind_ip, bind_port);
     let app = router::generate();
-    Server::new(TcpListener::bind(address)).run(app).await
+    Server::new(TcpListener::bind(address))
+        .run(app)
+        .await
+        .map_err(|e| WrapError::Message(e.to_string()))
 }

@@ -6,11 +6,21 @@
 use config::{Config, ConfigError};
 use once_cell::sync::Lazy;
 
-pub static GLOBAL_CONFIG: Lazy<Config> = Lazy::new(|| config().unwrap());
+use crate::service::error::WrapError;
+
+pub static GLOBAL_CONFIG: Lazy<Result<Config, ConfigError>> = Lazy::new(config);
 
 pub fn config() -> Result<Config, ConfigError> {
     Config::builder()
         .add_source(config::File::with_name("server/Config"))
-        // .add_source(config::Environment::with_prefix("APP"))
         .build()
+}
+
+pub fn get_config(key: &str) -> Result<String, WrapError> {
+    match GLOBAL_CONFIG.as_ref() {
+        Ok(config) => config
+            .get(key)
+            .map_err(|e| WrapError::Message(e.to_string())),
+        Err(e) => Err(WrapError::Message(e.to_string())),
+    }
 }

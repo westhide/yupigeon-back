@@ -21,7 +21,7 @@ impl<T: CollectionTrait> DBRefTrait<T> for DBRef<T> {
     where
         T: Serialize + DeserializeOwned + Unpin + Send + Sync,
     {
-        T::collection()
+        T::collection()?
             .find_one(doc! {"_id":self.ref_id}, None)
             .await?
             .ok_or_else(|| {
@@ -36,7 +36,7 @@ impl<T: CollectionTrait> DBRefTrait<T> for DBRef<T> {
 #[async_trait]
 pub trait QueryTrait: CollectionTrait {
     async fn insert_many(items: Vec<Self>) -> Result<InsertManyResult> {
-        let collection = Self::collection();
+        let collection = Self::collection()?;
         collection
             .insert_many(items, None)
             .await
@@ -75,7 +75,7 @@ where
     Vec<T>: Extend<<Cursor<T> as TryStream>::Ok>,
     Error: From<<Cursor<T> as TryStream>::Error>,
 {
-    let collection = crate::Mongo::database().collection::<T>(name);
+    let collection = crate::MongoPool::database()?.collection::<T>(name);
     let res = collection
         .find(None, None)
         .await?
