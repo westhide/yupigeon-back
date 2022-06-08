@@ -5,7 +5,6 @@
 
 use config::{Config, ConfigError};
 use once_cell::sync::Lazy;
-use sea_orm::DbErr;
 
 pub static GLOBAL_CONFIG: Lazy<Result<Config, ConfigError>> = Lazy::new(config);
 
@@ -15,9 +14,9 @@ pub fn config() -> Result<Config, ConfigError> {
         .build()
 }
 
-pub fn get_global_config(key: &str) -> Result<String, DbErr> {
+pub fn get_config(key: &str) -> Result<String, ConfigError> {
     match GLOBAL_CONFIG.as_ref() {
-        Ok(config) => config.get(key).map_err(|e| DbErr::Custom(e.to_string())),
-        Err(e) => Err(DbErr::Custom(e.to_string())),
+        Ok(config) => config.get(key),
+        Err(e) => Err(ConfigError::Message(e.to_string())),
     }
 }

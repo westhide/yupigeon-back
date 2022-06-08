@@ -1,4 +1,4 @@
-use database::{
+use database::mysql::{
     entity::{
         canyon_daily_sales_append as DailySalesAppend,
         canyon_offline_ticket_bill as OfflineTicketBill,

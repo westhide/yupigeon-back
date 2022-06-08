@@ -1,4 +1,4 @@
-use mongo::{
+use database::mongo::{
     collection::{FinanceAssistChannel, FinanceAssistPayment, FinanceVoucherTemplate},
     query::{self, common::QueryTrait},
 };

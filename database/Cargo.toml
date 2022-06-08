@@ -6,6 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+macro-lib = { path = "../macro-lib" }
+
 config = "^0.12"
 once_cell = { version = "^1" }
 
@@ -24,5 +26,14 @@ sea-orm = { version = "^0.7", features = [
 ], default-features = false }
 
 async-recursion = "^1.0"
-
 async-trait = "^0.1"
+
+mongodb = { version = "^2", features = [
+    "tokio-runtime",
+    "bson-chrono-0_4",
+    "bson-serde_with",
+    "zstd-compression",
+] }
+futures = "^0.3"
+anyhow = "^1.0"
+thiserror = "^1.0"

@@ -1,5 +1,5 @@
 [workspace]
-members = ["server", "database", "mongo", "macro-lib"]
+members = ["server", "database", "macro-lib"]
 
 [profile.release]
 opt-level = 'z'

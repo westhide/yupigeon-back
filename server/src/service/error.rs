@@ -1,5 +1,4 @@
-use database::sea_orm::DbErr;
-use mongo::error::MongoErr;
+use database::{mongo::error::MongoErr, sea_orm::DbErr};
 use poem::{
     error::{Error as PoemErr, ResponseError},
     http::StatusCode,

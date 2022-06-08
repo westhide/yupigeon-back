@@ -492,13 +492,18 @@ checksum = "3ee2393c4a91429dffb4bedf19f4d6abf27d8a732c8ce4980305d782e5426d57"
 name = "database"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "async-recursion",
  "async-trait",
  "config",
+ "futures",
+ "macro-lib",
+ "mongodb",
  "once_cell",
  "sea-orm",
  "serde",
  "serde_json",
+ "thiserror",
 ]
 
 [[package]]
@@ -1211,22 +1216,6 @@ dependencies = [
  "log",
  "wasi 0.11.0+wasi-snapshot-preview1",
  "windows-sys",
-]
-
-[[package]]
-name = "mongo"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "config",
- "futures",
- "macro-lib",
- "mongodb",
- "once_cell",
- "serde",
- "serde_json",
- "thiserror",
 ]
 
 [[package]]
@@ -2197,7 +2186,6 @@ dependencies = [
  "config",
  "database",
  "futures-util",
- "mongo",
  "once_cell",
  "poem",
  "serde",

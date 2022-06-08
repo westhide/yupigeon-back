@@ -26,9 +26,9 @@ async fn main() -> Result<()> {
 
     global_data::init_global_data()?;
 
-    database::Database::init().await?;
+    database::mysql::Database::init().await?;
 
-    mongo::MongoPool::init().await?;
+    database::mongo::MongoPool::init().await?;
 
     let bind_ip = get_config("BIND_HOST")?;
     let bind_port = get_config("BIND_PORT")?;

@@ -1,4 +1,4 @@
-use mongo::query;
+use database::mongo::query;
 use poem::{handler, IntoResponse};
 
 use crate::service::{

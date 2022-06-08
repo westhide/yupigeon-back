@@ -1,4 +1,4 @@
-use mongo::{
+use database::mongo::{
     collection::{OrganizationCompany, OrganizationGroup},
     query::{self, common::QueryTrait},
 };

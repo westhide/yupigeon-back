@@ -1,4 +1,4 @@
-use database::query;
+use database::mysql::query;
 use poem::{handler, IntoResponse};
 
 use crate::service::{

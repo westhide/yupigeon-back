@@ -8,7 +8,7 @@ default-run = "server"
 
 [dependencies]
 database = { path = "../database" }
-mongo = { path = "../mongo" }
+
 config = "^0.12"
 once_cell = "^1.9"
 poem = { version = "^1.3", features = ["compression","websocket"] }

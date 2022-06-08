@@ -1,5 +1,5 @@
 use chrono::offset::Local;
-use database::query;
+use database::mysql::query;
 use poem::{
     handler,
     web::{Json, Query},
