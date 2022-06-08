@@ -1,9 +1,8 @@
 [workspace]
-members = ["server", "file-server", "database", "mongo", "macro-lib"]
+members = ["server", "database", "mongo", "macro-lib"]
 
 [profile.release]
 opt-level = 'z'
 lto = true
 codegen-units = 1
 panic = "abort"
-strip = "debuginfo"
