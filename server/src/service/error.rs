@@ -1,4 +1,4 @@
-use database::{mongo::error::MongoErr, oracledb, sea_orm::DbErr};
+use database::{mongo::error::MongoErr, sea_orm::DbErr, sibyl};
 use poem::{
     error::{Error as PoemErr, ResponseError},
     http::StatusCode,
@@ -19,7 +19,7 @@ pub enum WrapError {
     Mongo(#[from] MongoErr),
 
     #[error("{0}")]
-    Oracle(#[from] oracledb::Error),
+    Oracle(#[from] sibyl::Error),
 
     #[error("{0}")]
     Poem(PoemErr),

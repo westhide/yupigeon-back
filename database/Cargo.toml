@@ -38,4 +38,4 @@ futures = "^0.3"
 anyhow = "^1.0"
 thiserror = "^1.0"
 
-oracle = { version = "^0.5", features = ["chrono"] }
+sibyl = { version="0.6", features=["tokio","nonblocking"] }

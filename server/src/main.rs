@@ -30,7 +30,7 @@ async fn main() -> Result<()> {
 
     database::mongo::MongoPool::init().await?;
 
-    database::oracle::base::test_oracle()?;
+    database::oracle::base::test_oracle().await?;
 
     let bind_ip = get_config("BIND_HOST")?;
     let bind_port = get_config("BIND_PORT")?;
