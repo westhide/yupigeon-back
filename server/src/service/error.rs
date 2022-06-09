@@ -1,4 +1,4 @@
-use database::{mongo::error::MongoErr, sea_orm::DbErr};
+use database::{mongo::error::MongoErr, oracledb, sea_orm::DbErr};
 use poem::{
     error::{Error as PoemErr, ResponseError},
     http::StatusCode,
@@ -17,6 +17,9 @@ pub enum WrapError {
 
     #[error("{0}")]
     Mongo(#[from] MongoErr),
+
+    #[error("{0}")]
+    Oracle(#[from] oracledb::Error),
 
     #[error("{0}")]
     Poem(PoemErr),
@@ -38,6 +41,7 @@ impl ResponseError for WrapError {
             Self::Message(message) => message.into(),
             Self::Db(err) => err.to_string(),
             Self::Mongo(err) => err.to_string(),
+            Self::Oracle(err) => err.to_string(),
             Self::Poem(err) => err.to_string(),
         };
         let body = Body::from_json(serde_json::json!({

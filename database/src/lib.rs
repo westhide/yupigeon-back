@@ -6,5 +6,8 @@
 mod config;
 pub mod mongo;
 pub mod mysql;
+pub mod oracle;
 
+pub use ::oracle as oracledb;
+pub use mongodb;
 pub use sea_orm;

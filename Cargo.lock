@@ -500,6 +500,7 @@ dependencies = [
  "macro-lib",
  "mongodb",
  "once_cell",
+ "oracle",
  "sea-orm",
  "serde",
  "serde_json",
@@ -1418,6 +1419,31 @@ dependencies = [
  "libc",
  "pkg-config",
  "vcpkg",
+]
+
+[[package]]
+name = "oracle"
+version = "0.5.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbceda700b7a3b7fd4c81de6b4f91acdf2e36042bd98802980bbcf483fbdc944"
+dependencies = [
+ "cc",
+ "chrono",
+ "lazy_static",
+ "oracle_procmacro",
+ "paste",
+]
+
+[[package]]
+name = "oracle_procmacro"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "97d3b10cc06920f144a84e77495c6f634cf7dd98856f4912f08f51e2829120bd"
+dependencies = [
+ "darling",
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
