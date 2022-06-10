@@ -12,16 +12,16 @@ pub enum WrapError {
     #[error("@Service {0}")]
     Message(String),
 
-    #[error("{0}")]
+    #[error("@Mysql {0}")]
     Db(#[from] DbErr),
 
-    #[error("{0}")]
+    #[error("@Mongodb {0}")]
     Mongo(#[from] MongoErr),
 
-    #[error("{0}")]
+    #[error("@Oracle {0}")]
     Oracle(#[from] oracledb::Error),
 
-    #[error("{0}")]
+    #[error("@Poem {0}")]
     Poem(PoemErr),
 }
 
