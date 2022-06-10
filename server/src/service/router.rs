@@ -166,6 +166,10 @@ pub fn generate() -> impl IntoEndpoint {
             "/mongo/finance/finance_assist",
             get(api::mongo_finance::finance_assist),
         )
+        .at(
+            "/oracle/canyon/ticket_bill",
+            post(api::oracle_canyon_ticket::ticket_bill),
+        )
         .with(Auth)
         .with(Tracing)
         .with(Compression)

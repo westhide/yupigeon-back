@@ -12,6 +12,7 @@ pub mod mapper;
 pub mod mongo;
 pub mod mongo_finance;
 pub mod mongo_organization;
+pub mod oracle_canyon_ticket;
 pub mod ship_ticket;
 pub mod tenpay;
 pub mod user;
