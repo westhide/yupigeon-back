@@ -36,6 +36,8 @@ pub struct CanyonTicketBill {
     ticket_model_price: f32,
     #[row_value(rename = "ticketCount")]
     ticket_count: f32,
+    #[row_value(rename = "tradePayType")]
+    trade_pay_type: f32,
     #[row_value(rename = "paySum")]
     pay_sum: f32,
     #[row_value(rename = "onlinePaySum")]
@@ -114,6 +116,7 @@ pub fn test_oracle(datetime_from: &str, datetime_end: &str) -> Result<Vec<Canyon
                         wb.ticketModelName onlineTicketModelName,
                         ttd.ticketModelPrice,
                         ttd.ticketCount,
+                        ttp.tradeTypeName,
                         ttd.paySum,
                         wb.paySum onlinePaySum,
                         stm.ticketModelGroupCode,
@@ -128,7 +131,8 @@ pub fn test_oracle(datetime_from: &str, datetime_end: &str) -> Result<Vec<Canyon
                         wb.app_from onlineAppFrom
                     from
                         TKT_TradeMain ttm
-                        LEFT JOIN TKT_TradeDetail ttd ON ttm.tradeID = ttd.tradeID
+                        LEFT JOIN TKT_TradeDetail ttd ON ttm.tradeId = ttd.tradeId
+                        LEFT JOIN TKT_TradePayType ttp ON ttm.tradeId = ttp.tradeId
                         LEFT JOIN SYS_TicketModel stm ON ttd.ticketModelCode = stm.ticketModelCode
                         LEFT JOIN SYS_TicketModelGroup stmg ON stmg.ticketModelGroupCode = stm.ticketModelGroupCode
                         LEFT JOIN CLT_ClientType ct ON ct.clientTypeCode = ttm.clientType
