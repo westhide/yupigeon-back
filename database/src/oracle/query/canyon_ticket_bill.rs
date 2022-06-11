@@ -37,7 +37,7 @@ pub struct CanyonTicketBill {
     #[row_value(rename = "ticketCount")]
     ticket_count: f32,
     #[row_value(rename = "payTypeName")]
-    pay_type_name: f32,
+    pay_type_name: Option<String>,
     #[row_value(rename = "paySum")]
     pay_sum: f32,
     #[row_value(rename = "onlinePaySum")]
