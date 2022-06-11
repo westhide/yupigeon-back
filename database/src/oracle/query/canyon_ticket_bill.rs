@@ -10,6 +10,8 @@ pub struct CanyonTicketBill {
     trade_id: String,
     #[row_value(rename = "tradeChannel")]
     trade_channel: String,
+    #[row_value(rename = "tradeType")]
+    trade_type: String,
     #[row_value(rename = "tradeTypeName")]
     trade_type_name: String,
     #[row_value(rename = "tradeDate")]
@@ -22,6 +24,8 @@ pub struct CanyonTicketBill {
     client_code: Option<String>,
     #[row_value(rename = "clientFullName")]
     client_full_name: String,
+    #[row_value(rename = "payTypeName")]
+    pay_type_name: Option<String>,
     #[row_value(rename = "optorCode")]
     operator_code: String,
     #[row_value(rename = "operatorName")]
@@ -32,12 +36,10 @@ pub struct CanyonTicketBill {
     ticket_model_name: String,
     #[row_value(rename = "onlineTicketModelName")]
     online_ticket_model_name: Option<String>,
-    #[row_value(rename = "ticketModelPrice")]
-    ticket_model_price: f32,
     #[row_value(rename = "ticketCount")]
     ticket_count: f32,
-    #[row_value(rename = "payTypeName")]
-    pay_type_name: Option<String>,
+    #[row_value(rename = "ticketModelPrice")]
+    ticket_model_price: f32,
     #[row_value(rename = "paySum")]
     pay_sum: f32,
     #[row_value(rename = "onlinePaySum")]
@@ -48,8 +50,6 @@ pub struct CanyonTicketBill {
     ticket_model_group_name: String,
     #[row_value(rename = "printCount")]
     print_count: f32,
-    #[row_value(rename = "tradeType")]
-    trade_type: String,
     #[row_value(rename = "onlineBillDate")]
     online_bill_date: Option<String>,
     #[row_value(rename = "billNo")]
@@ -88,6 +88,7 @@ pub fn test_oracle(datetime_from: &str, datetime_end: &str) -> Result<Vec<Canyon
                             when ttm.billNo IS NULL then '窗口'
                             else '线上'
                         end tradeChannel,
+                        ttd.tradeType,
                         (
                             CASE
                                 ttd.tradeType
@@ -109,20 +110,19 @@ pub fn test_oracle(datetime_from: &str, datetime_end: &str) -> Result<Vec<Canyon
                             when ttm.clientType = '01' then '散客'
                             else nvl(ci.clientFullName, '')
                         end clientFullName,
+                        ttp.payTypeName,
                         ttm.optorCode,
                         so.operatorName,
                         ttd.ticketModelCode,
                         stm.ticketModelName,
                         wb.ticketModelName onlineTicketModelName,
-                        ttd.ticketModelPrice,
                         ttd.ticketCount,
-                        ttp.payTypeName,
+                        ttd.ticketModelPrice,
                         ttd.paySum,
                         wb.paySum onlinePaySum,
                         stm.ticketModelGroupCode,
                         stmg.ticketModelGroupName,
                         ttd.printCount,
-                        ttd.tradeType,
                         wb.billDate onlineBillDate,
                         ttm.billNo,
                         wb.billDetailNo onlineDetailNo,
@@ -143,6 +143,9 @@ pub fn test_oracle(datetime_from: &str, datetime_end: &str) -> Result<Vec<Canyon
                     WHERE
                         ttm.tradeDate BETWEEN TO_DATE(:1, 'YYYY-MM-DD hh24:mi:ss')
                         AND TO_DATE(:2, 'YYYY-MM-DD hh24:mi:ss')
+                    ORDER BY
+                        tradeChannel,
+                        ttm.tradeDate
                         ";
 
     let rows = OracleDatabase::connection()?
