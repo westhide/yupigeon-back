@@ -36,8 +36,8 @@ pub struct CanyonTicketBill {
     ticket_model_price: f32,
     #[row_value(rename = "ticketCount")]
     ticket_count: f32,
-    #[row_value(rename = "tradePayType")]
-    trade_pay_type: f32,
+    #[row_value(rename = "payTypeName")]
+    pay_type_name: f32,
     #[row_value(rename = "paySum")]
     pay_sum: f32,
     #[row_value(rename = "onlinePaySum")]
@@ -116,7 +116,7 @@ pub fn test_oracle(datetime_from: &str, datetime_end: &str) -> Result<Vec<Canyon
                         wb.ticketModelName onlineTicketModelName,
                         ttd.ticketModelPrice,
                         ttd.ticketCount,
-                        ttp.tradeTypeName,
+                        ttp.payTypeName,
                         ttd.paySum,
                         wb.paySum onlinePaySum,
                         stm.ticketModelGroupCode,
