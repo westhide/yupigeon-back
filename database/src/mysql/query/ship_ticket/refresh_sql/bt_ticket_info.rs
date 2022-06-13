@@ -79,6 +79,7 @@ pub const CREATE_TABLE: &str = r#"
         KEY ix_ticket_id_new ( ticket_id_new ),
         KEY ix_ticket_id_old ( ticket_id_old ),
         KEY ix_order_id ( order_id ),
+        KEY ix_passenger_id_no ( passenger_id_no )
         KEY ix_ticket_no ( ticket_no ),
         KEY ix_u8_ticket_key ( u8_ticket_key ),
         KEY ix_change_order_id ( change_order_id ),
