@@ -18,7 +18,7 @@ pub struct TicketType {
     ticket_full_name: String,
     #[row_value(rename = "ticketShortName")]
     ticket_short_name: String,
-    #[row_value(rename = "ticket_price")]
+    #[row_value(rename = "ticketPrice")]
     ticket_price: String,
     #[row_value(rename = "remark")]
     remark: Option<String>,
@@ -33,7 +33,7 @@ pub fn ticket_type() -> Result<Vec<TicketType>> {
             st.id ticketId,
             st.ticketFullName,
             st.ticketShortName,
-            st.price,
+            st.price ticketPrice,
             st.remark
             FROM
                 Sys_TicketModel stm
