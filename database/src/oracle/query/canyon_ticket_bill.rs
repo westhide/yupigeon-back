@@ -1,7 +1,7 @@
 use oracle::{Result, RowValue};
 use serde::{Deserialize, Serialize};
 
-use crate::oracle::OracleDatabase;
+use crate::oracle::query::common::QueryTrait;
 
 #[derive(RowValue, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -148,13 +148,5 @@ pub fn ticket_bill(datetime_from: &str, datetime_end: &str) -> Result<Vec<Ticket
                         ttm.tradeDate
                         ";
 
-    let rows = OracleDatabase::connection()?
-        .query_as::<TicketBill>(sql, &[&datetime_from, &datetime_end])?;
-
-    let mut ticket_bill = vec![];
-    for row in rows {
-        ticket_bill.push(row?);
-    }
-
-    Ok(ticket_bill)
+    TicketBill::query(sql, &[&datetime_from, &datetime_end])
 }

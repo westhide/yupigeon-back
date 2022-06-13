@@ -1,7 +1,7 @@
 use oracle::{Result, RowValue};
 use serde::{Deserialize, Serialize};
 
-use crate::oracle::OracleDatabase;
+use crate::oracle::query::common::QueryTrait;
 
 #[derive(RowValue, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -43,12 +43,5 @@ pub fn ticket_type() -> Result<Vec<TicketType>> {
                 stm.ticketModelCode
             ";
 
-    let rows = OracleDatabase::connection()?.query_as::<TicketType>(sql, &[])?;
-
-    let mut ticket_type = vec![];
-    for row in rows {
-        ticket_type.push(row?);
-    }
-
-    Ok(ticket_type)
+    TicketType::query(sql, &[])
 }
