@@ -40,6 +40,7 @@ pub struct Model {
     u8_nickname: Option<String>,
     u8_vip_pact: Option<String>,
     payment_method: Option<String>,
+    u8_payment_method: Option<String>,
     payment_time: Option<DateTime>,
     pay_id: Option<String>,
     #[sea_orm(column_type = "BigInteger")]
