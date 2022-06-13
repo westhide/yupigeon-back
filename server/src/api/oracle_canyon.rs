@@ -14,8 +14,15 @@ pub fn ticket_bill(Json(params): Json<DateTimeParams>) -> Result<impl IntoRespon
         end_time,
     } = params;
 
-    let res = query::canyon_ticket_bill::test_oracle(&begin_time, &end_time)
+    let res = query::canyon_ticket_bill::ticket_bill(&begin_time, &end_time)
         .map_err(WrapError::Oracle)?;
+
+    Response::json(res)
+}
+
+#[handler]
+pub fn ticket_type() -> Result<impl IntoResponse> {
+    let res = query::canyon_ticket_type::ticket_type().map_err(WrapError::Oracle)?;
 
     Response::json(res)
 }

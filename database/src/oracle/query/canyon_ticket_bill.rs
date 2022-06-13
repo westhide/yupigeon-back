@@ -5,7 +5,7 @@ use crate::oracle::OracleDatabase;
 
 #[derive(RowValue, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct CanyonTicketBill {
+pub struct TicketBill {
     #[row_value(rename = "tradeId")]
     trade_id: String,
     #[row_value(rename = "tradeChannel")]
@@ -64,7 +64,7 @@ pub struct CanyonTicketBill {
     online_app_from: Option<String>,
 }
 
-pub fn test_oracle(datetime_from: &str, datetime_end: &str) -> Result<Vec<CanyonTicketBill>> {
+pub fn ticket_bill(datetime_from: &str, datetime_end: &str) -> Result<Vec<TicketBill>> {
     let sql = "WITH wb AS (
                         SELECT
                             wbd.billNo,
@@ -149,7 +149,7 @@ pub fn test_oracle(datetime_from: &str, datetime_end: &str) -> Result<Vec<Canyon
                         ";
 
     let rows = OracleDatabase::connection()?
-        .query_as::<CanyonTicketBill>(sql, &[&datetime_from, &datetime_end])?;
+        .query_as::<TicketBill>(sql, &[&datetime_from, &datetime_end])?;
 
     let mut ticket_bill = vec![];
     for row in rows {
