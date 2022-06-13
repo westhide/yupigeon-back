@@ -168,7 +168,7 @@ pub fn generate() -> impl IntoEndpoint {
         )
         .at(
             "/oracle/canyon/ticket_bill",
-            post(api::oracle_canyon_ticket::ticket_bill),
+            post(api::oracle_canyon::ticket_bill),
         )
         .with(Auth)
         .with(Tracing)
