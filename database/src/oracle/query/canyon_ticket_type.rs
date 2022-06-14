@@ -19,7 +19,7 @@ pub struct TicketType {
     #[row_value(rename = "ticketShortName")]
     ticket_short_name: String,
     #[row_value(rename = "ticketPrice")]
-    ticket_price: String,
+    ticket_price: f32,
     #[row_value(rename = "remark")]
     remark: Option<String>,
 }
