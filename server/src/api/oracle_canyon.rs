@@ -1,18 +1,19 @@
+use database::oracle::query;
+use poem::{handler, web::Json, IntoResponse};
+use serde::Deserialize;
+
 use crate::service::{
     error::Result,
     params::DateTimeParams,
     response::{Response, ResponseTrait},
 };
-use database::oracle::query;
-use poem::{handler, web::Json, IntoResponse};
-use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TicketBillParams {
     #[serde(flatten)]
     datetime_params: DateTimeParams,
-    operators: Vec<String>,
+    operators: Option<Vec<String>>,
 }
 
 #[handler]
@@ -45,7 +46,7 @@ pub fn ticket_type() -> Result<impl IntoResponse> {
 }
 
 #[handler]
-pub fn operators() -> Result<impl IntoResponse> {
+pub fn canyon_operators() -> Result<impl IntoResponse> {
     let res = query::operators::operators()?;
 
     Response::json(res)

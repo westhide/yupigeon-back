@@ -176,7 +176,7 @@ pub fn generate() -> impl IntoEndpoint {
         )
         .at(
             "/oracle/canyon/operators",
-            get(api::oracle_canyon::operators),
+            get(api::oracle_canyon::canyon_operators),
         )
         .with(Auth)
         .with(Tracing)
