@@ -29,8 +29,15 @@ pub fn ticket_bill(Json(params): Json<TicketBillParams>) -> Result<impl IntoResp
     } = datetime_params;
 
     let condition = match operators {
-        Some(operators) => format!(" AND so.operatorName IN ({})", operators.join(",")),
-        None => "".into(),
+        Some(operators) => {
+            let operators_wrap = operators
+                .iter()
+                .map(|v| format!("\"{}\"", v))
+                .collect::<Vec<String>>();
+
+            format!(" AND so.operatorName IN ({})", operators_wrap.join(","))
+        }
+        None => " AND 1".into(),
     };
 
     let res = query::canyon_ticket_bill::ticket_bill(&begin_time, &end_time, &condition)?;
