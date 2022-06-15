@@ -64,7 +64,11 @@ pub struct TicketBill {
     online_app_from: Option<String>,
 }
 
-pub fn ticket_bill(datetime_from: &str, datetime_end: &str) -> Result<Vec<TicketBill>> {
+pub fn ticket_bill(
+    datetime_from: &str,
+    datetime_end: &str,
+    condition: &str,
+) -> Result<Vec<TicketBill>> {
     let sql = "WITH wb AS (
                         SELECT
                             wbd.billNo,
@@ -143,10 +147,11 @@ pub fn ticket_bill(datetime_from: &str, datetime_end: &str) -> Result<Vec<Ticket
                     WHERE
                         ttm.tradeDate BETWEEN TO_DATE(:1, 'YYYY-MM-DD hh24:mi:ss')
                         AND TO_DATE(:2, 'YYYY-MM-DD hh24:mi:ss')
+                        :3
                     ORDER BY
                         tradeChannel,
                         ttm.tradeDate
                         ";
 
-    TicketBill::query(sql, &[&datetime_from, &datetime_end])
+    TicketBill::query(sql, &[&datetime_from, &datetime_end, &condition])
 }
