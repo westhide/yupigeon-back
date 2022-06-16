@@ -3,6 +3,7 @@ use database::mysql::{
         canyon_daily_sales_append as DailySalesAppend,
         canyon_offline_ticket_bill as OfflineTicketBill,
         canyon_online_ticket_bill as OnlineTicketBill,
+        finance_kingdee_cloud_voucher_combine as KingdeeCloudVoucher,
     },
     query::{self, common::QueryTrait},
 };
@@ -139,6 +140,39 @@ pub async fn operators() -> Result<impl IntoResponse> {
 #[handler]
 pub async fn clients() -> Result<impl IntoResponse> {
     let res = query::canyon::clients().await?;
+
+    Response::json(res)
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct KingdeeCloudVoucherData {
+    data: Vec<KingdeeCloudVoucher::Model>,
+}
+
+#[handler]
+pub async fn upload_kingdee_cloud_voucher(
+    Json(params): Json<KingdeeCloudVoucherData>,
+) -> Result<impl IntoResponse> {
+    let KingdeeCloudVoucherData { data } = params;
+
+    KingdeeCloudVoucher::Entity::insert_many_by_chunks(data, 100).await?;
+
+    Response::json(true)
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VoucherCombineParams {
+    operate_id: String,
+}
+
+#[handler]
+pub async fn voucher_combine(
+    Query(params): Query<VoucherCombineParams>,
+) -> Result<impl IntoResponse> {
+    let VoucherCombineParams { operate_id } = params;
+    let res = query::canyon::voucher_combine(&operate_id).await?;
 
     Response::json(res)
 }

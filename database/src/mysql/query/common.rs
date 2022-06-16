@@ -5,6 +5,22 @@ use sea_orm::{
 
 #[async_trait]
 pub trait QueryTrait {
+    async fn insert_once<A>(models: Vec<Self::Model>) -> Result<(), DbErr>
+    where
+        Self: EntityTrait,
+        Self::Model: IntoActiveModel<A>,
+        A: ActiveModelTrait<Entity = Self> + ActiveModelBehavior + Send,
+    {
+        let txn = crate::mysql::Database::new("default").await?.txn;
+
+        for model in models {
+            let active_model: A = model.into_active_model();
+            active_model.insert(&txn).await?;
+        }
+
+        txn.commit().await
+    }
+
     async fn insert_many<A>(models: Vec<Self::Model>) -> Result<InsertResult<A>, DbErr>
     where
         Self: EntityTrait,
@@ -24,6 +40,30 @@ pub trait QueryTrait {
 
         txn.commit().await?;
         Ok(result)
+    }
+
+    async fn insert_many_by_chunks<A>(
+        models: Vec<Self::Model>,
+        chunk_size: usize,
+    ) -> Result<(), DbErr>
+    where
+        Self: EntityTrait,
+        Self::Model: IntoActiveModel<A>,
+        A: ActiveModelTrait<Entity = Self> + Send + std::marker::Sync,
+    {
+        let txn = crate::mysql::Database::new("default").await?.txn;
+
+        let records: Vec<A> = models
+            .iter()
+            .map(|model| model.to_owned().into_active_model())
+            .collect();
+
+        for chunk in records.chunks(chunk_size) {
+            let data = chunk.to_vec();
+            <Self as EntityTrait>::insert_many(data).exec(&txn).await?;
+        }
+
+        txn.commit().await
     }
 
     async fn replace_many<A>(models: Vec<Self::Model>) -> Result<(), DbErr>

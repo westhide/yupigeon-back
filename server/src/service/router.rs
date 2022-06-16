@@ -178,6 +178,11 @@ pub fn generate() -> impl IntoEndpoint {
             "/oracle/canyon/operators",
             get(api::oracle_canyon::canyon_operators),
         )
+        .at(
+            "/canyon/upload_kingdee_cloud_voucher",
+            post(api::canyon::upload_kingdee_cloud_voucher),
+        )
+        .at("/canyon/voucher_combine", get(api::canyon::voucher_combine))
         .with(Auth)
         .with(Tracing)
         .with(Compression)

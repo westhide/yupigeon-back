@@ -11,6 +11,7 @@ pub mod canyon_ticket_client;
 pub mod canyon_ticket_type;
 pub mod canyon_ticket_type_item;
 pub mod finance_account;
+pub mod finance_kingdee_cloud_voucher_combine;
 pub mod finance_link_subsidiary_group;
 pub mod finance_link_voucher_template_group;
 pub mod finance_subsidiary_account;
