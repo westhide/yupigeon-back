@@ -1,6 +1,7 @@
 use database::mysql::{
     entity::{
         canyon_daily_sales_append as DailySalesAppend,
+        canyon_daily_sales_append_oracle as DailySalesAppendOracle,
         canyon_offline_ticket_bill as OfflineTicketBill,
         canyon_online_ticket_bill as OnlineTicketBill,
         finance_kingdee_cloud_voucher_combine as KingdeeCloudVoucher,
@@ -58,6 +59,23 @@ pub async fn replace_daily_sales_append(
     let ReplaceDailySalesAppend { append_data } = params;
 
     DailySalesAppend::Entity::replace_many(append_data).await?;
+
+    Response::message("录入成功")
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ReplaceDailySalesAppendOracle {
+    data: Vec<DailySalesAppendOracle::Model>,
+}
+
+#[handler]
+pub async fn replace_daily_sales_append_oracle(
+    Json(params): Json<ReplaceDailySalesAppendOracle>,
+) -> Result<impl IntoResponse> {
+    let ReplaceDailySalesAppendOracle { data } = params;
+
+    DailySalesAppendOracle::Entity::replace_many(data).await?;
 
     Response::message("录入成功")
 }
@@ -121,6 +139,44 @@ pub async fn daily_sales_appends(
     Response::json(res)
 }
 
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DailySalesAppendOracleParams {
+    #[serde(flatten)]
+    datetime_params: DateTimeParams,
+    operators: Vec<String>,
+}
+
+#[handler]
+pub async fn daily_sales_append_oracle(
+    Json(params): Json<DailySalesAppendOracleParams>,
+) -> Result<impl IntoResponse> {
+    let DailySalesAppendOracleParams {
+        datetime_params,
+        operators,
+    } = params;
+
+    let DateTimeParams {
+        begin_time,
+        end_time,
+    } = datetime_params;
+
+    let condition = if !operators.is_empty() {
+        let operators_wrap = operators
+            .iter()
+            .map(|v| format!("'{}'", v))
+            .collect::<Vec<String>>();
+
+        format!(" AND operator_name IN ({})", operators_wrap.join(","))
+    } else {
+        "".into()
+    };
+
+    let res = query::canyon::daily_sales_append_oracle(&begin_time, &end_time, &condition).await?;
+
+    Response::json(res)
+}
+
 #[handler]
 pub async fn delete_ticket_bill(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
     let (begin_time, end_time) = params.get_datetime_params()?;
@@ -128,13 +184,6 @@ pub async fn delete_ticket_bill(Query(params): Query<DateTimeParams>) -> Result<
     query::canyon::delete_ticket_bill(begin_time, end_time).await?;
 
     Response::message("删除成功")
-}
-
-#[handler]
-pub async fn operators() -> Result<impl IntoResponse> {
-    let res = query::canyon::operators().await?;
-
-    Response::json(res)
 }
 
 #[handler]
@@ -156,7 +205,7 @@ pub async fn upload_kingdee_cloud_voucher(
 ) -> Result<impl IntoResponse> {
     let KingdeeCloudVoucherData { data } = params;
 
-    KingdeeCloudVoucher::Entity::insert_many_by_chunks(data, 100).await?;
+    KingdeeCloudVoucher::Entity::insert_many_by_chunks(data, 500).await?;
 
     Response::json(true)
 }

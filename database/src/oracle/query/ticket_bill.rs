@@ -150,8 +150,7 @@ pub fn ticket_bill(
                     AND TO_DATE(:2, 'YYYY-MM-DD hh24:mi:ss')
                     {}
                 ORDER BY
-                    tradeChannel,
-                    ttm.tradeDate
+                    ttm.tradeDate DESC
                     ",condition);
 
     TicketBill::query(&sql, &[&datetime_from, &datetime_end])

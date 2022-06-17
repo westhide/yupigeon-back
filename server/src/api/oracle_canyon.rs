@@ -1,5 +1,9 @@
 use database::oracle::query;
-use poem::{handler, web::Json, IntoResponse};
+use poem::{
+    handler,
+    web::{Json, Query},
+    IntoResponse,
+};
 use serde::Deserialize;
 
 use crate::service::{
@@ -39,14 +43,14 @@ pub fn ticket_bill(Json(params): Json<TicketBillParams>) -> Result<impl IntoResp
         "".into()
     };
 
-    let res = query::canyon_ticket_bill::ticket_bill(&begin_time, &end_time, &condition)?;
+    let res = query::ticket_bill::ticket_bill(&begin_time, &end_time, &condition)?;
 
     Response::json(res)
 }
 
 #[handler]
 pub fn ticket_type() -> Result<impl IntoResponse> {
-    let res = query::canyon_ticket_type::ticket_type()?;
+    let res = query::ticket_type::ticket_type()?;
 
     Response::json(res)
 }
@@ -54,6 +58,18 @@ pub fn ticket_type() -> Result<impl IntoResponse> {
 #[handler]
 pub fn canyon_operators() -> Result<impl IntoResponse> {
     let res = query::operators::operators()?;
+
+    Response::json(res)
+}
+
+#[handler]
+pub fn daily_sales_chart(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
+    let DateTimeParams {
+        begin_time,
+        end_time,
+    } = params;
+
+    let res = query::daily_sales::daily_sales_chart(&begin_time, &end_time)?;
 
     Response::json(res)
 }

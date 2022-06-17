@@ -110,16 +110,23 @@ pub fn generate() -> impl IntoEndpoint {
             "/canyon/replace_daily_sales_append",
             post(api::canyon::replace_daily_sales_append),
         )
+        .at(
+            "/canyon/replace_daily_sales_append_oracle",
+            post(api::canyon::replace_daily_sales_append_oracle),
+        )
         .at("/canyon/daily_sales", post(api::canyon::daily_sales))
         .at(
             "/canyon/daily_sales_appends",
             get(api::canyon::daily_sales_appends),
         )
         .at(
+            "/canyon/daily_sales_append_oracle",
+            post(api::canyon::daily_sales_append_oracle),
+        )
+        .at(
             "/canyon/delete_ticket_bill",
             get(api::canyon::delete_ticket_bill),
         )
-        .at("/canyon/operators", get(api::canyon::operators))
         .at("/canyon/clients", get(api::canyon::clients))
         .at("/mongo/collection_names", get(api::mongo::collection_names))
         .at(
@@ -177,6 +184,10 @@ pub fn generate() -> impl IntoEndpoint {
         .at(
             "/oracle/canyon/operators",
             get(api::oracle_canyon::canyon_operators),
+        )
+        .at(
+            "/oracle/canyon/daily_sales_chart",
+            get(api::oracle_canyon::daily_sales_chart),
         )
         .at(
             "/canyon/upload_kingdee_cloud_voucher",
