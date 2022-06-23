@@ -194,6 +194,14 @@ pub fn generate() -> impl IntoEndpoint {
             post(api::canyon::upload_kingdee_cloud_voucher),
         )
         .at("/canyon/voucher_combine", get(api::canyon::voucher_combine))
+        .at(
+            "/canyon/statistics_times",
+            get(api::canyon::statistics_times),
+        )
+        .at(
+            "/canyon/replace_statistics_times",
+            post(api::canyon::replace_statistics_times),
+        )
         .with(Auth)
         .with(Tracing)
         .with(Compression)

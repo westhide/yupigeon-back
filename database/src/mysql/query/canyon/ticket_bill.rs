@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::mysql::entity::{
     canyon_daily_sales_append as DailySalesAppend, canyon_offline_ticket_bill as OfflineTicketBill,
-    canyon_online_ticket_bill as OnlineTicketBill,
+    canyon_online_ticket_bill as OnlineTicketBill, canyon_statistics_times as StatisticsTimes,
 };
 
 #[derive(Debug, FromQueryResult, Deserialize, Serialize)]
@@ -169,4 +169,17 @@ pub async fn delete_ticket_bill(
         .await?;
 
     txn.commit().await
+}
+
+pub async fn statistics_times(
+    datetime_from: DateTime,
+    datetime_end: DateTime,
+) -> Result<Vec<StatisticsTimes::Model>, DbErr> {
+    let txn = crate::mysql::Database::new("default").await?.txn;
+
+    StatisticsTimes::Entity::find()
+        .filter(StatisticsTimes::Column::TradeDate.between(datetime_from, datetime_end))
+        .filter(StatisticsTimes::Column::IsDeleted.eq(false))
+        .all(&txn)
+        .await
 }

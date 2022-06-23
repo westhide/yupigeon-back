@@ -3,7 +3,7 @@ use database::mysql::{
         canyon_daily_sales_append as DailySalesAppend,
         canyon_daily_sales_append_oracle as DailySalesAppendOracle,
         canyon_offline_ticket_bill as OfflineTicketBill,
-        canyon_online_ticket_bill as OnlineTicketBill,
+        canyon_online_ticket_bill as OnlineTicketBill, canyon_statistics_times as StatisticsTimes,
         finance_kingdee_cloud_voucher_combine as KingdeeCloudVoucher,
     },
     query::{self, common::QueryTrait},
@@ -224,4 +224,30 @@ pub async fn voucher_combine(
     let res = query::canyon::voucher_combine(&operate_id).await?;
 
     Response::json(res)
+}
+
+#[handler]
+pub async fn statistics_times(Query(params): Query<DateTimeParams>) -> Result<impl IntoResponse> {
+    let (begin_time, end_time) = params.get_datetime_params()?;
+
+    let res = query::canyon::statistics_times(begin_time, end_time).await?;
+
+    Response::json(res)
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ReplaceStatisticsTimes {
+    data: Vec<StatisticsTimes::Model>,
+}
+
+#[handler]
+pub async fn replace_statistics_times(
+    Json(params): Json<ReplaceStatisticsTimes>,
+) -> Result<impl IntoResponse> {
+    let ReplaceStatisticsTimes { data } = params;
+
+    StatisticsTimes::Entity::replace_many(data).await?;
+
+    Response::json(true)
 }
