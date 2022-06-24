@@ -11,7 +11,7 @@ pub struct Model {
     id: u32,
     trade_date: Date,
     tool_name: String,
-    code: String,
+    name: String,
     times: i32,
     is_deleted: i8,
     remark: Option<String>,
