@@ -15,7 +15,7 @@ pub async fn conductors() -> Result<Vec<Conductor>, DbErr> {
             r#"
                 SELECT  DISTINCT user_name AS value
                 FROM ticket_bill
-                WHERE user_type='线下'
+                WHERE user_type='线下' AND user_name IS NOT NULL
                 ;
            "#,
         )
